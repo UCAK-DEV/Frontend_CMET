@@ -1,6 +1,7 @@
 import { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
+import { UserProvider } from './context/UserContext'; // <--- IMPORT ICI
 
 // Composants Fixes
 import Navbar from './components/Navbar';
@@ -8,7 +9,7 @@ import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
 import Loading from './components/Loading'; 
 import PageWrapper from './components/PageWrapper';
-import ProtectedRoute from './components/ProtectedRoute'; // <--- AJOUTÉ
+import ProtectedRoute from './components/ProtectedRoute';
 
 // Lazy Loading
 const Hero = lazy(() => import('./components/Hero'));
@@ -38,7 +39,7 @@ function AnimatedRoutes() {
       <Suspense fallback={<Loading />}>
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>
-            {/* ROUTES PUBLIQUES */}
+            {/* Routes Publiques */}
             <Route path="/" element={<PageWrapper><Hero /></PageWrapper>} />
             <Route path="/about" element={<PageWrapper><About /></PageWrapper>} />
             <Route path="/news" element={<PageWrapper><News /></PageWrapper>} />
@@ -46,7 +47,7 @@ function AnimatedRoutes() {
             <Route path="/project/:id" element={<PageWrapper><ProjectDetails /></PageWrapper>} />
             <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
 
-            {/* ROUTES MEMBRES (PROTÉGÉES) */}
+            {/* Routes Protégées */}
             <Route path="/dashboard" element={<ProtectedRoute><PageWrapper><Dashboard /></PageWrapper></ProtectedRoute>} />
             <Route path="/career" element={<ProtectedRoute><PageWrapper><CareerCenter /></PageWrapper></ProtectedRoute>} />
             <Route path="/knowledge" element={<ProtectedRoute><PageWrapper><Knowledge /></PageWrapper></ProtectedRoute>} />
@@ -67,11 +68,13 @@ function AnimatedRoutes() {
 
 function App() {
   return (
-    <Router>
-      <div className="min-h-screen flex flex-col font-sans bg-ucak-light dark:bg-ucak-dark text-ucak-blue dark:text-white selection:bg-ucak-green selection:text-white transition-colors duration-300">
-        <AnimatedRoutes />
-      </div>
-    </Router>
+    <UserProvider> {/* <--- ENVELOPPER ICI */}
+      <Router>
+        <div className="min-h-screen flex flex-col font-sans bg-ucak-light dark:bg-ucak-dark text-ucak-blue dark:text-white selection:bg-ucak-green selection:text-white transition-colors duration-300">
+          <AnimatedRoutes />
+        </div>
+      </Router>
+    </UserProvider>
   );
 }
 
