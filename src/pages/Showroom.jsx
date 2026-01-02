@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Link as LinkIcon, ExternalLink } from 'lucide-react';
+import { Search, Link as ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function Showroom() {
