@@ -1,22 +1,19 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Download, Printer, Plus, Trash2, ChevronDown, ChevronUp, Layout, CheckCircle } from 'lucide-react';
 
-// --- COMPOSANT : TEMPLATE 1 (MODERNE - Colonne latérale) ---
+// --- COMPOSANT : TEMPLATE 1 (MODERNE) ---
 const TemplateModern = ({ data }) => (
   <div className="w-full h-full bg-white flex text-gray-800">
-    {/* Sidebar */}
     <div className="w-[35%] bg-ucak-blue text-white p-6 md:p-8 flex flex-col">
       <div className="w-24 h-24 md:w-32 md:h-32 mx-auto bg-white/10 rounded-full flex items-center justify-center text-3xl font-bold border-4 border-ucak-gold mb-6">
         {data.personal.name.charAt(0)}
       </div>
-      
       <div className="space-y-4 text-sm mb-8">
         <h3 className="text-ucak-gold font-bold uppercase tracking-widest border-b border-white/20 pb-1 mb-2">Contact</h3>
         <p className="opacity-90">{data.personal.email}</p>
         <p className="opacity-90">{data.personal.phone}</p>
         <p className="opacity-90">{data.personal.address}</p>
       </div>
-
       <div>
         <h3 className="text-ucak-gold font-bold uppercase tracking-widest border-b border-white/20 pb-1 mb-2">Skills</h3>
         <div className="flex flex-wrap gap-2">
@@ -26,15 +23,12 @@ const TemplateModern = ({ data }) => (
         </div>
       </div>
     </div>
-
-    {/* Main Content */}
     <div className="w-[65%] p-6 md:p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-black text-ucak-blue uppercase mb-1">{data.personal.name}</h1>
         <h2 className="text-lg font-bold text-ucak-green uppercase">{data.personal.title}</h2>
         <p className="mt-4 text-sm text-gray-600 italic border-l-4 border-gray-200 pl-3">{data.personal.summary}</p>
       </div>
-
       <div className="mb-6">
         <h3 className="text-ucak-blue font-bold uppercase tracking-wider border-b-2 border-ucak-gold/30 pb-1 mb-4">Expériences</h3>
         <div className="space-y-4">
@@ -50,7 +44,6 @@ const TemplateModern = ({ data }) => (
           ))}
         </div>
       </div>
-
       <div>
         <h3 className="text-ucak-blue font-bold uppercase tracking-wider border-b-2 border-ucak-gold/30 pb-1 mb-4">Formation</h3>
         <div className="space-y-4">
@@ -69,23 +62,19 @@ const TemplateModern = ({ data }) => (
   </div>
 );
 
-// --- COMPOSANT : TEMPLATE 2 (CLASSIQUE - Centré) ---
+// --- COMPOSANT : TEMPLATE 2 (CLASSIQUE) ---
 const TemplateClassic = ({ data }) => (
   <div className="w-full h-full bg-white text-gray-800 p-8 md:p-12">
     <div className="text-center border-b-2 border-gray-800 pb-6 mb-8">
       <h1 className="text-4xl font-serif font-bold text-gray-900 uppercase mb-2">{data.personal.name}</h1>
       <h2 className="text-xl text-gray-600 mb-4">{data.personal.title}</h2>
       <div className="flex justify-center gap-4 text-xs font-mono text-gray-500">
-        <span>{data.personal.email}</span> | 
-        <span>{data.personal.phone}</span> | 
-        <span>{data.personal.address}</span>
+        <span>{data.personal.email}</span> | <span>{data.personal.phone}</span> | <span>{data.personal.address}</span>
       </div>
     </div>
-
     <div className="mb-8">
       <p className="text-sm text-gray-700 text-center italic max-w-lg mx-auto leading-relaxed">"{data.personal.summary}"</p>
     </div>
-
     <div className="grid grid-cols-3 gap-8">
       <div className="col-span-2">
         <h3 className="font-serif font-bold text-lg uppercase border-b border-gray-300 mb-4">Expérience Professionnelle</h3>
@@ -102,7 +91,6 @@ const TemplateClassic = ({ data }) => (
           ))}
         </div>
       </div>
-
       <div className="col-span-1">
         <div className="mb-8">
           <h3 className="font-serif font-bold text-lg uppercase border-b border-gray-300 mb-4">Formation</h3>
@@ -116,13 +104,10 @@ const TemplateClassic = ({ data }) => (
             ))}
           </div>
         </div>
-        
         <div>
           <h3 className="font-serif font-bold text-lg uppercase border-b border-gray-300 mb-4">Compétences</h3>
           <ul className="list-disc list-inside text-sm space-y-1">
-            {data.skills.map((skill, i) => (
-              <li key={i}>{skill}</li>
-            ))}
+            {data.skills.map((skill, i) => (<li key={i}>{skill}</li>))}
           </ul>
         </div>
       </div>
@@ -130,7 +115,7 @@ const TemplateClassic = ({ data }) => (
   </div>
 );
 
-// --- COMPOSANT : TEMPLATE 3 (MINIMALISTE - Clean) ---
+// --- COMPOSANT : TEMPLATE 3 (MINIMALISTE) ---
 const TemplateMinimal = ({ data }) => (
   <div className="w-full h-full bg-white text-gray-800 p-8 md:p-12 font-sans">
     <div className="flex justify-between items-start mb-12">
@@ -144,20 +129,12 @@ const TemplateMinimal = ({ data }) => (
         <p>{data.personal.address}</p>
       </div>
     </div>
-
     <div className="grid grid-cols-4 gap-8">
-      <div className="col-span-1">
-        <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-6">À Propos</h3>
-      </div>
-      <div className="col-span-3">
-        <p className="text-sm text-gray-700 leading-relaxed mb-8">{data.personal.summary}</p>
-      </div>
+      <div className="col-span-1"><h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-6">À Propos</h3></div>
+      <div className="col-span-3"><p className="text-sm text-gray-700 leading-relaxed mb-8">{data.personal.summary}</p></div>
     </div>
-
     <div className="grid grid-cols-4 gap-8 mb-8">
-      <div className="col-span-1">
-        <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-6">Expérience</h3>
-      </div>
+      <div className="col-span-1"><h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-6">Expérience</h3></div>
       <div className="col-span-3 space-y-8">
         {data.experience.map((exp, i) => (
           <div key={i} className="relative pl-6 border-l border-gray-200">
@@ -169,11 +146,8 @@ const TemplateMinimal = ({ data }) => (
         ))}
       </div>
     </div>
-
     <div className="grid grid-cols-4 gap-8">
-       <div className="col-span-1">
-          <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-6">Expertise</h3>
-       </div>
+       <div className="col-span-1"><h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-6">Expertise</h3></div>
        <div className="col-span-3">
           <div className="flex flex-wrap gap-3">
             {data.skills.map((skill, i) => (
@@ -185,13 +159,12 @@ const TemplateMinimal = ({ data }) => (
   </div>
 );
 
-// --- COMPOSANT PRINCIPAL ---
 export default function CareerCenter() {
-  const [activeTab, setActiveTab] = useState('modern'); // 'modern', 'classic', 'minimal'
-  const [activeSection, setActiveSection] = useState('personal'); // Pour l'accordéon du formulaire
+  const [activeTab, setActiveTab] = useState('modern');
+  const [activeSection, setActiveSection] = useState('personal');
 
-  // État des données du CV
-  const [cvData, setCvData] = useState({
+  // DONNÉES PAR DÉFAUT
+  const defaultData = {
     personal: {
       name: "Moussa Diop",
       title: "Développeur Fullstack",
@@ -207,9 +180,20 @@ export default function CareerCenter() {
     education: [
       { degree: "Licence Info", school: "UCAK", date: "2025" }
     ]
+  };
+
+  // PERSISTANCE : Charger depuis localStorage
+  const [cvData, setCvData] = useState(() => {
+    const saved = localStorage.getItem('user_cv_data');
+    return saved ? JSON.parse(saved) : defaultData;
   });
 
-  // Gestionnaires de modifications
+  // PERSISTANCE : Sauvegarder à chaque changement
+  useEffect(() => {
+    localStorage.setItem('user_cv_data', JSON.stringify(cvData));
+  }, [cvData]);
+
+  // Handlers
   const handlePersonalChange = (e) => {
     setCvData({ ...cvData, personal: { ...cvData.personal, [e.target.name]: e.target.value } });
   };
@@ -229,7 +213,6 @@ export default function CareerCenter() {
     setCvData({ ...cvData, experience: newExp });
   };
 
-  // Idem pour Education et Skills (simplifié pour l'exemple, mais même logique)
   const handleSkillChange = (e) => {
       const skillsArray = e.target.value.split(',').map(s => s.trim());
       setCvData({ ...cvData, skills: skillsArray });
@@ -239,16 +222,11 @@ export default function CareerCenter() {
 
   return (
     <div className="pt-28 pb-10 min-h-screen bg-gray-100 dark:bg-ucak-dark print:bg-white print:p-0">
-      
-      {/* HEADER PAGE (Non imprimé) */}
       <div className="container mx-auto px-6 mb-8 print:hidden">
         <h1 className="text-3xl font-black text-ucak-blue dark:text-white mb-2">Générateur de CV</h1>
         <p className="text-gray-500 mb-6">Remplissez le formulaire à gauche, visualisez à droite. Imprimez.</p>
         
-        {/* BARRE D'ACTIONS */}
         <div className="flex flex-col md:flex-row justify-between items-center bg-white dark:bg-ucak-dark-card p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-           
-           {/* Sélecteur Template */}
            <div className="flex gap-4 mb-4 md:mb-0">
               <button onClick={() => setActiveTab('modern')} className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 font-bold text-sm transition-all ${activeTab === 'modern' ? 'border-ucak-green bg-ucak-green/10 text-ucak-green' : 'border-transparent hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500'}`}>
                 <Layout size={16} /> Moderne
@@ -260,7 +238,6 @@ export default function CareerCenter() {
                 <Layout size={16} /> Minimal
               </button>
            </div>
-
            <button onClick={handlePrint} className="bg-ucak-blue text-white px-6 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-ucak-green transition-colors shadow-lg">
              <Printer size={18} /> Télécharger PDF
            </button>
@@ -269,15 +246,12 @@ export default function CareerCenter() {
 
       <div className="container mx-auto px-6 flex flex-col lg:flex-row gap-8 print:block print:w-full print:max-w-none print:px-0">
         
-        {/* --- COLONNE GAUCHE : FORMULAIRE (Non imprimé) --- */}
+        {/* Formulaire */}
         <div className="lg:w-1/3 space-y-4 print:hidden h-fit">
-          
-          {/* Section Personnelle */}
           <div className="bg-white dark:bg-ucak-dark-card rounded-xl shadow-sm p-4 border border-gray-200 dark:border-gray-700">
             <button onClick={() => setActiveSection('personal')} className="flex justify-between items-center w-full font-bold text-ucak-blue dark:text-white mb-2">
               Informations Personnelles {activeSection === 'personal' ? <ChevronUp size={16}/> : <ChevronDown size={16}/>}
             </button>
-            
             {activeSection === 'personal' && (
               <div className="space-y-3 animate-fadeIn">
                 <input type="text" name="name" value={cvData.personal.name} onChange={handlePersonalChange} placeholder="Nom Complet" className="w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-600 dark:text-white text-sm" />
@@ -289,12 +263,10 @@ export default function CareerCenter() {
             )}
           </div>
 
-          {/* Section Expérience */}
           <div className="bg-white dark:bg-ucak-dark-card rounded-xl shadow-sm p-4 border border-gray-200 dark:border-gray-700">
             <button onClick={() => setActiveSection('experience')} className="flex justify-between items-center w-full font-bold text-ucak-blue dark:text-white mb-2">
               Expériences {activeSection === 'experience' ? <ChevronUp size={16}/> : <ChevronDown size={16}/>}
             </button>
-            
             {activeSection === 'experience' && (
               <div className="space-y-4">
                 {cvData.experience.map((exp, i) => (
@@ -315,7 +287,6 @@ export default function CareerCenter() {
             )}
           </div>
 
-          {/* Section Compétences (Simplifié) */}
            <div className="bg-white dark:bg-ucak-dark-card rounded-xl shadow-sm p-4 border border-gray-200 dark:border-gray-700">
             <button onClick={() => setActiveSection('skills')} className="flex justify-between items-center w-full font-bold text-ucak-blue dark:text-white mb-2">
               Compétences {activeSection === 'skills' ? <ChevronUp size={16}/> : <ChevronDown size={16}/>}
@@ -334,10 +305,9 @@ export default function CareerCenter() {
            </div>
         </div>
 
-        {/* --- COLONNE DROITE : PREVIEW (WYSIWYG) --- */}
+        {/* Aperçu */}
         <div className="lg:w-2/3 print:w-full print:absolute print:top-0 print:left-0 print:m-0">
           <div className="bg-gray-300 p-8 rounded-xl print:p-0 print:bg-white min-h-[800px] flex justify-center items-start overflow-auto">
-             {/* FEUILLE A4 */}
              <div className="bg-white shadow-2xl print:shadow-none w-[210mm] min-h-[297mm] relative overflow-hidden print:w-full">
                 {activeTab === 'modern' && <TemplateModern data={cvData} />}
                 {activeTab === 'classic' && <TemplateClassic data={cvData} />}
@@ -345,7 +315,6 @@ export default function CareerCenter() {
              </div>
           </div>
         </div>
-
       </div>
 
       <style>{`

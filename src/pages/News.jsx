@@ -5,7 +5,10 @@ import { Calendar, MapPin, ArrowRight, Clock, Tag, ChevronRight, Bell } from 'lu
 export default function News() {
   const [activeTab, setActiveTab] = useState('tous'); // 'tous', 'tech', 'hec', 'social'
 
-  // --- DONNÉES SIMULÉES ---
+  const handleSubscribe = () => {
+    alert("Succès ! Vous êtes maintenant abonné à la newsletter du Club MET.");
+  };
+
   const featuredEvent = {
     id: 1,
     title: "Grand Magal Tech 2025 : Bilan et Perspectives",
@@ -56,7 +59,6 @@ export default function News() {
     <div className="pt-32 pb-20 min-h-screen bg-gray-50 dark:bg-ucak-dark">
       <div className="container mx-auto px-6">
         
-        {/* EN-TÊTE */}
         <div className="text-center mb-16">
           <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-ucak-gold font-bold tracking-widest text-xs uppercase mb-2 block">
             Actualités & Agenda
@@ -71,20 +73,17 @@ export default function News() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-20">
           
-          {/* --- GAUCHE : À LA UNE --- */}
           <div className="lg:col-span-2">
             <h2 className="text-xl font-bold text-ucak-blue dark:text-white mb-6 flex items-center gap-2">
                <Tag className="text-ucak-gold"/> À la Une
             </h2>
             <div className="relative h-[400px] rounded-3xl overflow-hidden group cursor-pointer shadow-2xl">
-              {/* Image Hero (Chargée immédiatement car visible en haut) */}
               <img 
                 src={featuredEvent.image} 
                 alt={featuredEvent.title} 
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-ucak-blue via-transparent to-transparent opacity-90"></div>
-              
               <div className="absolute bottom-0 left-0 p-8 w-full">
                 <span className="bg-ucak-green text-white text-xs font-bold px-3 py-1 rounded-full mb-3 inline-block">
                   {featuredEvent.category}
@@ -103,7 +102,6 @@ export default function News() {
             </div>
           </div>
 
-          {/* --- DROITE : AGENDA --- */}
           <div className="lg:col-span-1">
              <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-ucak-blue dark:text-white flex items-center gap-2">
@@ -141,8 +139,11 @@ export default function News() {
                    <div className="absolute top-0 right-0 w-20 h-20 bg-ucak-gold rounded-full blur-2xl opacity-20"></div>
                    <Bell className="w-8 h-8 text-ucak-gold mx-auto mb-2" />
                    <p className="text-sm font-bold text-white mb-2">Ne manquez rien !</p>
-                   <p className="text-xs text-gray-300 mb-4">Recevez les notifications par mail.</p>
-                   <button className="bg-white text-ucak-blue px-6 py-2 rounded-lg text-xs font-bold hover:bg-ucak-gold hover:text-ucak-dark transition-colors w-full">
+                   <p className="text-xs text-gray-300 mb-4">Recevez les notifications des prochains événements directement par mail.</p>
+                   <button 
+                      onClick={handleSubscribe}
+                      className="bg-white text-ucak-blue px-6 py-2 rounded-lg text-xs font-bold hover:bg-ucak-gold hover:text-ucak-dark transition-colors w-full"
+                   >
                       M'abonner
                    </button>
                 </div>
@@ -150,11 +151,9 @@ export default function News() {
           </div>
         </div>
 
-        {/* --- SECTION ARTICLES --- */}
         <div className="mb-8">
            <div className="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-gray-200 dark:border-gray-700 pb-4">
               <h2 className="text-2xl font-bold text-ucak-blue dark:text-white mb-4 md:mb-0">Derniers Articles</h2>
-              
               <div className="flex gap-2">
                  {['tous', 'tech', 'hec', 'social'].map(filter => (
                     <button 
@@ -180,13 +179,7 @@ export default function News() {
                    className="bg-white dark:bg-ucak-dark-card rounded-2xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800 hover:shadow-lg transition-all group cursor-pointer"
                  >
                     <div className="h-48 overflow-hidden relative">
-                       {/* OPTIMISATION LAZY LOADING : Ces images sont plus bas dans la page, donc on les charge "lazy" */}
-                       <img 
-                          src={article.image} 
-                          alt={article.title} 
-                          loading="lazy" 
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
-                       />
+                       <img src={article.image} alt={article.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                        <div className="absolute top-4 left-4 bg-white/90 backdrop-blur text-ucak-blue text-xs font-bold px-3 py-1 rounded-full">
                           {article.category}
                        </div>
