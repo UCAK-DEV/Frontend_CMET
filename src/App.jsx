@@ -2,15 +2,15 @@ import { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 
-// Composants Fixes (Chargés immédiatement)
+// Composants Fixes
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
 import Loading from './components/Loading'; 
 import PageWrapper from './components/PageWrapper';
+import ProtectedRoute from './components/ProtectedRoute'; // <--- AJOUTÉ
 
-// --- OPTIMISATION : LAZY LOADING DES PAGES ---
-// Ces pages ne se chargent que lorsque l'utilisateur clique dessus
+// Lazy Loading
 const Hero = lazy(() => import('./components/Hero'));
 const About = lazy(() => import('./pages/About'));
 const News = lazy(() => import('./pages/News'));
@@ -35,26 +35,25 @@ function AnimatedRoutes() {
       <ScrollToTop />
       {!isImmersiveMode && <Navbar />}
       
-      {/* Suspense affiche le Loading pendant le téléchargement de la page */}
       <Suspense fallback={<Loading />}>
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>
+            {/* ROUTES PUBLIQUES */}
             <Route path="/" element={<PageWrapper><Hero /></PageWrapper>} />
             <Route path="/about" element={<PageWrapper><About /></PageWrapper>} />
             <Route path="/news" element={<PageWrapper><News /></PageWrapper>} />
             <Route path="/showroom" element={<PageWrapper><Showroom /></PageWrapper>} />
             <Route path="/project/:id" element={<PageWrapper><ProjectDetails /></PageWrapper>} />
-            
-            <Route path="/knowledge" element={<PageWrapper><Knowledge /></PageWrapper>} />
-            <Route path="/course/:id" element={<CoursePlayer />} />
-            
-            <Route path="/quizz" element={<PageWrapper><Challenges /></PageWrapper>} />
-            <Route path="/network" element={<PageWrapper><Networking /></PageWrapper>} />
-            <Route path="/elections" element={<PageWrapper><Elections /></PageWrapper>} />
-            
             <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
-            <Route path="/dashboard" element={<PageWrapper><Dashboard /></PageWrapper>} />
-            <Route path="/career" element={<PageWrapper><CareerCenter /></PageWrapper>} />
+
+            {/* ROUTES MEMBRES (PROTÉGÉES) */}
+            <Route path="/dashboard" element={<ProtectedRoute><PageWrapper><Dashboard /></PageWrapper></ProtectedRoute>} />
+            <Route path="/career" element={<ProtectedRoute><PageWrapper><CareerCenter /></PageWrapper></ProtectedRoute>} />
+            <Route path="/knowledge" element={<ProtectedRoute><PageWrapper><Knowledge /></PageWrapper></ProtectedRoute>} />
+            <Route path="/course/:id" element={<ProtectedRoute><CoursePlayer /></ProtectedRoute>} />
+            <Route path="/quizz" element={<ProtectedRoute><PageWrapper><Challenges /></PageWrapper></ProtectedRoute>} />
+            <Route path="/network" element={<ProtectedRoute><PageWrapper><Networking /></PageWrapper></ProtectedRoute>} />
+            <Route path="/elections" element={<ProtectedRoute><PageWrapper><Elections /></PageWrapper></ProtectedRoute>} />
             
             <Route path="*" element={<NotFound />} />
           </Routes>
