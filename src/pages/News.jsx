@@ -6,8 +6,6 @@ export default function News() {
   const [activeTab, setActiveTab] = useState('tous'); // 'tous', 'tech', 'hec', 'social'
 
   // --- DONNÉES SIMULÉES ---
-
-  // 1. Événement Principal (Hero)
   const featuredEvent = {
     id: 1,
     title: "Grand Magal Tech 2025 : Bilan et Perspectives",
@@ -17,14 +15,12 @@ export default function News() {
     desc: "Retour sur 48h d'innovation au service de la ville sainte. Plus de 50 projets présentés devant le jury, alliant technologie et valeurs mourides."
   };
 
-  // 2. Agenda (Prochains événements)
   const upcomingEvents = [
     { id: 1, title: "Conférence : Finance Islamique & Fintech", date: "22 Jan", time: "15:00", location: "Amphi A", type: "HEC" },
     { id: 2, title: "Workshop : Introduction à Docker", date: "25 Jan", time: "09:00", location: "Salle Info 2", type: "Tech" },
     { id: 3, title: "Journée d'Intégration UFR MET", date: "01 Fév", time: "08:00", location: "Campus Social", type: "Social" },
   ];
 
-  // 3. Articles Récents
   const articles = [
     {
       id: 1,
@@ -52,7 +48,6 @@ export default function News() {
     }
   ];
 
-  // Filtrage des articles
   const filteredArticles = activeTab === 'tous' 
     ? articles 
     : articles.filter(a => a.category.toLowerCase().includes(activeTab));
@@ -76,12 +71,13 @@ export default function News() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-20">
           
-          {/* --- GAUCHE : À LA UNE (Featured) --- */}
+          {/* --- GAUCHE : À LA UNE --- */}
           <div className="lg:col-span-2">
             <h2 className="text-xl font-bold text-ucak-blue dark:text-white mb-6 flex items-center gap-2">
                <Tag className="text-ucak-gold"/> À la Une
             </h2>
             <div className="relative h-[400px] rounded-3xl overflow-hidden group cursor-pointer shadow-2xl">
+              {/* Image Hero (Chargée immédiatement car visible en haut) */}
               <img 
                 src={featuredEvent.image} 
                 alt={featuredEvent.title} 
@@ -107,7 +103,7 @@ export default function News() {
             </div>
           </div>
 
-          {/* --- DROITE : AGENDA (Upcoming) --- */}
+          {/* --- DROITE : AGENDA --- */}
           <div className="lg:col-span-1">
              <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-ucak-blue dark:text-white flex items-center gap-2">
@@ -120,13 +116,10 @@ export default function News() {
                 {upcomingEvents.map((evt) => (
                   <div key={evt.id} className="bg-white dark:bg-ucak-dark-card p-5 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow group cursor-pointer">
                     <div className="flex gap-4">
-                       {/* Date Box */}
                        <div className="flex-shrink-0 w-16 h-16 bg-gray-50 dark:bg-gray-800 rounded-xl flex flex-col items-center justify-center border border-gray-200 dark:border-gray-600 group-hover:border-ucak-gold transition-colors">
                           <span className="text-xl font-black text-ucak-blue dark:text-white">{evt.date.split(' ')[0]}</span>
                           <span className="text-[10px] font-bold uppercase text-gray-500">{evt.date.split(' ')[1]}</span>
                        </div>
-                       
-                       {/* Infos */}
                        <div>
                           <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${
                              evt.type === 'HEC' ? 'bg-purple-100 text-purple-700' :
@@ -144,12 +137,11 @@ export default function News() {
                   </div>
                 ))}
 
-                {/* Newsletter Box */}
                 <div className="bg-gradient-to-br from-ucak-blue to-ucak-dark rounded-2xl p-6 text-center border border-white/10 relative overflow-hidden">
                    <div className="absolute top-0 right-0 w-20 h-20 bg-ucak-gold rounded-full blur-2xl opacity-20"></div>
                    <Bell className="w-8 h-8 text-ucak-gold mx-auto mb-2" />
                    <p className="text-sm font-bold text-white mb-2">Ne manquez rien !</p>
-                   <p className="text-xs text-gray-300 mb-4">Recevez les notifications des prochains événements directement par mail.</p>
+                   <p className="text-xs text-gray-300 mb-4">Recevez les notifications par mail.</p>
                    <button className="bg-white text-ucak-blue px-6 py-2 rounded-lg text-xs font-bold hover:bg-ucak-gold hover:text-ucak-dark transition-colors w-full">
                       M'abonner
                    </button>
@@ -163,7 +155,6 @@ export default function News() {
            <div className="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-gray-200 dark:border-gray-700 pb-4">
               <h2 className="text-2xl font-bold text-ucak-blue dark:text-white mb-4 md:mb-0">Derniers Articles</h2>
               
-              {/* Filtres simples */}
               <div className="flex gap-2">
                  {['tous', 'tech', 'hec', 'social'].map(filter => (
                     <button 
@@ -189,7 +180,13 @@ export default function News() {
                    className="bg-white dark:bg-ucak-dark-card rounded-2xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800 hover:shadow-lg transition-all group cursor-pointer"
                  >
                     <div className="h-48 overflow-hidden relative">
-                       <img src={article.image} alt={article.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                       {/* OPTIMISATION LAZY LOADING : Ces images sont plus bas dans la page, donc on les charge "lazy" */}
+                       <img 
+                          src={article.image} 
+                          alt={article.title} 
+                          loading="lazy" 
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
+                       />
                        <div className="absolute top-4 left-4 bg-white/90 backdrop-blur text-ucak-blue text-xs font-bold px-3 py-1 rounded-full">
                           {article.category}
                        </div>
