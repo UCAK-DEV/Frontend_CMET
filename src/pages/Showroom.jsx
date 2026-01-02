@@ -1,20 +1,18 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Github, ExternalLink, Filter } from 'lucide-react';
+import { Search, Link as LinkIcon, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function Showroom() {
   const [activeTab, setActiveTab] = useState('talents');
 
-  // Données Talents (Mixte Informatique & Gestion)
   const talents = [
-    { id: 1, name: "Moussa Diop", role: "Dev Fullstack", skills: ["React", "Node.js"], promo: "L3 Informatique" },
-    { id: 2, name: "Aïssatou Sow", role: "Marketer Digital", skills: ["SEO", "Stratégie", "Canva"], promo: "M1 Marketing (HEC)" },
-    { id: 3, name: "Cheikh Lo", role: "Analyste Financier", skills: ["Audit", "Excel", "Finance"], promo: "L3 Gestion" },
-    { id: 4, name: "Fatou Ndiaye", role: "Designer UX/UI", skills: ["Figma", "Tailwind"], promo: "M1 Multimédia" },
+    { id: 1, name: "Moussa Diop", role: "Dev Fullstack", promo: "L3 Informatique" },
+    { id: 2, name: "Aïssatou Sow", role: "Marketer Digital", promo: "M1 Marketing (HEC)" },
+    { id: 3, name: "Cheikh Lo", role: "Analyste Financier", promo: "L3 Gestion" },
+    { id: 4, name: "Fatou Ndiaye", role: "Designer UX/UI", promo: "M1 Multimédia" },
   ];
 
-  // Données Projets (Avec Images)
   const projects = [
     { 
       id: 1, 
@@ -46,7 +44,6 @@ export default function Showroom() {
     <div className="pt-32 pb-20 min-h-screen">
       <div className="container mx-auto px-6">
         
-        {/* En-tête */}
         <div className="text-center mb-12">
             <span className="text-ucak-gold font-bold tracking-widest text-xs uppercase mb-2 block">Portfolis UCAK</span>
             <h1 className="text-4xl md:text-5xl font-black text-ucak-blue dark:text-white mb-4">
@@ -55,9 +52,7 @@ export default function Showroom() {
             <p className="text-gray-600 dark:text-gray-400">Ingénieurs, Managers et Créatifs de l'UCAK.</p>
         </div>
 
-        {/* Contrôles */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
-           {/* Barre de recherche */}
            <div className="relative w-full md:w-96">
             <Search className="absolute left-4 top-3.5 text-gray-400 w-5 h-5" />
             <input 
@@ -67,7 +62,6 @@ export default function Showroom() {
             />
           </div>
 
-          {/* Onglets */}
           <div className="bg-gray-100 dark:bg-ucak-dark-card p-1 rounded-xl flex">
             {['talents', 'projects'].map((tab) => (
                 <button 
@@ -85,7 +79,6 @@ export default function Showroom() {
           </div>
         </div>
 
-        {/* --- LISTE DES PROJETS (AVEC PHOTOS) --- */}
         {activeTab === 'projects' && (
           <motion.div 
             initial={{ opacity: 0 }} animate={{ opacity: 1 }}
@@ -93,12 +86,12 @@ export default function Showroom() {
           >
             {projects.map((project) => (
               <div key={project.id} className="group rounded-2xl overflow-hidden bg-white dark:bg-ucak-dark-card border border-gray-100 dark:border-gray-800 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
-                
-                {/* Image */}
                 <div className="relative h-56 overflow-hidden">
+                    {/* OPTIMISATION LAZY LOADING ICI */}
                     <img 
                         src={project.image} 
                         alt={project.title} 
+                        loading="lazy" 
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
                     <div className="absolute top-4 right-4 bg-black/50 backdrop-blur-md text-white text-xs font-bold px-3 py-1 rounded-full">
@@ -106,14 +99,15 @@ export default function Showroom() {
                     </div>
                 </div>
 
-                {/* Contenu */}
                 <div className="p-6">
                   <h3 className="font-bold text-xl text-ucak-blue dark:text-white mb-2">{project.title}</h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">{project.desc}</p>
                   
                   <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
                     <span className="text-xs font-bold text-ucak-green">Par {project.author}</span>
-                    <Link to={`/project/${project.id}`} className="text-ucak-gold text-sm font-bold hover:underline">Voir Détails</Link>
+                    <Link to={`/project/${project.id}`} className="text-ucak-gold text-sm font-bold hover:underline flex items-center gap-1">
+                       Voir Détails <ExternalLink size={14}/>
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -121,7 +115,6 @@ export default function Showroom() {
           </motion.div>
         )}
 
-        {/* --- LISTE DES TALENTS --- */}
         {activeTab === 'talents' && (
              <motion.div 
              initial={{ opacity: 0 }} animate={{ opacity: 1 }}
@@ -141,7 +134,6 @@ export default function Showroom() {
              ))}
            </motion.div>
         )}
-
       </div>
     </div>
   );
