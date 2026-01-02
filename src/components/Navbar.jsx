@@ -28,7 +28,7 @@ export default function Navbar() {
   const publicLinks = [
     { path: '/about', label: 'A Propos' },
     { path: '/news', label: 'Actualités' },
-    { path: '/showroom', label: 'Showroom' },
+    { path: '/showroom', label: 'Talents' },
   ];
 
   // LIENS MEMBRES
