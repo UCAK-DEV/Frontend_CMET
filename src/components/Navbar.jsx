@@ -1,23 +1,24 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
-  Sun, Moon, LogIn, LogOut, User as UserIcon, 
-  LayoutDashboard, Trophy, Home, BookOpen, Menu, X, 
-  Briefcase, Globe, Award, Newspaper, ChevronDown 
+  Sun, Moon, LogIn, LogOut, User, LayoutDashboard, 
+  BookOpen, Menu, X, Briefcase, Globe, Award, 
+  Newspaper, Trophy, ChevronRight, Users
 } from 'lucide-react';
 import { useUser } from '../context/UserContext';
 import logoUcak from '../assets/logo-ucak.png';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Navbar() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false); // Menu Mobile
+  const [isProfileOpen, setIsProfileOpen] = useState(false); // Menu Profil
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
   
   const { user, logout } = useUser();
   const location = useLocation();
   const navigate = useNavigate();
 
+  // Gestion du Thème
   useEffect(() => {
     if (theme === 'dark') document.documentElement.classList.add('dark');
     else document.documentElement.classList.remove('dark');
@@ -27,159 +28,217 @@ export default function Navbar() {
   const toggleTheme = () => setTheme(theme === 'dark' ? 'light' : 'dark');
   const isActive = (path) => location.pathname === path;
 
-  // --- CONFIGURATION INTELLIGENTE DES LIENS ---
-  
-  const mainLinks = [
-    { path: '/', label: 'Accueil', icon: Home },
-    // Si connecté : Dashboard, sinon caché
-    { path: '/dashboard', label: 'Espace', icon: LayoutDashboard, protected: true },
-    // Si connecté : Bibliothèque, sinon Brochure Publique
-    { 
-      path: user ? '/knowledge' : '/formation/informatique', 
-      label: user ? 'Bibliothèque' : 'Savoir', 
-      icon: BookOpen 
-    },
-    { path: '/career', label: 'Carrière', icon: Briefcase, protected: true },
-  ];
-
-  const secondaryLinks = [
-    { path: '/news', label: 'Actualités', icon: Newspaper },
-    { path: '/showroom', label: 'Showroom', icon: Award },
-    { path: '/about', label: 'Institution', icon: Globe },
-    { path: '/quizz', label: 'Quizz & XP', icon: Trophy, protected: true },
-    { path: '/elections', label: 'Élections', icon: UserIcon, protected: true },
-    { path: '/network', label: 'Réseau', icon: Globe, protected: true },
-  ];
-
-  // Fusion pour le mobile (Tout afficher)
-  const allLinksMobile = [...mainLinks, ...secondaryLinks];
+  // Fermer le menu mobile lors d'un changement de page
+  useEffect(() => {
+    setIsOpen(false);
+    setIsProfileOpen(false);
+  }, [location]);
 
   const handleLogout = () => {
     logout();
-    setIsProfileOpen(false);
-    setIsMenuOpen(false);
     navigate('/');
   };
 
+  // --- LOGIQUE DES MENUS ---
+  
+  // 1. LES INCONTOURNABLES (Visibles directement dans la Navbar Desktop)
+  const primaryLinks = [
+    { name: 'Accueil', path: '/' },
+    { name: 'Institution', path: '/about' },
+    // Lien intelligent : "Formations" pour visiteur, "Ma Bibliothèque" pour étudiant
+    { 
+      name: user ? 'Bibliothèque' : 'Formations', 
+      path: user ? '/knowledge' : '/formation/informatique' 
+    },
+    // Espace étudiant visible uniquement si connecté
+    ...(user ? [{ name: 'Mon Espace', path: '/dashboard' }] : []),
+  ];
+
+  // 2. LE RESTE (Accessible via Menu Mobile ou Dropdown Profil)
+  const secondaryLinks = [
+    { name: 'Actualités', path: '/news', icon: Newspaper },
+    { name: 'Showroom Projets', path: '/showroom', icon: Award },
+    ...(user ? [
+      { name: 'Carrière & Stages', path: '/career', icon: Briefcase },
+      { name: 'Challenges XP', path: '/quizz', icon: Trophy },
+      { name: 'Élections', path: '/elections', icon: User },
+      { name: 'Réseau Alumni', path: '/network', icon: Users },
+    ] : [])
+  ];
+
   return (
-    <>
-      {/* --- DESKTOP NAVBAR --- */}
-      <nav className="hidden md:block fixed w-full z-50 bg-white/90 dark:bg-ucak-dark/90 backdrop-blur-md border-b border-gray-100 dark:border-white/5 transition-all">
-        <div className="container mx-auto px-6 h-20 flex items-center justify-between">
-          
-          <Link to="/" className="flex items-center gap-3">
-            <img src={logoUcak} alt="UCAK" className="w-10 h-10 object-contain bg-white rounded-lg p-0.5 shadow-md" />
-            <span className="text-xl font-extrabold text-ucak-blue dark:text-white tracking-tighter leading-none flex flex-col">
-              <span>CLUB</span><span className="text-ucak-green text-sm">MET</span>
-            </span>
-          </Link>
-
-          {/* Navigation Desktop */}
-          <div className="flex items-center gap-6">
-            {/* On affiche les liens principaux + les 2 premiers secondaires */}
-            {[...mainLinks, ...secondaryLinks].filter(l => !l.protected || user).slice(0, 6).map(link => (
-              <Link key={link.path} to={link.path} className={`text-xs font-bold uppercase tracking-widest transition-colors ${isActive(link.path) ? 'text-ucak-green' : 'text-gray-500 hover:text-ucak-blue dark:text-gray-400 dark:hover:text-white'}`}>
-                {link.label}
-              </Link>
-            ))}
+    <nav className="fixed w-full z-50 bg-white/95 dark:bg-ucak-dark/95 backdrop-blur-xl border-b border-gray-100 dark:border-white/5 transition-all duration-300">
+      <div className="container mx-auto px-6 h-20 flex items-center justify-between">
+        
+        {/* === LOGO & IDENTITÉ === */}
+        <Link to="/" className="flex items-center gap-3 group">
+          <div className="p-1.5 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-100 dark:border-white/5 group-hover:border-ucak-blue/30 transition-colors">
+             <img src={logoUcak} alt="Logo" className="w-8 h-8 object-contain" />
           </div>
-
-          <div className="flex items-center gap-4">
-            <button onClick={toggleTheme} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/5 text-ucak-blue dark:text-ucak-gold">
-              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-            </button>
-            
-            {user ? (
-              <div className="relative">
-                <button onClick={() => setIsProfileOpen(!isProfileOpen)} className="flex items-center gap-2 pl-2 pr-1 py-1 rounded-full border border-transparent hover:border-gray-200 dark:hover:border-white/10 transition-all">
-                  <div className="w-8 h-8 rounded-full bg-ucak-blue text-white flex items-center justify-center font-black text-xs">
-                    {user.full_name?.charAt(0)}
-                  </div>
-                  <ChevronDown size={14} className="text-gray-400" />
-                </button>
-                
-                {isProfileOpen && (
-                  <div className="absolute right-0 mt-4 w-64 bg-white dark:bg-ucak-dark-card rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-800 overflow-hidden py-2 animate-in fade-in slide-in-from-top-2">
-                     <div className="px-5 py-4 border-b border-gray-100 dark:border-white/5 mb-2">
-                        <p className="text-sm font-black text-ucak-blue dark:text-white truncate">{user.full_name}</p>
-                        <p className="text-[10px] text-gray-400 uppercase tracking-widest">{user.matricule}</p>
-                     </div>
-                     {/* Liens cachés dans la navbar principale */}
-                     {secondaryLinks.slice(2).filter(l => !l.protected || user).map(link => (
-                        <Link key={link.path} to={link.path} onClick={() => setIsProfileOpen(false)} className="block px-5 py-2 text-xs font-bold text-gray-500 hover:text-ucak-blue hover:bg-gray-50 dark:hover:bg-white/5">
-                           {link.label}
-                        </Link>
-                     ))}
-                     <div className="h-px bg-gray-100 dark:bg-white/5 my-2"></div>
-                     <button onClick={handleLogout} className="w-full text-left px-5 py-2 text-xs font-bold text-red-500 hover:bg-red-50 flex items-center gap-2">
-                        <LogOut size={14}/> Déconnexion
-                     </button>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <Link to="/login" className="px-6 py-2.5 bg-ucak-blue text-white rounded-full text-xs font-black uppercase tracking-widest hover:bg-ucak-green transition-colors">
-                Connexion
-              </Link>
-            )}
+          <div className="flex flex-col leading-none">
+            <span className="text-lg font-black text-ucak-blue dark:text-white tracking-tighter">CLUB MET</span>
+            <span className="text-[10px] font-bold text-gray-400 tracking-[0.2em] uppercase group-hover:text-ucak-green transition-colors">UFR SET</span>
           </div>
+        </Link>
+
+        {/* === DESKTOP : NAVIGATION CENTRALE (Incontournables) === */}
+        <div className="hidden md:flex items-center gap-1 bg-gray-50 dark:bg-white/5 p-1.5 rounded-full border border-gray-100 dark:border-white/5">
+          {primaryLinks.map((link) => (
+            <Link 
+              key={link.path} 
+              to={link.path}
+              className={`px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wide transition-all ${
+                isActive(link.path) 
+                ? 'bg-white dark:bg-ucak-dark-card text-ucak-blue dark:text-white shadow-sm' 
+                : 'text-gray-500 hover:text-ucak-blue dark:text-gray-400 dark:hover:text-white'
+              }`}
+            >
+              {link.name}
+            </Link>
+          ))}
         </div>
-      </nav>
 
-      {/* --- MOBILE NAVBAR (BOTTOM) --- */}
-      <div className="md:hidden fixed bottom-0 w-full z-50 bg-white dark:bg-[#0f141e] border-t border-gray-100 dark:border-white/5 pb-safe px-2 h-[80px] flex justify-around items-center shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
-         {mainLinks.map((link) => {
-           if (link.protected && !user) return null;
-           const active = isActive(link.path);
-           return (
-             <Link key={link.path} to={link.path} className="flex flex-col items-center justify-center w-16 h-full gap-1">
-                <div className={`p-1.5 rounded-xl transition-all ${active ? 'bg-ucak-blue/10 text-ucak-blue dark:text-ucak-gold dark:bg-ucak-gold/10' : 'text-gray-400'}`}>
-                   <link.icon size={22} strokeWidth={active ? 2.5 : 2} />
+        {/* === ACTIONS DROITE (Thème + Auth + Menu Mobile) === */}
+        <div className="flex items-center gap-3">
+          
+          {/* Switch Thème */}
+          <button 
+            onClick={toggleTheme} 
+            className="p-2.5 rounded-full text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 hover:text-ucak-blue transition-colors"
+          >
+            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+          </button>
+
+          {/* Séparateur */}
+          <div className="h-6 w-px bg-gray-200 dark:bg-white/10 mx-1"></div>
+
+          {/* État Connecté */}
+          {user ? (
+            <div className="relative">
+              <button 
+                onClick={() => setIsProfileOpen(!isProfileOpen)}
+                className="flex items-center gap-3 pl-1 pr-3 py-1 rounded-full hover:bg-gray-50 dark:hover:bg-white/5 border border-transparent hover:border-gray-100 dark:hover:border-white/10 transition-all"
+              >
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-ucak-blue to-ucak-green text-white flex items-center justify-center text-xs font-black shadow-md">
+                  {user.full_name?.charAt(0)}
                 </div>
-                <span className={`text-[9px] font-bold ${active ? 'text-ucak-blue dark:text-ucak-gold' : 'text-gray-400'}`}>{link.label}</span>
-             </Link>
-           )
-         })}
-         <button onClick={() => setIsMenuOpen(true)} className="flex flex-col items-center justify-center w-16 h-full gap-1">
-            <div className={`p-1.5 rounded-xl ${isMenuOpen ? 'bg-ucak-green/10 text-ucak-green' : 'text-gray-400'}`}><Menu size={22} /></div>
-            <span className="text-[9px] font-bold text-gray-400">Menu</span>
-         </button>
+                <span className="hidden md:block text-xs font-bold text-gray-700 dark:text-gray-200 max-w-[100px] truncate">
+                  {user.full_name.split(' ')[0]}
+                </span>
+              </button>
+
+              {/* Dropdown Profil (Desktop & Mobile) */}
+              <AnimatePresence>
+                {isProfileOpen && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    className="absolute right-0 mt-4 w-64 bg-white dark:bg-ucak-dark-card rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-800 overflow-hidden z-50 origin-top-right"
+                  >
+                    <div className="p-4 bg-gray-50 dark:bg-white/5 border-b border-gray-100 dark:border-white/5">
+                      <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Connecté en tant que</p>
+                      <p className="text-sm font-black text-ucak-blue dark:text-white truncate">{user.full_name}</p>
+                      <p className="text-[10px] text-gray-500 font-mono mt-0.5">{user.matricule}</p>
+                    </div>
+                    
+                    <div className="p-2">
+                      {secondaryLinks.filter(l => l.path !== '/dashboard').map((link) => (
+                        <Link 
+                          key={link.path} to={link.path}
+                          className="flex items-center gap-3 px-4 py-3 text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl transition-colors"
+                        >
+                          <link.icon size={16} className="text-gray-400"/> {link.name}
+                        </Link>
+                      ))}
+                      <div className="h-px bg-gray-100 dark:bg-white/5 my-2 mx-2"></div>
+                      <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-xs font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-xl transition-colors">
+                        <LogOut size={16} /> Déconnexion
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          ) : (
+            /* État Non Connecté */
+            <Link to="/login" className="hidden md:flex items-center gap-2 px-6 py-2.5 bg-ucak-blue text-white rounded-full text-xs font-black uppercase tracking-widest hover:bg-ucak-green hover:shadow-lg hover:shadow-ucak-green/20 transition-all transform hover:-translate-y-0.5">
+              <LogIn size={16} /> Connexion
+            </Link>
+          )}
+
+          {/* Bouton Hamburger (Mobile Seulement) */}
+          <button 
+            onClick={() => setIsOpen(true)}
+            className="md:hidden p-2.5 rounded-xl bg-gray-50 dark:bg-white/5 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10 active:scale-95 transition-all"
+          >
+            <Menu size={24} />
+          </button>
+        </div>
       </div>
 
-      {/* --- MOBILE DRAWER (MENU PLUS) --- */}
+      {/* === MENU MOBILE FULLSCREEN (OVERLAY) === */}
       <AnimatePresence>
-        {isMenuOpen && (
-          <>
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/60 z-[60] md:hidden backdrop-blur-sm" onClick={() => setIsMenuOpen(false)} />
-            <motion.div initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }} transition={{ type: "spring", damping: 25, stiffness: 200 }} className="fixed bottom-0 left-0 w-full bg-white dark:bg-ucak-dark-card z-[70] md:hidden rounded-t-[2.5rem] overflow-hidden max-h-[80vh] flex flex-col">
-               <div className="p-6 border-b border-gray-100 dark:border-white/5 flex items-center justify-between bg-gray-50/50 dark:bg-white/5">
-                  <span className="font-black text-lg dark:text-white">Menu Complet</span>
-                  <button onClick={() => setIsMenuOpen(false)} className="p-2 bg-gray-100 dark:bg-white/10 rounded-full"><X size={20}/></button>
-               </div>
-               <div className="p-6 grid grid-cols-3 gap-4 overflow-y-auto pb-32">
-                  {!user && <Link to="/login" onClick={() => setIsMenuOpen(false)} className="col-span-3 p-4 bg-ucak-blue text-white rounded-2xl flex justify-center font-black text-xs uppercase mb-2">Se Connecter</Link>}
-                  
-                  {secondaryLinks.map((link) => {
-                    if (link.protected && !user) return null;
-                    return (
-                      <Link key={link.path} to={link.path} onClick={() => setIsMenuOpen(false)} className="flex flex-col items-center justify-center gap-2 p-4 bg-gray-50 dark:bg-white/5 rounded-2xl active:scale-95 transition-transform">
-                         <div className="w-10 h-10 bg-white dark:bg-white/10 rounded-full flex items-center justify-center text-ucak-blue dark:text-white shadow-sm"><link.icon size={20} /></div>
-                         <span className="text-[10px] font-bold text-center uppercase text-gray-600 dark:text-gray-300">{link.label}</span>
-                      </Link>
-                    )
-                  })}
-                  {user && <button onClick={handleLogout} className="col-span-3 mt-4 p-4 border border-red-100 bg-red-50 text-red-500 rounded-2xl font-bold text-xs uppercase">Déconnexion</button>}
-               </div>
-            </motion.div>
-          </>
+        {isOpen && (
+          <motion.div 
+            initial={{ opacity: 0, x: "100%" }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: "100%" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="fixed inset-0 bg-white dark:bg-ucak-dark z-[100] md:hidden flex flex-col"
+          >
+            {/* Header Mobile */}
+            <div className="px-6 h-20 flex items-center justify-between border-b border-gray-100 dark:border-gray-800">
+              <span className="text-xl font-black text-ucak-blue dark:text-white">Menu</span>
+              <button onClick={() => setIsOpen(false)} className="p-2 rounded-full bg-gray-50 dark:bg-white/5 hover:bg-red-50 hover:text-red-500 transition-colors">
+                <X size={24} />
+              </button>
+            </div>
+
+            {/* Liens Mobile */}
+            <div className="flex-1 overflow-y-auto p-6">
+              <div className="space-y-2">
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 pl-2">Navigation</p>
+                {primaryLinks.map(link => (
+                  <Link 
+                    key={link.path} to={link.path}
+                    className={`block p-4 rounded-2xl text-lg font-bold transition-all ${isActive(link.path) ? 'bg-ucak-blue text-white shadow-lg shadow-ucak-blue/20' : 'bg-gray-50 dark:bg-white/5 text-gray-600 dark:text-gray-300'}`}
+                  >
+                    {link.name}
+                  </Link>
+                ))}
+              </div>
+
+              <div className="mt-8 space-y-2">
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 pl-2">Explorer</p>
+                {secondaryLinks.map(link => (
+                  <Link 
+                    key={link.path} to={link.path}
+                    className="flex items-center justify-between p-4 rounded-2xl border border-gray-100 dark:border-gray-800 hover:border-ucak-blue/30 active:bg-gray-50 dark:active:bg-white/5 transition-colors group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-gray-100 dark:bg-white/10 text-gray-500 group-hover:text-ucak-blue transition-colors">
+                        <link.icon size={20} />
+                      </div>
+                      <span className="font-bold text-gray-700 dark:text-gray-200">{link.name}</span>
+                    </div>
+                    <ChevronRight size={16} className="text-gray-300" />
+                  </Link>
+                ))}
+              </div>
+
+              {/* Bouton Login Mobile (si pas connecté) */}
+              {!user && (
+                <div className="mt-8">
+                  <Link to="/login" className="flex items-center justify-center gap-3 w-full p-5 bg-ucak-blue text-white rounded-2xl font-black uppercase tracking-widest shadow-xl">
+                    <LogIn size={20} /> Se Connecter
+                  </Link>
+                </div>
+              )}
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
-
-      {/* --- MOBILE TOP BAR (LOGO) --- */}
-      <div className="md:hidden fixed top-0 w-full z-40 bg-white/95 dark:bg-ucak-dark/95 backdrop-blur-md border-b border-gray-100 dark:border-white/5 h-14 px-4 flex items-center justify-between">
-         <Link to="/" className="flex items-center gap-2"><img src={logoUcak} alt="Logo" className="w-8 h-8" /><span className="font-black text-ucak-blue dark:text-white">CLUB MET</span></Link>
-         <button onClick={toggleTheme} className="p-2 text-ucak-blue dark:text-ucak-gold">{theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}</button>
-      </div>
-    </>
+    </nav>
   );
 }
