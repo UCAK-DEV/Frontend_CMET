@@ -3,7 +3,7 @@ import axios from 'axios';
 
 const UserContext = createContext();
 
-// Export de l'instance API pour l'utiliser dans les autres pages
+// Export de l'instance API pour l'utiliser ailleurs
 export const api = axios.create({
   baseURL: 'http://localhost:3000', 
   headers: {
@@ -14,6 +14,11 @@ export const api = axios.create({
 export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // --- LOGIQUE ADMIN ---
+  // On vérifie si le rôle est strictement 'ADMIN'
+  const isAdmin = user?.role === 'ADMIN'; 
+  // ---------------------
 
   useEffect(() => {
     const initializeAuth = () => {
@@ -30,7 +35,6 @@ export function UserProvider({ children }) {
 
   const login = async (email, password) => {
     try {
-      // Appel vers POST /api/v1/auth/login
       const response = await api.post('/api/v1/auth/login', { email, password });
       const { access_token, user: userData } = response.data;
 
@@ -46,7 +50,6 @@ export function UserProvider({ children }) {
 
   const register = async (registerData) => {
     try {
-      // Appel vers POST /api/v1/auth/register
       await api.post('/api/v1/auth/register', registerData);
       return { success: true };
     } catch (error) {
@@ -63,7 +66,8 @@ export function UserProvider({ children }) {
   };
 
   return (
-    <UserContext.Provider value={{ user, login, register, logout, loading }}>
+    // On expose 'isAdmin' à toute l'application
+    <UserContext.Provider value={{ user, login, register, logout, loading, isAdmin }}>
       {children}
     </UserContext.Provider>
   );
