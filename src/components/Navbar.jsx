@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Sun, Moon, LogIn, LogOut, User, Menu, X, Briefcase, Award, 
-  Newspaper, Trophy, ChevronRight, Users, ShieldAlert 
+  Newspaper, Trophy, ChevronRight, Users, ShieldAlert, BookOpen 
 } from 'lucide-react';
 import { useUser } from '../context/UserContext';
 import logoUcak from '../assets/logo-ucak.png';
@@ -13,7 +13,6 @@ export default function Navbar() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
   
-  // On récupère isAdmin
   const { user, logout, isAdmin } = useUser(); 
   const location = useLocation();
   const navigate = useNavigate();
@@ -37,8 +36,11 @@ export default function Navbar() {
     { name: user ? 'Bibliothèque' : 'Formations', path: user ? '/knowledge' : '/formation/informatique' },
     ...(user ? [{ name: 'Mon Espace', path: '/dashboard' }] : []),
     
-    // --- LIGNE CLÉ : Affiche le bouton uniquement si isAdmin est vrai ---
-    ...(isAdmin ? [{ name: 'Webmaster', path: '/admin/courses', isSpecial: true }] : []),
+    // --- LIENS ADMIN ---
+    ...(isAdmin ? [
+      { name: 'Créer Cours', path: '/admin/courses', isSpecial: true },
+      { name: 'Étudiants', path: '/admin/students', isSpecial: true }
+    ] : []),
   ];
 
   const secondaryLinks = [
@@ -75,7 +77,7 @@ export default function Navbar() {
                 isActive(link.path) 
                 ? 'bg-white dark:bg-ucak-dark-card text-ucak-blue dark:text-white shadow-sm' 
                 : link.isSpecial 
-                  ? 'bg-red-500 text-white hover:bg-red-600 shadow-lg shadow-red-500/30'
+                  ? 'bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white border border-red-500/20'
                   : 'text-gray-500 hover:text-ucak-blue dark:text-gray-400 dark:hover:text-white'
               }`}
             >
@@ -115,12 +117,6 @@ export default function Navbar() {
                     </div>
                     
                     <div className="p-2">
-                      {isAdmin && (
-                        <Link to="/admin/courses" className="flex items-center gap-3 px-4 py-3 text-xs font-bold text-red-500 bg-red-50 dark:bg-red-900/10 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-xl transition-colors mb-1">
-                          <ShieldAlert size={16}/> Zone Webmaster
-                        </Link>
-                      )}
-                      
                       {secondaryLinks.filter(l => l.path !== '/dashboard').map((link) => (
                         <Link key={link.path} to={link.path} className="flex items-center gap-3 px-4 py-3 text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl transition-colors">
                           <link.icon size={16} className="text-gray-400"/> {link.name}

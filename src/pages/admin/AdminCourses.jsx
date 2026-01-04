@@ -1,41 +1,41 @@
 import { useState } from 'react';
 import { api } from '../../context/UserContext';
-import { Plus, AlertCircle, CheckCircle, Shield } from 'lucide-react';
+import { Plus, Trash2, Video, FileText, Save, LayoutList, ShieldAlert, CheckCircle, AlertCircle } from 'lucide-react';
 
 export default function AdminCourses() {
-  // CORRECTION ICI : Les clés correspondent désormais au DTO du Backend
-  const [formData, setFormData] = useState({
-    title: '',
-    instructor_name: '', // Backend attend 'instructor_name', pas 'instructor'
-    duration: '',        // Ce champ n'est pas sauvegardé pour l'instant (absent de l'entité Course)
-    filiere_tag: 'Informatique', // Backend attend 'filiere_tag', pas 'category'
-    level: 'Débutant',
-    description: ''
+  // État global du cours
+  const [courseData, setCourseData] = useState({
+    title: '', instructor_name: '', description: '',
+    filiere_tag: 'Informatique', level: 'Débutant',
+    modules: [] // Liste des chapitres
   });
-  
-  const [status, setStatus] = useState(null); // 'success', 'error', 'loading'
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  // État temporaire pour le module en cours d'ajout
+  const [newModule, setNewModule] = useState({ title: '', video_url: '', pdf_url: '' });
+  const [status, setStatus] = useState(null);
+
+  // Ajout d'un module à la liste
+  const addModule = () => {
+    if (!newModule.title || !newModule.video_url) return alert("Titre et lien vidéo obligatoires");
+    setCourseData({ ...courseData, modules: [...courseData.modules, newModule] });
+    setNewModule({ title: '', video_url: '', pdf_url: '' }); // Reset des champs
   };
 
+  // Suppression d'un module
+  const removeModule = (index) => {
+    const updated = courseData.modules.filter((_, i) => i !== index);
+    setCourseData({ ...courseData, modules: updated });
+  };
+
+  // Envoi au Backend
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus('loading');
     try {
-      // APPEL API RÉEL VERS LE BACKEND
-      await api.post('/api/v1/courses', formData); 
-      
+      await api.post('/api/v1/courses', courseData);
       setStatus('success');
-      // Réinitialisation avec les bonnes clés
-      setFormData({ 
-        title: '', 
-        instructor_name: '', 
-        duration: '', 
-        filiere_tag: 'Informatique', 
-        level: 'Débutant', 
-        description: '' 
-      });
+      // Reset complet du formulaire
+      setCourseData({ title: '', instructor_name: '', description: '', filiere_tag: 'Informatique', level: 'Débutant', modules: [] });
     } catch (error) {
       console.error(error);
       setStatus('error');
@@ -43,79 +43,173 @@ export default function AdminCourses() {
   };
 
   return (
-    <div className="min-h-screen pt-32 pb-20 bg-gray-50 dark:bg-ucak-dark px-6">
-      <div className="container mx-auto max-w-2xl">
-        <div className="mb-10 text-center">
-          <div className="inline-flex items-center gap-2 bg-red-500/10 text-red-500 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border border-red-500/20 mb-4">
-            <Shield size={12} /> Zone Webmaster
+    <div className="min-h-screen pt-32 pb-20 bg-[#0f172a] text-white px-6">
+      <div className="container mx-auto max-w-5xl">
+        
+        {/* Header Admin */}
+        <div className="flex items-center justify-between mb-10 border-b border-white/10 pb-6">
+          <div>
+            <div className="inline-flex items-center gap-2 bg-red-500/20 text-red-400 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border border-red-500/30 mb-2">
+              <ShieldAlert size={12} /> Zone Webmaster
+            </div>
+            <h1 className="text-3xl font-black text-white">Gestion des Cours</h1>
           </div>
-          <h1 className="text-3xl font-black text-ucak-blue dark:text-white">Gestion des Cours</h1>
-          <p className="text-gray-500 mt-2">Ajoutez de nouvelles ressources pédagogiques à la bibliothèque.</p>
+          <div className="text-right hidden md:block">
+            <p className="text-sm text-gray-400">Total Modules</p>
+            <p className="text-3xl font-black text-ucak-blue">{courseData.modules.length}</p>
+          </div>
         </div>
 
-        <div className="bg-white dark:bg-ucak-dark-card p-8 rounded-[2rem] shadow-xl border border-gray-100 dark:border-white/5 relative overflow-hidden">
-          {status === 'success' && (
-            <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 text-green-600 rounded-xl flex items-center gap-3 animate-in fade-in slide-in-from-top-2 border border-green-200 dark:border-green-900/30">
-              <CheckCircle size={20} />
-              <div><span className="font-bold text-sm block">Cours publié !</span><span className="text-xs opacity-80">Visible par tous les étudiants.</span></div>
-            </div>
-          )}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
-          {status === 'error' && (
-            <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 text-red-600 rounded-xl flex items-center gap-3 animate-in fade-in slide-in-from-top-2 border border-red-200 dark:border-red-900/30">
-              <AlertCircle size={20} />
-              <span className="font-bold text-sm">Erreur lors de la publication. Vérifiez les champs.</span>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-xs font-black uppercase text-gray-400 mb-2 ml-1">Titre du Module</label>
-              <input name="title" value={formData.title} onChange={handleChange} required placeholder="Ex: Architecture TCP/IP" className="w-full p-4 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 outline-none focus:border-ucak-blue font-bold text-gray-700 dark:text-white" />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-black uppercase text-gray-400 mb-2 ml-1">Instructeur</label>
-                {/* CORRECTION : name="instructor_name" */}
-                <input name="instructor_name" value={formData.instructor_name} onChange={handleChange} required placeholder="Ex: Dr. Sene" className="w-full p-4 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 outline-none focus:border-ucak-blue font-bold" />
+          {/* COLONNE GAUCHE : INFOS GÉNÉRALES */}
+          <div className="lg:col-span-1 space-y-6">
+            <div className="bg-white/5 p-6 rounded-2xl border border-white/10">
+              <h3 className="font-bold text-lg mb-4 flex items-center gap-2 text-ucak-blue"><LayoutList size={20}/> Informations</h3>
+              <div className="space-y-4">
+                <div>
+                    <label className="text-[10px] uppercase font-bold text-gray-500 ml-1">Titre du Cours</label>
+                    <input 
+                    placeholder="Ex: Réseaux TCP/IP" 
+                    value={courseData.title}
+                    onChange={(e) => setCourseData({...courseData, title: e.target.value})}
+                    className="w-full p-3 bg-black/20 rounded-xl border border-white/10 text-sm focus:border-ucak-blue outline-none transition-colors"
+                    />
+                </div>
+                <div>
+                    <label className="text-[10px] uppercase font-bold text-gray-500 ml-1">Instructeur</label>
+                    <input 
+                    placeholder="Ex: Dr. Sene" 
+                    value={courseData.instructor_name}
+                    onChange={(e) => setCourseData({...courseData, instructor_name: e.target.value})}
+                    className="w-full p-3 bg-black/20 rounded-xl border border-white/10 text-sm focus:border-ucak-blue outline-none transition-colors"
+                    />
+                </div>
+                <div>
+                    <label className="text-[10px] uppercase font-bold text-gray-500 ml-1">Filière</label>
+                    <select 
+                    value={courseData.filiere_tag}
+                    onChange={(e) => setCourseData({...courseData, filiere_tag: e.target.value})}
+                    className="w-full p-3 bg-black/20 rounded-xl border border-white/10 text-sm focus:border-ucak-blue outline-none transition-colors"
+                    >
+                    <option value="Informatique">Informatique</option>
+                    <option value="HEC">HEC / Gestion</option>
+                    <option value="Génie Civil">Génie Civil</option>
+                    </select>
+                </div>
+                <div>
+                    <label className="text-[10px] uppercase font-bold text-gray-500 ml-1">Niveau</label>
+                    <select 
+                    value={courseData.level}
+                    onChange={(e) => setCourseData({...courseData, level: e.target.value})}
+                    className="w-full p-3 bg-black/20 rounded-xl border border-white/10 text-sm focus:border-ucak-blue outline-none transition-colors"
+                    >
+                    <option value="Débutant">Débutant (L1)</option>
+                    <option value="Intermédiaire">Intermédiaire (L2)</option>
+                    <option value="Avancé">Avancé (L3)</option>
+                    </select>
+                </div>
+                <textarea 
+                  placeholder="Description du cours..." 
+                  value={courseData.description}
+                  onChange={(e) => setCourseData({...courseData, description: e.target.value})}
+                  className="w-full p-3 bg-black/20 rounded-xl border border-white/10 text-sm focus:border-ucak-blue outline-none min-h-[100px]"
+                />
               </div>
-              <div>
-                <label className="block text-xs font-black uppercase text-gray-400 mb-2 ml-1">Durée</label>
-                <input name="duration" value={formData.duration} onChange={handleChange} required placeholder="Ex: 12h 30m" className="w-full p-4 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 outline-none focus:border-ucak-blue font-bold" />
+            </div>
+          </div>
+
+          {/* COLONNE DROITE : GESTION DES MODULES */}
+          <div className="lg:col-span-2 space-y-6">
+            
+            {/* Ajout Module */}
+            <div className="bg-white/5 p-6 rounded-2xl border border-white/10 relative overflow-hidden group hover:border-ucak-blue/30 transition-colors">
+              <div className="absolute top-0 right-0 p-20 bg-ucak-blue/5 rounded-full blur-3xl pointer-events-none"></div>
+              <h3 className="font-bold text-lg mb-4 flex items-center gap-2 relative z-10 text-white"><Plus size={20} className="text-ucak-blue"/> Ajouter un Chapitre</h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 relative z-10">
+                <div className="md:col-span-2">
+                    <input 
+                    placeholder="Titre du Chapitre (ex: Introduction aux SGBD)" 
+                    value={newModule.title}
+                    onChange={(e) => setNewModule({...newModule, title: e.target.value})}
+                    className="w-full p-3 bg-black/40 rounded-xl border border-white/10 text-sm focus:border-ucak-blue outline-none font-bold"
+                    />
+                </div>
+                <div className="relative">
+                  <Video size={16} className="absolute left-3 top-3.5 text-red-400" />
+                  <input 
+                    placeholder="Lien YouTube" 
+                    value={newModule.video_url}
+                    onChange={(e) => setNewModule({...newModule, video_url: e.target.value})}
+                    className="w-full pl-10 p-3 bg-black/40 rounded-xl border border-white/10 text-sm focus:border-ucak-blue outline-none"
+                  />
+                </div>
+                <div className="relative">
+                  <FileText size={16} className="absolute left-3 top-3.5 text-blue-400" />
+                  <input 
+                    placeholder="Lien PDF (Drive/Dropbox)" 
+                    value={newModule.pdf_url}
+                    onChange={(e) => setNewModule({...newModule, pdf_url: e.target.value})}
+                    className="w-full pl-10 p-3 bg-black/40 rounded-xl border border-white/10 text-sm focus:border-ucak-blue outline-none"
+                  />
+                </div>
               </div>
+              <button 
+                onClick={addModule}
+                className="w-full py-3 bg-ucak-blue hover:bg-ucak-green text-white rounded-xl font-bold text-xs uppercase tracking-widest transition-all relative z-10 shadow-lg"
+              >
+                + Ajouter ce module à la liste
+              </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-black uppercase text-gray-400 mb-2 ml-1">Filière</label>
-                {/* CORRECTION : name="filiere_tag" */}
-                <select name="filiere_tag" value={formData.filiere_tag} onChange={handleChange} className="w-full p-4 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 outline-none focus:border-ucak-blue font-bold">
-                  <option value="Informatique">Informatique & Télécoms</option>
-                  <option value="HEC">Gestion & HEC</option>
-                  <option value="Génie Civil">Génie Civil</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-black uppercase text-gray-400 mb-2 ml-1">Niveau</label>
-                <select name="level" value={formData.level} onChange={handleChange} className="w-full p-4 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 outline-none focus:border-ucak-blue font-bold">
-                  <option value="Débutant">Débutant (L1)</option>
-                  <option value="Intermédiaire">Intermédiaire (L2)</option>
-                  <option value="Avancé">Avancé (L3)</option>
-                </select>
-              </div>
+            {/* Liste des Modules Ajoutés */}
+            <div className="space-y-3">
+              {courseData.modules.length > 0 && <p className="text-xs font-bold text-gray-500 uppercase tracking-widest pl-1">Chapitres prêts à publier</p>}
+              
+              {courseData.modules.map((mod, idx) => (
+                <div key={idx} className="flex items-center justify-between p-4 bg-white/5 border border-white/5 rounded-xl hover:bg-white/10 transition-colors">
+                  <div className="flex items-center gap-4">
+                    <span className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-xs font-black text-gray-400">{idx + 1}</span>
+                    <div>
+                      <p className="font-bold text-sm text-white">{mod.title}</p>
+                      <div className="flex gap-4 text-[10px] text-gray-400 mt-1">
+                        <a href={mod.video_url} target="_blank" className="flex items-center gap-1 hover:text-red-400 transition-colors"><Video size={12}/> Lien Vidéo</a>
+                        {mod.pdf_url && <a href={mod.pdf_url} target="_blank" className="flex items-center gap-1 hover:text-blue-400 transition-colors"><FileText size={12}/> Lien PDF</a>}
+                      </div>
+                    </div>
+                  </div>
+                  <button onClick={() => removeModule(idx)} className="p-2 rounded-lg hover:bg-red-500/20 text-gray-500 hover:text-red-500 transition-colors">
+                    <Trash2 size={18} />
+                  </button>
+                </div>
+              ))}
+              
+              {courseData.modules.length === 0 && (
+                <div className="text-center py-10 border-2 border-dashed border-white/10 rounded-xl text-gray-500 text-sm">
+                  <LayoutList className="mx-auto mb-2 opacity-20" size={32} />
+                  Commencez par ajouter des chapitres ci-dessus.
+                </div>
+              )}
             </div>
 
-            {/* Description (Optionnel mais recommandé pour éviter les chaines vides si le back le demande) */}
-            <div>
-               <label className="block text-xs font-black uppercase text-gray-400 mb-2 ml-1">Description courte</label>
-               <textarea name="description" value={formData.description} onChange={handleChange} placeholder="Objectifs du cours..." className="w-full p-4 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 outline-none focus:border-ucak-blue font-bold min-h-[100px]" />
+            {/* Actions Finales */}
+            <div className="pt-6 border-t border-white/10 flex items-center justify-between">
+               <div className="flex-1">
+                 {status === 'success' && <div className="flex items-center gap-2 text-green-400 text-xs font-bold bg-green-500/10 px-3 py-2 rounded-lg border border-green-500/20"><CheckCircle size={14}/> Cours publié avec succès !</div>}
+                 {status === 'error' && <div className="flex items-center gap-2 text-red-400 text-xs font-bold bg-red-500/10 px-3 py-2 rounded-lg border border-red-500/20"><AlertCircle size={14}/> Erreur technique. Vérifiez la console.</div>}
+               </div>
+               
+               <button 
+                 onClick={handleSubmit}
+                 disabled={status === 'loading' || courseData.modules.length === 0}
+                 className="px-8 py-4 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 text-white rounded-xl font-black uppercase tracking-widest shadow-xl shadow-green-900/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3 transition-all transform active:scale-95"
+               >
+                 {status === 'loading' ? 'Publication...' : <><Save size={18}/> Publier le Cours</>}
+               </button>
             </div>
 
-            <button type="submit" disabled={status === 'loading'} className="w-full py-4 bg-ucak-blue text-white rounded-xl font-black uppercase tracking-widest hover:bg-ucak-green transition-all shadow-xl flex items-center justify-center gap-3 disabled:opacity-70 mt-4">
-              {status === 'loading' ? 'Publication...' : <><Plus size={20} /> Publier le Cours</>}
-            </button>
-          </form>
+          </div>
         </div>
       </div>
     </div>
