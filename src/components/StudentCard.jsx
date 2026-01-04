@@ -7,18 +7,21 @@ export default function StudentCard() {
 
   const studentName = user?.full_name || "Étudiant Invité";
   const studentFiliere = user?.filiere || "Visiteur";
-  const studentMatricule = user?.matricule || "UCAK-GUEST";
+  const studentMatricule = user?.matricule || "GUEST";
   const currentYear = "2025-2026";
 
-  // QR Code sécurisé pointant vers URL de vérif
-  const encryptedToken = btoa(`UCAK-SECURE-${studentMatricule}-${Date.now()}`);
+  // GÉNÉRATION DU TOKEN COMPATIBLE AVEC LE BACKEND
+  // Format attendu par le backend: UCAK-SECURE-MATRICULE-TIMESTAMP
+  const tokenString = `UCAK-SECURE-${studentMatricule}-${Date.now()}`;
+  const encryptedToken = btoa(tokenString); // Encodage Base64 simple
+  
   const secureQrData = `${window.location.origin}/verify/student/${encryptedToken}`;
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(secureQrData)}&bgcolor=ffffff&color=000000&margin=2`;
 
   return (
     <div className="w-full relative overflow-hidden rounded-[1.5rem] bg-gradient-to-br from-[#0f141e] to-[#1a2333] text-white shadow-2xl border border-gray-700/50 p-6 flex flex-col justify-between h-full min-h-[240px] group transition-transform hover:scale-[1.01]">
       <div className="absolute top-0 bottom-0 left-8 w-0.5 bg-gradient-to-b from-transparent via-white/30 to-transparent z-0"></div>
-      <div className="absolute inset-0 ucak-pattern opacity-10 pointer-events-none z-0"></div>
+      <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] pointer-events-none z-0"></div>
       <img src={logoUcak} alt="" className="absolute -bottom-8 -right-8 w-56 h-56 opacity-[0.03] pointer-events-none grayscale rotate-12" />
 
       {/* Header */}
