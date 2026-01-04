@@ -1,91 +1,90 @@
 import { useState, useEffect } from 'react';
-import { ShieldCheck, CheckCircle, AlertTriangle, FileText, Lock, Loader2 } from 'lucide-react';
-import { api } from '../context/UserContext'; // Import de l'instance liée
+import { api } from '../context/UserContext';
+import { Vote, CheckCircle2, User, Lock } from 'lucide-react';
 
 export default function Elections() {
-  const [election, setElection] = useState(null);
+  const [elections, setElections] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedCandidate, setSelectedCandidate] = useState(null);
-  const [hasVoted, setHasVoted] = useState(false);
-  const [showManifesto, setShowManifesto] = useState(null);
 
   useEffect(() => {
-    const fetchElections = async () => {
+    const fetchData = async () => {
       try {
-        // Récupère toutes les élections
-        const response = await api.get('/api/v1/elections');
-        // On sélectionne la première élection ouverte (OPEN)
-        const active = response.data.find(e => e.status === 'open') || response.data[0];
-        setElection(active);
-      } catch (error) {
-        console.error("Erreur de chargement des élections", error);
+        const res = await api.get('/api/v1/elections');
+        // On ne garde que les élections ouvertes ou fermées (pas les brouillons si on veut)
+        const publicElections = res.data.filter(e => e.status !== 'draft');
+        setElections(publicElections);
+      } catch (e) {
+        console.error(e);
       } finally {
         setLoading(false);
       }
     };
-    fetchElections();
+    fetchData();
   }, []);
 
-  const handleVote = async () => {
-    if (!selectedCandidate) return;
-    // Ici, vous pourrez ajouter l'appel API de vote quand il sera prêt sur le back
-    setHasVoted(true);
-    window.scrollTo(0, 0);
-  };
-
-  if (loading) return <div className="pt-40 text-center"><Loader2 className="animate-spin mx-auto" /></div>;
-  if (!election) return <div className="pt-40 text-center">Aucune élection disponible.</div>;
+  if (loading) return <div className="min-h-screen pt-32 text-center text-gray-500">Chargement des scrutins...</div>;
 
   return (
-    <div className="pt-32 pb-20 min-h-screen bg-gray-50 dark:bg-ucak-dark">
-      <div className="container mx-auto px-6 max-w-5xl">
+    <div className="min-h-screen pt-32 pb-20 bg-gray-50 dark:bg-ucak-dark px-6">
+      <div className="container mx-auto max-w-5xl">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-black text-ucak-blue dark:text-white mb-4">{election.title}</h1>
-          <p className="text-gray-600 dark:text-gray-400">{election.description}</p>
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-ucak-blue/10 text-ucak-blue rounded-full text-xs font-black uppercase tracking-widest mb-4">
+            <Lock size={12} /> Zone Sécurisée Blockchain
+          </div>
+          <h1 className="text-4xl font-black text-ucak-blue dark:text-white mb-2">Espace Électoral</h1>
+          <p className="text-gray-500">Participez à la vie démocratique de l'université.</p>
         </div>
 
-        {hasVoted ? (
-          <div className="bg-green-50 dark:bg-green-900/20 p-12 rounded-3xl text-center border border-green-200">
-            <CheckCircle size={48} className="mx-auto mb-4 text-green-600" />
-            <h2 className="text-2xl font-bold text-green-800">Vote enregistré !</h2>
+        {elections.length === 0 ? (
+          <div className="bg-white dark:bg-ucak-dark-card p-12 rounded-[2.5rem] text-center shadow-xl border border-gray-100 dark:border-white/5 max-w-2xl mx-auto">
+            <Vote size={64} className="mx-auto mb-6 text-gray-300" />
+            <h3 className="text-xl font-bold mb-2">Aucun vote en cours</h3>
+            <p className="text-gray-500">Il n'y a pas d'élection active pour le moment.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {election.candidates?.map((candidate) => (
-              <div 
-                key={candidate.id}
-                onClick={() => setSelectedCandidate(candidate.id)}
-                className={`bg-white dark:bg-ucak-dark-card rounded-2xl overflow-hidden cursor-pointer border-2 transition-all ${
-                  selectedCandidate === candidate.id ? 'border-ucak-green scale-105' : 'border-transparent shadow-lg'
-                }`}
-              >
-                <img src={candidate.photo_url || 'https://via.placeholder.com/400'} alt={candidate.full_name} className="h-48 w-full object-cover" />
-                <div className="p-6">
-                  <h3 className="font-bold text-xl mb-2">{candidate.full_name}</h3>
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); setShowManifesto(showManifesto === candidate.id ? null : candidate.id); }}
-                    className="text-xs font-bold text-ucak-blue underline"
-                  >
-                    Voir le programme
-                  </button>
-                  {showManifesto === candidate.id && <p className="mt-4 text-xs text-gray-600 italic">{candidate.biography}</p>}
+          <div className="space-y-12">
+            {elections.map(election => (
+              <div key={election.id} className="bg-white dark:bg-ucak-dark-card rounded-[2.5rem] overflow-hidden shadow-2xl border border-gray-100 dark:border-white/5">
+                {/* Header Élection */}
+                <div className="bg-ucak-blue p-8 text-white flex justify-between items-start">
+                  <div>
+                    <h2 className="text-2xl font-black mb-1">{election.title}</h2>
+                    <p className="opacity-80 text-sm max-w-xl">{election.description || "Faites entendre votre voix."}</p>
+                  </div>
+                  <div className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest ${election.status === 'open' ? 'bg-white text-ucak-blue' : 'bg-red-500 text-white'}`}>
+                    {election.status === 'open' ? 'Vote Ouvert' : 'Terminé'}
+                  </div>
+                </div>
+
+                {/* Liste Candidats */}
+                <div className="p-8">
+                  <h3 className="text-xs font-black uppercase text-gray-400 tracking-widest mb-6">Candidats en lice</h3>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {election.candidates && election.candidates.length > 0 ? (
+                      election.candidates.map(candidate => (
+                        <div key={candidate.id} className="flex items-center gap-4 p-4 rounded-2xl border border-gray-100 dark:border-white/5 hover:border-ucak-blue/50 hover:bg-gray-50 dark:hover:bg-white/5 transition-all group cursor-pointer">
+                          <div className="w-16 h-16 rounded-xl bg-gray-200 dark:bg-white/10 flex items-center justify-center text-2xl font-black text-gray-400 overflow-hidden">
+                            {candidate.photo_url ? <img src={candidate.photo_url} alt="" className="w-full h-full object-cover"/> : candidate.full_name.charAt(0)}
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="font-bold text-lg text-gray-800 dark:text-white">{candidate.full_name}</h4>
+                            <p className="text-xs text-gray-500 line-clamp-1">{candidate.biography}</p>
+                          </div>
+                          {election.status === 'open' && (
+                            <button className="w-10 h-10 rounded-full border-2 border-gray-200 dark:border-white/20 flex items-center justify-center text-gray-300 group-hover:bg-ucak-blue group-hover:border-ucak-blue group-hover:text-white transition-all">
+                              <CheckCircle2 size={20} />
+                            </button>
+                          )}
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-gray-400 text-sm italic col-span-2">Les candidats n'ont pas encore été annoncés.</p>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
-          </div>
-        )}
-
-        {!hasVoted && (
-          <div className="fixed bottom-0 left-0 w-full bg-white dark:bg-ucak-dark-card border-t p-4 z-40 shadow-xl">
-            <div className="container mx-auto flex justify-center max-w-4xl">
-              <button 
-                onClick={handleVote}
-                disabled={!selectedCandidate}
-                className="px-10 py-4 bg-ucak-green text-white rounded-xl font-bold disabled:bg-gray-300"
-              >
-                Confirmer mon vote
-              </button>
-            </div>
           </div>
         )}
       </div>
