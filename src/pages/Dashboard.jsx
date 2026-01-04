@@ -2,7 +2,7 @@ import { useUser } from '../context/UserContext';
 import StudentCard from '../components/StudentCard';
 import { 
   Briefcase, Trophy, Users, Clock, Calendar, 
-  ArrowUpRight, BookOpen, MoreHorizontal, Bell, Shield 
+  ArrowUpRight, BookOpen, MoreHorizontal, Bell, Shield, Vote, Newspaper 
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -21,7 +21,7 @@ const QuickAction = ({ icon: Icon, label, path, color, delay }) => (
 );
 
 export default function Dashboard() {
-  const { user, isAdmin } = useUser(); // On récupère isAdmin
+  const { user, isAdmin } = useUser();
 
   const nextClass = { title: "Architecture Réseaux", time: "14:00", room: "Amphi A", status: "Dans 30 min" };
   const notifications = [ { id: 1, text: "Note disponible : Algorithmique", time: "2 min" }, { id: 2, text: "Nouveau stage : Orange Sénégal", time: "1h" } ];
@@ -67,7 +67,7 @@ export default function Dashboard() {
                    <div className="h-2 bg-black/20 rounded-full overflow-hidden"><motion.div initial={{ width: 0 }} animate={{ width: `${Math.min(((user?.xp_points || 0) / 2000) * 100, 100)}%` }} className="h-full bg-ucak-green" /></div>
                 </div>
               )}
-              {isAdmin && <p className="relative z-10 mt-6 text-sm opacity-70">Vous avez les droits pour gérer les cours, les utilisateurs et le contenu de la plateforme.</p>}
+              {isAdmin && <p className="relative z-10 mt-6 text-sm opacity-70">Vous avez tous les droits. Utilisez les raccourcis ci-dessous pour gérer la plateforme.</p>}
            </div>
 
            <div className="bg-white dark:bg-ucak-dark-card p-6 rounded-[2.5rem] border border-gray-100 dark:border-white/5 flex flex-col justify-center">
@@ -77,14 +77,21 @@ export default function Dashboard() {
               <div className="mt-auto"><span className="inline-block px-3 py-1 bg-green-100 dark:bg-green-900/20 text-green-600 text-[10px] font-black uppercase rounded-lg">{nextClass.status}</span></div>
            </div>
 
-           {/* --- ACTIONS RAPIDES (AVEC ADMIN OPTION) --- */}
+           {/* --- ACTIONS RAPIDES (DYNAMIQUES ADMIN/STUDENT) --- */}
+           
            {isAdmin ? (
-             <QuickAction icon={Shield} label="Gérer les Cours" path="/admin/courses" color="from-red-500 to-orange-500" delay={0.1} />
+             <>
+                <QuickAction icon={Shield} label="Gérer les Cours" path="/admin/courses" color="from-red-500 to-orange-500" delay={0.1} />
+                <QuickAction icon={Vote} label="Gérer les Votes" path="/admin/elections" color="from-blue-500 to-indigo-500" delay={0.2} />
+                <QuickAction icon={Newspaper} label="Publier News" path="/admin/news" color="from-purple-500 to-pink-500" delay={0.3} />
+             </>
            ) : (
-             <QuickAction icon={BookOpen} label="Bibliothèque" path="/knowledge" color="from-blue-400 to-blue-600" delay={0.1} />
+             <>
+                <QuickAction icon={BookOpen} label="Bibliothèque" path="/knowledge" color="from-blue-400 to-blue-600" delay={0.1} />
+                <QuickAction icon={Briefcase} label="Offres Stages" path="/career" color="from-green-400 to-green-600" delay={0.2} />
+                <QuickAction icon={Users} label="Réseau Alumni" path="/network" color="from-purple-400 to-purple-600" delay={0.3} />
+             </>
            )}
-           <QuickAction icon={Briefcase} label="Offres Stages" path="/career" color="from-green-400 to-green-600" delay={0.2} />
-           <QuickAction icon={Users} label="Réseau Alumni" path="/network" color="from-purple-400 to-purple-600" delay={0.3} />
            
            <div className="md:col-span-1 bg-white dark:bg-ucak-dark-card p-6 rounded-[2.5rem] border border-gray-100 dark:border-white/5">
               <div className="flex justify-between items-center mb-6"><h4 className="font-black text-sm uppercase tracking-widest">Activité</h4><MoreHorizontal size={16} className="text-gray-400" /></div>

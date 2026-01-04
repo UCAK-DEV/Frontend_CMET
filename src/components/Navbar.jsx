@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Sun, Moon, LogIn, LogOut, User, Menu, X, Briefcase, Award, 
-  Newspaper, Trophy, ChevronRight, Users, ShieldAlert, BookOpen 
+  Newspaper, Trophy, Users, ShieldAlert 
 } from 'lucide-react';
 import { useUser } from '../context/UserContext';
 import logoUcak from '../assets/logo-ucak.png';
@@ -36,10 +36,12 @@ export default function Navbar() {
     { name: user ? 'Bibliothèque' : 'Formations', path: user ? '/knowledge' : '/formation/informatique' },
     ...(user ? [{ name: 'Mon Espace', path: '/dashboard' }] : []),
     
-    // --- LIENS ADMIN ---
+    // --- MENU ADMIN COMPLET ---
     ...(isAdmin ? [
-      { name: 'Créer Cours', path: '/admin/courses', isSpecial: true },
-      { name: 'Étudiants', path: '/admin/students', isSpecial: true }
+      { name: 'Cours', path: '/admin/courses', isSpecial: true },
+      { name: 'Étudiants', path: '/admin/students', isSpecial: true },
+      { name: 'Votes', path: '/admin/elections', isSpecial: true },
+      { name: 'News', path: '/admin/news', isSpecial: true }
     ] : []),
   ];
 
@@ -68,6 +70,7 @@ export default function Navbar() {
           </div>
         </Link>
 
+        {/* Desktop Menu */}
         <div className="hidden md:flex items-center gap-1 bg-gray-50 dark:bg-white/5 p-1.5 rounded-full border border-gray-100 dark:border-white/5">
           {primaryLinks.map((link) => (
             <Link 
@@ -87,6 +90,7 @@ export default function Navbar() {
           ))}
         </div>
 
+        {/* User & Theme Actions */}
         <div className="flex items-center gap-3">
           <button onClick={toggleTheme} className="p-2.5 rounded-full text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 hover:text-ucak-blue transition-colors">
             {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
@@ -117,6 +121,14 @@ export default function Navbar() {
                     </div>
                     
                     <div className="p-2">
+                      {isAdmin && (
+                        <div className="mb-2 pb-2 border-b border-gray-100 dark:border-white/5">
+                           <p className="px-4 py-1 text-[10px] uppercase font-bold text-gray-400">Outils Admin</p>
+                           <Link to="/admin/courses" className="flex items-center gap-3 px-4 py-2 text-xs font-bold text-gray-600 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-lg">Cours</Link>
+                           <Link to="/admin/elections" className="flex items-center gap-3 px-4 py-2 text-xs font-bold text-gray-600 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-lg">Votes</Link>
+                        </div>
+                      )}
+                      
                       {secondaryLinks.filter(l => l.path !== '/dashboard').map((link) => (
                         <Link key={link.path} to={link.path} className="flex items-center gap-3 px-4 py-3 text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl transition-colors">
                           <link.icon size={16} className="text-gray-400"/> {link.name}
@@ -132,7 +144,7 @@ export default function Navbar() {
               </AnimatePresence>
             </div>
           ) : (
-            <Link to="/login" className="hidden md:flex items-center gap-2 px-6 py-2.5 bg-ucak-blue text-white rounded-full text-xs font-black uppercase tracking-widest hover:bg-ucak-green hover:shadow-lg hover:shadow-ucak-green/20 transition-all transform hover:-translate-y-0.5">
+            <Link to="/login" className="hidden md:flex items-center gap-2 px-6 py-2.5 bg-ucak-blue text-white rounded-full text-xs font-black uppercase tracking-widest hover:bg-ucak-green hover:shadow-lg transition-all">
               <LogIn size={16} /> Connexion
             </Link>
           )}

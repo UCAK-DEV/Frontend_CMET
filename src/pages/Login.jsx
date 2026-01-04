@@ -8,12 +8,8 @@ import logoUcak from '../assets/logo-ucak.png';
 export default function Login() {
   const [isRegister, setIsRegister] = useState(false);
   const [formData, setFormData] = useState({ 
-    email: '', 
-    password: '', 
-    full_name: '', 
-    matricule: '', 
-    filiere: 'Informatique & Télécoms', 
-    promo: 'Licence 1' 
+    email: '', password: '', full_name: '', matricule: '', 
+    filiere: 'Informatique & Télécoms', promo: 'Licence 1' 
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -34,12 +30,11 @@ export default function Login() {
         if (res.success) {
            setSuccessMsg("Compte créé ! Redirection...");
            setTimeout(() => navigate('/dashboard'), 1500);
-        }
-        else setError(res.message || "Erreur inscription");
+        } else setError(res.message || "Erreur inscription");
       } else {
         const res = await login(formData.email, formData.password);
         if (res.success) navigate('/dashboard');
-        else setError(res.message || "Identifiants incorrects");
+        else setError("Identifiants incorrects");
       }
     } catch (err) { setError("Erreur technique"); } 
     finally { setIsLoading(false); }
@@ -47,7 +42,6 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex bg-white dark:bg-ucak-dark overflow-hidden">
-      {/* Branding Gauche */}
       <div className={`hidden lg:flex w-1/2 relative items-center justify-center p-12 transition-colors duration-700 ${isRegister ? 'bg-purple-900' : 'bg-ucak-blue'}`}>
         <div className="absolute inset-0 ucak-pattern opacity-10"></div>
         <div className="relative z-10 text-white max-w-lg">
@@ -57,7 +51,6 @@ export default function Login() {
         </div>
       </div>
 
-      {/* Formulaire Droite */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
         <div className="w-full max-w-md">
            <div className="text-center mb-8">

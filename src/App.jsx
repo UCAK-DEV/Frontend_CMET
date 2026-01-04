@@ -12,32 +12,35 @@ import PageWrapper from './components/PageWrapper';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 
-// Lazy Loading des Pages
+// Pages Publiques
 const Hero = lazy(() => import('./components/Hero'));
 const About = lazy(() => import('./pages/About'));
 const News = lazy(() => import('./pages/News'));
 const Showroom = lazy(() => import('./pages/Showroom'));
-const Knowledge = lazy(() => import('./pages/Knowledge'));
-const Challenges = lazy(() => import('./pages/Challenges'));
-const Networking = lazy(() => import('./pages/Networking'));
-const Elections = lazy(() => import('./pages/Elections'));
+const ITCurriculum = lazy(() => import('./components/ITCurriculum'));
+const ProjectDetails = lazy(() => import('./pages/ProjectDetails'));
 const Login = lazy(() => import('./pages/Login'));
+const NotFound = lazy(() => import('./pages/NotFound'));
+const VerifyStudent = lazy(() => import('./pages/VerifyStudent'));
+
+// Pages Étudiant
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const CareerCenter = lazy(() => import('./pages/CareerCenter'));
 const CVGenerator = lazy(() => import('./pages/CVGenerator'));
-const ITCurriculum = lazy(() => import('./components/ITCurriculum'));
-const ProjectDetails = lazy(() => import('./pages/ProjectDetails'));
+const Knowledge = lazy(() => import('./pages/Knowledge'));
 const CoursePlayer = lazy(() => import('./pages/CoursePlayer'));
-const NotFound = lazy(() => import('./pages/NotFound'));
-const VerifyStudent = lazy(() => import('./pages/VerifyStudent'));
+const Challenges = lazy(() => import('./pages/Challenges'));
+const Networking = lazy(() => import('./pages/Networking'));
+const Elections = lazy(() => import('./pages/Elections'));
 
 // Pages Admin
 const AdminCourses = lazy(() => import('./pages/admin/AdminCourses'));
 const AdminStudents = lazy(() => import('./pages/admin/AdminStudents'));
+const AdminElections = lazy(() => import('./pages/admin/AdminElections')); // NOUVEAU
+const AdminNews = lazy(() => import('./pages/admin/AdminNews'));           // NOUVEAU
 
 function AnimatedRoutes() {
   const location = useLocation();
-  // Mode immersif : Cache Navbar/Footer pour Lecteur Cours et Scan QR
   const isImmersiveMode = location.pathname.startsWith('/course/') || location.pathname.startsWith('/verify/');
 
   return (
@@ -58,11 +61,9 @@ function AnimatedRoutes() {
               <Route path="/showroom" element={<PageWrapper><Showroom /></PageWrapper>} />
               <Route path="/project/:id" element={<PageWrapper><ProjectDetails /></PageWrapper>} />
               <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
-              
-              {/* === VERIFICATION QR (Publique avec Token) === */}
               <Route path="/verify/student/:token" element={<PageWrapper><VerifyStudent /></PageWrapper>} />
 
-              {/* === ÉTUDIANT (Protégé) === */}
+              {/* === ÉTUDIANT === */}
               <Route path="/dashboard" element={<ProtectedRoute><PageWrapper><Dashboard /></PageWrapper></ProtectedRoute>} />
               <Route path="/career" element={<ProtectedRoute><PageWrapper><CareerCenter /></PageWrapper></ProtectedRoute>} />
               <Route path="/cv-builder" element={<ProtectedRoute><PageWrapper><CVGenerator /></PageWrapper></ProtectedRoute>} />
@@ -72,9 +73,11 @@ function AnimatedRoutes() {
               <Route path="/network" element={<ProtectedRoute><PageWrapper><Networking /></PageWrapper></ProtectedRoute>} />
               <Route path="/elections" element={<ProtectedRoute><PageWrapper><Elections /></PageWrapper></ProtectedRoute>} />
 
-              {/* === ADMIN (Webmaster) === */}
+              {/* === ADMIN (Tous les outils) === */}
               <Route path="/admin/courses" element={<AdminRoute><PageWrapper><AdminCourses /></PageWrapper></AdminRoute>} />
               <Route path="/admin/students" element={<AdminRoute><PageWrapper><AdminStudents /></PageWrapper></AdminRoute>} />
+              <Route path="/admin/elections" element={<AdminRoute><PageWrapper><AdminElections /></PageWrapper></AdminRoute>} />
+              <Route path="/admin/news" element={<AdminRoute><PageWrapper><AdminNews /></PageWrapper></AdminRoute>} />
               
               <Route path="*" element={<NotFound />} />
             </Routes>
