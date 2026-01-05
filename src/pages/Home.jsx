@@ -13,9 +13,8 @@ export default function Home() {
   return (
     <div className="overflow-hidden bg-gray-50 dark:bg-ucak-dark">
       
-      {/* === 1. HERO SECTION (Identité Club & UFR) === */}
+      {/* === 1. HERO SECTION === */}
       <section className="relative pt-36 pb-24 min-h-[95vh] flex items-center bg-white dark:bg-ucak-dark">
-        {/* Fond animé */}
         <div className="absolute inset-0 ucak-pattern opacity-20 pointer-events-none"></div>
         <div className="absolute top-20 left-0 w-[600px] h-[600px] bg-ucak-green/10 rounded-full blur-[120px] -z-10 pointer-events-none"></div>
         
@@ -59,7 +58,6 @@ export default function Home() {
               </Link>
             )}
             
-            {/* Lien d'ancrage vers les Valeurs (Section ci-dessous) */}
             <a href="#ufr-met">
               <button className="px-10 py-5 bg-white dark:bg-white/5 text-ucak-blue dark:text-white border border-gray-200 dark:border-white/10 font-black rounded-2xl hover:bg-gray-50 dark:hover:bg-white/10 transition-all backdrop-blur-xl uppercase tracking-widest text-xs">
                 Découvrir l'UFR
