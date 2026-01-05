@@ -18,6 +18,7 @@ const About = lazy(() => import('./pages/About'));
 const News = lazy(() => import('./pages/News'));
 const Showroom = lazy(() => import('./pages/Showroom'));
 const ITCurriculum = lazy(() => import('./components/ITCurriculum'));
+const HECCurriculum = lazy(() => import('./components/HECCurriculum')); // NOUVEAU IMPORT
 const ProjectDetails = lazy(() => import('./pages/ProjectDetails'));
 const Login = lazy(() => import('./pages/Login'));
 const NotFound = lazy(() => import('./pages/NotFound'));
@@ -65,6 +66,7 @@ function AnimatedRoutes() {
               {/* === VISITEURS === */}
               <Route path="/about" element={<PageWrapper><About /></PageWrapper>} />
               <Route path="/formation/informatique" element={<PageWrapper><ITCurriculum /></PageWrapper>} />
+              <Route path="/formation/hec" element={<PageWrapper><HECCurriculum /></PageWrapper>} /> {/* NOUVELLE ROUTE */}
               <Route path="/news" element={<PageWrapper><News /></PageWrapper>} />
               <Route path="/showroom" element={<PageWrapper><Showroom /></PageWrapper>} />
               <Route path="/project/:id" element={<PageWrapper><ProjectDetails /></PageWrapper>} />
