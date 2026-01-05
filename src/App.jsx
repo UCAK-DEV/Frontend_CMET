@@ -1,5 +1,5 @@
 import { Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { UserProvider } from './context/UserContext';
 
@@ -12,9 +12,7 @@ import PageWrapper from './components/PageWrapper';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 
-// --- LAZY LOADING ---
-
-// Pages Publiques
+// --- PAGES ---
 const Home = lazy(() => import('./pages/Home')); 
 const Login = lazy(() => import('./pages/Login'));
 const ITCurriculum = lazy(() => import('./components/ITCurriculum'));
@@ -43,6 +41,7 @@ const AdminNews = lazy(() => import('./pages/admin/AdminNews'));
 
 function AnimatedRoutes() {
   const location = useLocation();
+  // Cache la navbar sur le lecteur de cours pour l'immersion
   const isImmersiveMode = location.pathname.startsWith('/course/') || location.pathname.startsWith('/verify/');
 
   return (
@@ -50,26 +49,24 @@ function AnimatedRoutes() {
       <ScrollToTop />
       {!isImmersiveMode && <Navbar />}
       
-      {/* Pas de padding bottom forcé sur mobile car le nouveau menu est full screen ou header */}
       <main className="flex-1 relative min-h-screen">
         <Suspense fallback={<Loading />}>
           <AnimatePresence mode="wait">
             <Routes location={location} key={location.pathname}>
               
-              {/* === ZONE PUBLIQUE (Accessible à tous, même connectés) === */}
-              {/* Note: J'ai retiré le SmartHome pour permettre à l'étudiant de voir l'accueil public s'il clique sur "Accueil" */}
+              {/* === VISITEUR & TOUT PUBLIC === */}
+              {/* L'accueil reste l'accueil pour tout le monde */}
               <Route path="/" element={<PageWrapper><Home /></PageWrapper>} />
-              <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
               
+              <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
               <Route path="/formation/informatique" element={<PageWrapper><ITCurriculum /></PageWrapper>} />
               <Route path="/formation/hec" element={<PageWrapper><HECCurriculum /></PageWrapper>} />
-              
               <Route path="/news" element={<PageWrapper><News /></PageWrapper>} />
               <Route path="/showroom" element={<PageWrapper><Showroom /></PageWrapper>} />
               <Route path="/project/:id" element={<PageWrapper><ProjectDetails /></PageWrapper>} />
               <Route path="/verify/student/:token" element={<PageWrapper><VerifyStudent /></PageWrapper>} />
 
-              {/* === ZONE ÉTUDIANT (Protégée) === */}
+              {/* === ÉTUDIANT (Protégé) === */}
               <Route path="/dashboard" element={<ProtectedRoute><PageWrapper><Dashboard /></PageWrapper></ProtectedRoute>} />
               <Route path="/knowledge" element={<ProtectedRoute><PageWrapper><Knowledge /></PageWrapper></ProtectedRoute>} />
               <Route path="/course/:id" element={<ProtectedRoute><CoursePlayer /></ProtectedRoute>} />
@@ -82,7 +79,7 @@ function AnimatedRoutes() {
               <Route path="/network" element={<ProtectedRoute><PageWrapper><Networking /></PageWrapper></ProtectedRoute>} />
               <Route path="/elections" element={<ProtectedRoute><PageWrapper><Elections /></PageWrapper></ProtectedRoute>} />
 
-              {/* === ZONE ADMIN === */}
+              {/* === ADMIN === */}
               <Route path="/admin/courses" element={<AdminRoute><PageWrapper><AdminCourses /></PageWrapper></AdminRoute>} />
               <Route path="/admin/students" element={<AdminRoute><PageWrapper><AdminStudents /></PageWrapper></AdminRoute>} />
               <Route path="/admin/elections" element={<AdminRoute><PageWrapper><AdminElections /></PageWrapper></AdminRoute>} />

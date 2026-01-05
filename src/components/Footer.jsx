@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Facebook, Twitter, Linkedin, Instagram, MapPin, Mail, Phone, ExternalLink } from 'lucide-react';
+import { Facebook, Twitter, Linkedin, Instagram, MapPin, Mail, Phone } from 'lucide-react';
 import logoUcak from '../assets/logo-ucak.png';
 
 export default function Footer() {
@@ -32,7 +32,8 @@ export default function Footer() {
           <div>
             <h4 className="font-black text-ucak-blue dark:text-white uppercase tracking-widest mb-6 text-xs">Navigation</h4>
             <ul className="space-y-4 text-sm font-medium text-gray-500 dark:text-gray-400">
-              <li><Link to="/about" className="hover:text-ucak-green transition-colors">L'Institution</Link></li>
+              {/* Lien corrigé : pointe vers l'ancre #ufr-met de la page d'accueil */}
+              <li><a href="/#ufr-met" className="hover:text-ucak-green transition-colors">L'Institution</a></li>
               <li><Link to="/formation/informatique" className="hover:text-ucak-green transition-colors">Nos Formations</Link></li>
               <li><Link to="/showroom" className="hover:text-ucak-green transition-colors">Showroom Projets</Link></li>
               <li><Link to="/news" className="hover:text-ucak-green transition-colors">Actualités</Link></li>
