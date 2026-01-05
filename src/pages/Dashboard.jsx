@@ -49,8 +49,10 @@ export default function Dashboard() {
            
            <div className="md:col-span-1 md:row-span-2"><StudentCard /></div>
 
-           <div className="md:col-span-2 bg-ucak-blue text-white p-8 rounded-[2.5rem] relative overflow-hidden shadow-2xl flex flex-col justify-between min-h-[200px]">
+           {/* --- CARTE XP & BADGES (Modifiée) --- */}
+           <div className="md:col-span-2 bg-ucak-blue text-white p-8 rounded-[2.5rem] relative overflow-hidden shadow-2xl flex flex-col justify-between min-h-[220px]">
               <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+              
               <div className="relative z-10 flex justify-between items-start">
                  <div>
                     <h3 className="text-lg font-black opacity-80 mb-1">{isAdmin ? 'Mode Administrateur' : 'Niveau d\'Expérience'}</h3>
@@ -62,10 +64,29 @@ export default function Dashboard() {
               </div>
               
               {!isAdmin && (
-                <div className="relative z-10 mt-6">
-                   <div className="flex justify-between text-xs font-bold uppercase tracking-widest opacity-60 mb-2"><span>Progression</span><span>Niveau Suivant: 2000 XP</span></div>
-                   <div className="h-2 bg-black/20 rounded-full overflow-hidden"><motion.div initial={{ width: 0 }} animate={{ width: `${Math.min(((user?.xp_points || 0) / 2000) * 100, 100)}%` }} className="h-full bg-ucak-green" /></div>
-                </div>
+                <>
+                  <div className="relative z-10 mt-6">
+                     <div className="flex justify-between text-xs font-bold uppercase tracking-widest opacity-60 mb-2"><span>Progression</span><span>Niveau Suivant: 1000 XP</span></div>
+                     <div className="h-2 bg-black/20 rounded-full overflow-hidden">
+                       <motion.div initial={{ width: 0 }} animate={{ width: `${Math.min(((user?.xp_points || 0) / 1000) * 100, 100)}%` }} className="h-full bg-ucak-green" />
+                     </div>
+                  </div>
+
+                  {/* AJOUT : Affichage des Badges */}
+                  {user?.badges && user.badges.length > 0 && (
+                    <div className="mt-6 pt-4 border-t border-white/10 relative z-10">
+                      <p className="text-[10px] font-black uppercase tracking-widest opacity-60 mb-3">Succès débloqués</p>
+                      <div className="flex flex-wrap gap-2">
+                        {user.badges.map((badge, index) => (
+                          <div key={index} className="flex items-center gap-2 px-3 py-1.5 bg-white/10 backdrop-blur-md rounded-xl border border-white/5 hover:bg-white/20 transition-colors" title={`Obtenu le ${new Date(badge.unlockedAt).toLocaleDateString()}`}>
+                            <span className="text-lg">{badge.icon}</span>
+                            <span className="text-xs font-bold">{badge.name}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
               {isAdmin && <p className="relative z-10 mt-6 text-sm opacity-70">Vous avez tous les droits. Utilisez les raccourcis ci-dessous pour gérer la plateforme.</p>}
            </div>
@@ -77,8 +98,7 @@ export default function Dashboard() {
               <div className="mt-auto"><span className="inline-block px-3 py-1 bg-green-100 dark:bg-green-900/20 text-green-600 text-[10px] font-black uppercase rounded-lg">{nextClass.status}</span></div>
            </div>
 
-           {/* --- ACTIONS RAPIDES (DYNAMIQUES ADMIN/STUDENT) --- */}
-           
+           {/* --- ACTIONS RAPIDES --- */}
            {isAdmin ? (
              <>
                 <QuickAction icon={Shield} label="Gérer les Cours" path="/admin/courses" color="from-red-500 to-orange-500" delay={0.1} />

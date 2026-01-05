@@ -1,7 +1,7 @@
 import { Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
-import { UserProvider } from './context/UserContext';
+import { UserProvider, useUser } from './context/UserContext';
 
 // Composants Fixes
 import Navbar from './components/Navbar';
@@ -12,7 +12,7 @@ import PageWrapper from './components/PageWrapper';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 
-// Pages Publiques
+// Imports Lazy... (identiques à avant)
 const Hero = lazy(() => import('./components/Hero'));
 const About = lazy(() => import('./pages/About'));
 const News = lazy(() => import('./pages/News'));
@@ -23,7 +23,6 @@ const Login = lazy(() => import('./pages/Login'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const VerifyStudent = lazy(() => import('./pages/VerifyStudent'));
 
-// Pages Étudiant
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const CareerCenter = lazy(() => import('./pages/CareerCenter'));
 const CVGenerator = lazy(() => import('./pages/CVGenerator'));
@@ -33,11 +32,18 @@ const Challenges = lazy(() => import('./pages/Challenges'));
 const Networking = lazy(() => import('./pages/Networking'));
 const Elections = lazy(() => import('./pages/Elections'));
 
-// Pages Admin
 const AdminCourses = lazy(() => import('./pages/admin/AdminCourses'));
 const AdminStudents = lazy(() => import('./pages/admin/AdminStudents'));
-const AdminElections = lazy(() => import('./pages/admin/AdminElections')); // NOUVEAU
-const AdminNews = lazy(() => import('./pages/admin/AdminNews'));           // NOUVEAU
+const AdminElections = lazy(() => import('./pages/admin/AdminElections'));
+const AdminNews = lazy(() => import('./pages/admin/AdminNews'));
+
+// Composant Home Intelligent
+// Redirige vers Dashboard si connecté, sinon affiche Hero
+const SmartHome = () => {
+  const { user } = useUser();
+  if (user) return <Navigate to="/dashboard" replace />;
+  return <Hero />;
+};
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -53,8 +59,10 @@ function AnimatedRoutes() {
           <AnimatePresence mode="wait">
             <Routes location={location} key={location.pathname}>
               
-              {/* === PUBLIQUE === */}
-              <Route path="/" element={<PageWrapper><Hero /></PageWrapper>} />
+              {/* === ROUTE INTELLIGENTE === */}
+              <Route path="/" element={<PageWrapper><SmartHome /></PageWrapper>} />
+
+              {/* === VISITEURS === */}
               <Route path="/about" element={<PageWrapper><About /></PageWrapper>} />
               <Route path="/formation/informatique" element={<PageWrapper><ITCurriculum /></PageWrapper>} />
               <Route path="/news" element={<PageWrapper><News /></PageWrapper>} />
@@ -63,7 +71,7 @@ function AnimatedRoutes() {
               <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
               <Route path="/verify/student/:token" element={<PageWrapper><VerifyStudent /></PageWrapper>} />
 
-              {/* === ÉTUDIANT === */}
+              {/* === ÉTUDIANTS (Protégé) === */}
               <Route path="/dashboard" element={<ProtectedRoute><PageWrapper><Dashboard /></PageWrapper></ProtectedRoute>} />
               <Route path="/career" element={<ProtectedRoute><PageWrapper><CareerCenter /></PageWrapper></ProtectedRoute>} />
               <Route path="/cv-builder" element={<ProtectedRoute><PageWrapper><CVGenerator /></PageWrapper></ProtectedRoute>} />
@@ -73,7 +81,7 @@ function AnimatedRoutes() {
               <Route path="/network" element={<ProtectedRoute><PageWrapper><Networking /></PageWrapper></ProtectedRoute>} />
               <Route path="/elections" element={<ProtectedRoute><PageWrapper><Elections /></PageWrapper></ProtectedRoute>} />
 
-              {/* === ADMIN (Tous les outils) === */}
+              {/* === ADMIN === */}
               <Route path="/admin/courses" element={<AdminRoute><PageWrapper><AdminCourses /></PageWrapper></AdminRoute>} />
               <Route path="/admin/students" element={<AdminRoute><PageWrapper><AdminStudents /></PageWrapper></AdminRoute>} />
               <Route path="/admin/elections" element={<AdminRoute><PageWrapper><AdminElections /></PageWrapper></AdminRoute>} />
