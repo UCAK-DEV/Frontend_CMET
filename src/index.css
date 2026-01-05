@@ -26,6 +26,11 @@
         repeating-linear-gradient(45deg, rgba(212, 175, 55, 0.02) 0px, rgba(212, 175, 55, 0.02) 1px, transparent 1px, transparent 16px); /* Fines lignes dorées */
 }
 
+/* --- UTILITAIRES MOBILES --- */
+/* Gestion de la zone de sécurité en bas (iPhone X et plus récents) pour la barre de nav */
+.pb-safe-area-inset-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
 
 /* --- Styles Globaux --- */
 body {
@@ -38,6 +43,21 @@ body {
 .dark body {
     /* Fond bleu nuit profond en mode sombre */
     @apply bg-ucak-dark text-gray-100;
+}
+
+/* --- SCROLLBAR PERSONNALISÉE --- */
+/* Pour Chrome, Edge, Safari */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 dark:bg-white/10 rounded-full border-2 border-transparent bg-clip-content;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-ucak-blue dark:bg-ucak-gold;
 }
 
 /* --- Composants Pro --- */
