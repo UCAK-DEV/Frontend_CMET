@@ -12,11 +12,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 // --- COMPOSANTS UI ---
 
-const NavItem = ({ to, icon: Icon, children, isActive, onClick, className }) => (
+const NavItem = ({ to, icon: Icon, children, isActive, onClick }) => (
   <Link 
     to={to} 
     onClick={onClick}
-    className={`relative flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 group ${className} ${
+    className={`relative flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 group ${
       isActive 
         ? 'text-white' 
         : 'text-gray-600 dark:text-gray-300 hover:text-ucak-blue dark:hover:text-white'
@@ -72,7 +72,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
 
-  const { user, logout, isAdmin } = useUser(); // Récupération du statut Admin
+  const { user, logout, isAdmin } = useUser();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -100,9 +100,7 @@ export default function Navbar() {
     navigate('/');
   };
 
-  // --- CONFIGURATION NAVIGATION ---
-  
-  // 1. Liens Communs (Visibles par tous)
+  // --- CONFIGURATION ---
   const commonLinks = [
     { name: 'Accueil', path: '/', icon: Home },
     { 
@@ -116,7 +114,6 @@ export default function Navbar() {
     { name: 'Showroom', path: '/showroom', icon: Construction },
   ];
 
-  // 2. Liens Étudiant (Si connecté)
   const studentLinks = [
     { name: 'Cours', path: '/knowledge', icon: BookOpen },
     { 
@@ -130,7 +127,6 @@ export default function Navbar() {
     { name: 'Espace Étudiant', path: '/dashboard', icon: LayoutDashboard, isButton: true }
   ];
 
-  // 3. Liens ADMIN (Si isAdmin = true)
   const adminLinksSection = {
     name: 'Admin', type: 'dropdown', id: 'admin', icon: ShieldCheck, style: 'admin',
     items: [
@@ -141,14 +137,12 @@ export default function Navbar() {
     ]
   };
 
-  // Construction de la liste finale
   let navLinks = [...commonLinks];
   if (user) navLinks = [...navLinks, ...studentLinks];
-  if (isAdmin) navLinks.push(adminLinksSection); // Ajout du menu Admin à la fin
+  if (isAdmin) navLinks.push(adminLinksSection);
 
   return (
     <>
-      {/* === NAVBAR FLOTTANTE (Desktop) === */}
       <motion.nav 
         initial={{ y: -100 }} animate={{ y: 0 }} transition={{ type: 'spring', damping: 20, stiffness: 100 }}
         className={`hidden lg:flex fixed top-6 inset-x-0 mx-auto w-[95%] max-w-7xl z-50 transition-all duration-500 ${
@@ -158,8 +152,6 @@ export default function Navbar() {
         }`}
       >
         <div className="w-full flex items-center justify-between">
-          
-          {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
             <div className="relative">
               <div className="absolute inset-0 bg-ucak-blue blur-lg opacity-20 group-hover:opacity-40 transition-opacity rounded-full"></div>
@@ -171,37 +163,26 @@ export default function Navbar() {
             </div>
           </Link>
 
-          {/* Navigation Centrale */}
           <div className="flex items-center gap-1 bg-white/50 dark:bg-white/5 p-1.5 rounded-full border border-white/20 dark:border-white/5 shadow-inner">
             {navLinks.map((link, idx) => {
               if (link.isButton) return null;
-              
               const isAdminMenu = link.style === 'admin';
-
               if (link.type === 'dropdown') {
                 return (
                   <div key={idx} className="relative" onMouseEnter={() => setActiveDropdown(link.id)} onMouseLeave={() => setActiveDropdown(null)}>
                     <button className={`relative flex items-center gap-2 px-4 py-2 rounded-full transition-all text-sm font-bold tracking-wide ${
-                      activeDropdown === link.id 
-                        ? 'bg-white dark:bg-white/10 shadow-sm' 
-                        : 'hover:bg-white/50 dark:hover:bg-white/5'
-                      } ${isAdminMenu ? 'text-red-600 dark:text-red-400' : 'text-gray-600 dark:text-gray-400 hover:text-ucak-blue dark:hover:text-white'}`}>
+                      activeDropdown === link.id ? 'bg-white dark:bg-white/10 shadow-sm' : 'hover:bg-white/50 dark:hover:bg-white/5'
+                    } ${isAdminMenu ? 'text-red-600 dark:text-red-400' : 'text-gray-600 dark:text-gray-400 hover:text-ucak-blue dark:hover:text-white'}`}>
                       <link.icon size={16} /> {link.name} <ChevronDown size={12} className={`transition-transform duration-300 ${activeDropdown === link.id ? 'rotate-180' : ''}`}/>
                     </button>
                     <DropdownMenu items={link.items} parentId={link.id} activeDropdown={activeDropdown} />
                   </div>
                 );
               }
-
-              return (
-                <NavItem key={idx} to={link.path} icon={link.icon} isActive={location.pathname === link.path}>
-                  {link.name}
-                </NavItem>
-              );
+              return <NavItem key={idx} to={link.path} icon={link.icon} isActive={location.pathname === link.path}>{link.name}</NavItem>;
             })}
           </div>
 
-          {/* Actions Droite */}
           <div className="flex items-center gap-4">
             <button onClick={toggleTheme} className="p-2.5 rounded-full bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-ucak-gold hover:bg-ucak-blue/10 hover:text-ucak-blue transition-all active:scale-90">
               <motion.div initial={false} animate={{ rotate: theme === 'dark' ? 180 : 0 }}>{theme === 'dark' ? <Moon size={20} /> : <Sun size={20} />}</motion.div>
@@ -219,7 +200,6 @@ export default function Navbar() {
                     </div>
                   </div>
                 </div>
-
                 <AnimatePresence>
                   {activeDropdown === 'user' && (
                     <motion.div initial={{ opacity: 0, y: 15, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 10, scale: 0.95 }} className="absolute top-full right-0 mt-4 w-64 bg-white/90 dark:bg-[#1a1f2e]/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 dark:border-white/10 overflow-hidden p-2 z-50">

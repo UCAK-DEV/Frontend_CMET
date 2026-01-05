@@ -1,5 +1,5 @@
 import { Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { UserProvider } from './context/UserContext';
 
@@ -41,7 +41,6 @@ const AdminNews = lazy(() => import('./pages/admin/AdminNews'));
 
 function AnimatedRoutes() {
   const location = useLocation();
-  // Cache la navbar sur le lecteur de cours pour l'immersion
   const isImmersiveMode = location.pathname.startsWith('/course/') || location.pathname.startsWith('/verify/');
 
   return (
@@ -55,9 +54,7 @@ function AnimatedRoutes() {
             <Routes location={location} key={location.pathname}>
               
               {/* === VISITEUR & TOUT PUBLIC === */}
-              {/* L'accueil reste l'accueil pour tout le monde */}
               <Route path="/" element={<PageWrapper><Home /></PageWrapper>} />
-              
               <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
               <Route path="/formation/informatique" element={<PageWrapper><ITCurriculum /></PageWrapper>} />
               <Route path="/formation/hec" element={<PageWrapper><HECCurriculum /></PageWrapper>} />
@@ -70,12 +67,9 @@ function AnimatedRoutes() {
               <Route path="/dashboard" element={<ProtectedRoute><PageWrapper><Dashboard /></PageWrapper></ProtectedRoute>} />
               <Route path="/knowledge" element={<ProtectedRoute><PageWrapper><Knowledge /></PageWrapper></ProtectedRoute>} />
               <Route path="/course/:id" element={<ProtectedRoute><CoursePlayer /></ProtectedRoute>} />
-              
-              {/* Carrières */}
               <Route path="/career" element={<ProtectedRoute><PageWrapper><CareerCenter /></PageWrapper></ProtectedRoute>} />
               <Route path="/cv-builder" element={<ProtectedRoute><PageWrapper><CVGenerator /></PageWrapper></ProtectedRoute>} />
               <Route path="/quizz" element={<ProtectedRoute><PageWrapper><Challenges /></PageWrapper></ProtectedRoute>} />
-              
               <Route path="/network" element={<ProtectedRoute><PageWrapper><Networking /></PageWrapper></ProtectedRoute>} />
               <Route path="/elections" element={<ProtectedRoute><PageWrapper><Elections /></PageWrapper></ProtectedRoute>} />
 
