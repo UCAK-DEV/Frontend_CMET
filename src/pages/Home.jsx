@@ -23,23 +23,23 @@ export default function Home() {
             initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}
             className="inline-flex items-center gap-3 py-2 px-6 rounded-full bg-white/40 dark:bg-ucak-dark-card/40 border border-ucak-gold/20 backdrop-blur-xl text-ucak-blue dark:text-ucak-gold font-black text-xs mb-10 uppercase tracking-[0.2em] shadow-xl"
           >
-            <Sparkles size={14} className="animate-pulse" /> <span>Technologie • Management • Innovation</span>
+            <Sparkles size={14} className="animate-pulse" /> <span>Savoir utile – Action vertueuse – Conduite exemplaire</span>
           </motion.div>
 
           <motion.h1 
             initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}
             className="text-6xl md:text-[7rem] font-black text-ucak-blue dark:text-white mb-8 leading-[0.9] tracking-tighter"
           >
-            UFR <br/> 
+            CLUB <br/> 
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-ucak-green via-ucak-gold to-ucak-green bg-[length:200%_auto] animate-gradient-x">
               MET
             </span>
           </motion.h1>
 
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="max-w-4xl mx-auto mb-14">
-            <h2 className="text-2xl font-bold text-ucak-blue dark:text-gray-200 uppercase tracking-widest mb-4">Métiers, Économie et Technologies</h2>
+            <h2 className="text-2xl font-bold text-ucak-blue dark:text-gray-200 uppercase tracking-widest mb-4">Métiers et Technologies</h2>
             <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 font-medium leading-relaxed italic">
-              "De l'Ingénierie Informatique aux Hautes Études Commerciales, nous formons l'élite technique de demain."
+              "Nous formons l'élite technique de demain."
             </p>
           </motion.div>
 
