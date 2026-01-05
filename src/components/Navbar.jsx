@@ -2,14 +2,15 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Sun, Moon, LogIn, LogOut, User, Menu, ChevronDown, LayoutDashboard, 
-  BookOpen, Briefcase, Home, GraduationCap, Newspaper, MoreHorizontal, ShieldAlert, Users 
+  BookOpen, Briefcase, Home, GraduationCap, Newspaper, MoreHorizontal, 
+  ShieldAlert, Users, Vote, Trophy, FileText 
 } from 'lucide-react';
 import { useUser } from '../context/UserContext';
 import logoUcak from '../assets/logo-ucak.png';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // ==========================================
-// 1. SOUS-COMPOSANTS (Définis AVANT l'usage)
+// 1. SOUS-COMPOSANTS
 // ==========================================
 
 const FormationsDropdown = () => (
@@ -60,10 +61,15 @@ const DesktopProfileMenu = ({ user, isAdmin, logout }) => (
         <Link to="/dashboard" className="flex items-center gap-3 px-4 py-3 text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl transition-colors">
           <LayoutDashboard size={16} className="text-ucak-blue"/> Dashboard
         </Link>
-        <Link to="/career" className="flex items-center gap-3 px-4 py-3 text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl transition-colors">
-          <Briefcase size={16} className="text-ucak-gold"/> Stages
+        <Link to="/cv-builder" className="flex items-center gap-3 px-4 py-3 text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl transition-colors">
+          <FileText size={16} className="text-ucak-gold"/> Créer mon CV
         </Link>
+        <Link to="/quizz" className="flex items-center gap-3 px-4 py-3 text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl transition-colors">
+          <Trophy size={16} className="text-purple-500"/> Challenges
+        </Link>
+        
         <div className="h-px bg-gray-100 dark:bg-white/5 my-2 mx-2"></div>
+        
         <button onClick={logout} className="w-full flex items-center gap-3 px-4 py-3 text-xs font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-xl transition-colors">
           <LogOut size={16}/> Déconnexion
         </button>
@@ -73,12 +79,18 @@ const DesktopProfileMenu = ({ user, isAdmin, logout }) => (
 
 const MobileMenuButton = ({ icon: Icon, label, to, visible = true, onClick }) => {
   if (!visible) return null;
+  
+  if (onClick) {
+    return (
+      <button onClick={onClick} className="flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-white/5 rounded-2xl active:scale-95 transition-all w-full h-full border border-transparent hover:border-gray-100 dark:hover:border-white/10">
+         <Icon size={24} className="mb-2 text-ucak-blue dark:text-gray-200" />
+         <span className="text-xs font-bold text-gray-600 dark:text-gray-400">{label}</span>
+      </button>
+    );
+  }
+
   return (
-    <Link 
-      to={to} 
-      onClick={onClick} // Correction : Ferme le menu au clic
-      className="flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-white/5 rounded-2xl active:scale-95 transition-all w-full h-full"
-    >
+    <Link to={to} className="flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-white/5 rounded-2xl active:scale-95 transition-all h-full border border-transparent hover:border-gray-100 dark:hover:border-white/10">
        <Icon size={24} className="mb-2 text-ucak-blue dark:text-gray-200" />
        <span className="text-xs font-bold text-gray-600 dark:text-gray-400">{label}</span>
     </Link>
@@ -121,19 +133,32 @@ export default function Navbar() {
     setShowMobileMenu(false);
   };
 
-  const desktopLinks = [
+  // --- CONFIGURATION DES LIENS ---
+
+  const visitorDesktopLinks = [
     { name: 'Accueil', path: '/', icon: Home },
     { type: 'dropdown', name: 'Formations', icon: GraduationCap },
     { name: 'Infos', path: '/news', icon: Newspaper },
   ];
 
-  const guestMobileLinks = [
+  // Liens Étudiant Desktop (Barre Principale)
+  const studentDesktopLinks = [
+    { name: 'Tableau de bord', path: '/dashboard', icon: LayoutDashboard },
+    { name: 'Bibliothèque', path: '/knowledge', icon: BookOpen },
+    { name: 'Carrière', path: '/career', icon: Briefcase },
+    { name: 'Réseau', path: '/network', icon: Users },
+    { name: 'Votes', path: '/elections', icon: Vote },
+  ];
+
+  // Liens Mobile (Visiteur)
+  const visitorMobileLinks = [
     { name: 'Accueil', path: '/', icon: Home },
     { name: 'Info', path: '/formation/informatique', icon: GraduationCap },
     { name: 'HEC', path: '/formation/hec', icon: Briefcase },
     { name: 'Login', path: '/login', icon: LogIn },
   ];
 
+  // Liens Mobile (Étudiant) : Bottom Bar
   const studentMobileLinks = [
     { name: 'Accueil', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Cours', path: '/knowledge', icon: BookOpen },
@@ -141,7 +166,7 @@ export default function Navbar() {
     { name: 'Menu', path: '#', action: 'menu', icon: MoreHorizontal },
   ];
 
-  const currentMobileLinks = user ? studentMobileLinks : guestMobileLinks;
+  const currentMobileLinks = user ? studentMobileLinks : visitorMobileLinks;
 
   return (
     <>
@@ -159,14 +184,16 @@ export default function Navbar() {
 
           <div className="flex items-center gap-1 bg-gray-50 dark:bg-white/5 p-1.5 rounded-full border border-gray-100 dark:border-white/5">
             {user ? (
-               [{ name: 'Tableau de bord', path: '/dashboard', icon: LayoutDashboard }, { name: 'Bibliothèque', path: '/knowledge', icon: BookOpen }, { name: 'Carrière', path: '/career', icon: Briefcase }].map(link => (
+               // MENU ÉTUDIANT COMPLET
+               studentDesktopLinks.map(link => (
                   <Link key={link.path} to={link.path} className={`px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wide transition-all flex items-center gap-2 ${isActive(link.path) ? 'bg-white dark:bg-ucak-dark-card text-ucak-blue dark:text-white shadow-sm scale-105' : 'text-gray-500 hover:text-ucak-blue dark:text-gray-400'}`}>
                     <link.icon size={14} className={isActive(link.path) ? 'text-ucak-green' : 'opacity-70'} />
                     {link.name}
                   </Link>
                ))
             ) : (
-               desktopLinks.map((link, idx) => {
+               // MENU VISITEUR
+               visitorDesktopLinks.map((link, idx) => {
                  if (link.type === 'dropdown') {
                    return (
                      <div key={idx} className="relative" onMouseEnter={() => setIsFormationOpen(true)} onMouseLeave={() => setIsFormationOpen(false)}>
@@ -252,7 +279,7 @@ export default function Navbar() {
                  )
                }
                return (
-                 <Link key={index} to={link.path} className={`flex flex-col items-center justify-center w-full h-full gap-1 transition-all relative group`}>
+                 <Link key={index} to={link.path} onClick={() => setShowMobileMenu(false)} className={`flex flex-col items-center justify-center w-full h-full gap-1 transition-all relative group`}>
                     {active && <motion.div layoutId="mobileNavIndicator" className="absolute -top-[1px] w-8 h-1 bg-ucak-blue rounded-b-full" />}
                     <div className={`p-1.5 rounded-xl transition-all ${active ? 'bg-blue-50 dark:bg-white/10 text-ucak-blue dark:text-white -translate-y-1' : 'text-gray-400'}`}>
                        <link.icon size={20} strokeWidth={active ? 2.5 : 2} />
@@ -283,9 +310,10 @@ export default function Navbar() {
                  )}
                  <div className="grid grid-cols-2 gap-3 mb-6">
                     <MobileMenuButton icon={User} label="Mon Profil" to="/dashboard" onClick={() => setShowMobileMenu(false)} />
-                    <MobileMenuButton icon={Briefcase} label="Stages" to="/career" onClick={() => setShowMobileMenu(false)} />
                     <MobileMenuButton icon={Users} label="Réseau Alumni" to="/network" onClick={() => setShowMobileMenu(false)} />
-                    <MobileMenuButton icon={Newspaper} label="News" to="/news" onClick={() => setShowMobileMenu(false)} />
+                    <MobileMenuButton icon={Vote} label="Élections" to="/elections" onClick={() => setShowMobileMenu(false)} />
+                    <MobileMenuButton icon={Trophy} label="Challenges" to="/quizz" onClick={() => setShowMobileMenu(false)} />
+                    <MobileMenuButton icon={FileText} label="Mon CV" to="/cv-builder" onClick={() => setShowMobileMenu(false)} />
                     <MobileMenuButton icon={ShieldAlert} label="Admin" to="/admin/courses" visible={isAdmin} onClick={() => setShowMobileMenu(false)} />
                  </div>
                  {user ? (
