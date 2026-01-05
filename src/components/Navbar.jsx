@@ -3,208 +3,300 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Home, GraduationCap, Newspaper, LayoutDashboard, 
   BookOpen, Briefcase, FileText, Trophy, 
-  Menu, X, ChevronDown, User, LogOut, Construction, Rocket
+  Menu, X, ChevronDown, User, LogOut, Construction, Rocket,
+  Sun, Moon, ExternalLink, Layers
 } from 'lucide-react';
 import { useUser } from '../context/UserContext';
 import logoUcak from '../assets/logo-ucak.png';
 import { motion, AnimatePresence } from 'framer-motion';
 
+// --- COMPOSANT LIEN ANIMÉ ---
+const NavItem = ({ to, icon: Icon, children, isActive, onClick }) => (
+  <Link 
+    to={to} 
+    onClick={onClick}
+    className={`relative flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 group ${
+      isActive 
+        ? 'text-white' 
+        : 'text-gray-600 dark:text-gray-300 hover:text-ucak-blue dark:hover:text-white'
+    }`}
+  >
+    {isActive && (
+      <motion.div
+        layoutId="activeTab"
+        className="absolute inset-0 bg-ucak-blue rounded-full shadow-[0_0_20px_rgba(37,99,235,0.3)]"
+        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+      />
+    )}
+    <span className="relative z-10 flex items-center gap-2 text-sm font-bold tracking-wide">
+      <Icon size={16} strokeWidth={2.5} />
+      {children}
+    </span>
+  </Link>
+);
+
+// --- COMPOSANT DROPDOWN ---
+const DropdownMenu = ({ items, parentId, activeDropdown }) => (
+  <AnimatePresence>
+    {activeDropdown === parentId && (
+      <motion.div
+        initial={{ opacity: 0, y: 15, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+        transition={{ duration: 0.2 }}
+        className="absolute top-full left-0 mt-4 w-64 bg-white/80 dark:bg-[#1a1f2e]/90 backdrop-blur-xl rounded-3xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] border border-white/20 dark:border-white/5 overflow-hidden p-2 z-50 ring-1 ring-black/5"
+      >
+        {items.map((item, idx) => (
+          <Link 
+            key={idx} 
+            to={item.path} 
+            className="flex items-center gap-4 p-3 rounded-2xl hover:bg-ucak-blue/5 dark:hover:bg-white/5 transition-all group"
+          >
+            <div className="p-2.5 bg-white dark:bg-white/5 rounded-xl text-ucak-blue dark:text-ucak-gold shadow-sm group-hover:scale-110 transition-transform">
+              <item.icon size={18} />
+            </div>
+            <div>
+              <p className="text-xs font-black text-gray-800 dark:text-white uppercase tracking-wider">{item.title}</p>
+              {item.desc && <p className="text-[10px] text-gray-400 font-medium leading-tight mt-0.5">{item.desc}</p>}
+            </div>
+          </Link>
+        ))}
+      </motion.div>
+    )}
+  </AnimatePresence>
+);
+
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
+  const [scrolled, setScrolled] = useState(false);
+  
+  // Gestion du Thème
+  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
 
-  const { user, logout } = useUser();
+  const { user, logout, isAdmin } = useUser();
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Fermer le menu au changement de page
+  // Effet Scroll pour changer l'apparence
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Effet Thème
+  useEffect(() => {
+    if (theme === 'dark') document.documentElement.classList.add('dark');
+    else document.documentElement.classList.remove('dark');
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+
+  // Reset menu au changement de route
   useEffect(() => { 
     setIsMobileMenuOpen(false); 
     setActiveDropdown(null); 
   }, [location]);
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
-
-  // --- CONFIGURATION DES MENUS ---
-
-  // 1. MENU VISITEUR (Visible par TOUS)
-  const visitorLinks = [
+  // --- CONFIGURATION NAVIGATION ---
+  
+  const commonLinks = [
     { name: 'Accueil', path: '/', icon: Home },
     { 
-      name: 'Formations', 
-      type: 'dropdown', 
-      id: 'formations',
-      icon: GraduationCap,
+      name: 'Formations', type: 'dropdown', id: 'formations', icon: GraduationCap,
       items: [
-        { title: 'Informatique', path: '/formation/informatique', icon: GraduationCap },
-        { title: 'HEC', path: '/formation/hec', icon: Briefcase }
+        { title: 'Informatique', desc: 'Dev, Réseaux & IA', path: '/formation/informatique', icon: GraduationCap },
+        { title: 'HEC', desc: 'Finance & Management', path: '/formation/hec', icon: Briefcase }
       ]
     },
     { name: 'Actualités', path: '/news', icon: Newspaper },
     { name: 'Showroom', path: '/showroom', icon: Construction },
   ];
 
-  // 2. MENU ÉTUDIANT (S'ajoute au menu visiteur)
   const studentLinks = [
-    { name: 'Espace Étudiant', path: '/dashboard', icon: LayoutDashboard, style: 'btn-primary' },
     { name: 'Cours', path: '/knowledge', icon: BookOpen },
     { 
-      name: 'Carrières', 
-      type: 'dropdown', 
-      id: 'carrieres',
-      icon: Rocket,
+      name: 'Carrières', type: 'dropdown', id: 'carrieres', icon: Rocket,
       items: [
-        { title: 'Générateur CV', path: '/cv-builder', icon: FileText },
-        { title: 'Offres de Stage', path: '/career', icon: Briefcase },
-        { title: 'Quizz & Défis', path: '/quizz', icon: Trophy }
+        { title: 'Mon CV', desc: 'Générateur Pro', path: '/cv-builder', icon: FileText },
+        { title: 'Stages', desc: 'Offres exclusives', path: '/career', icon: Briefcase },
+        { title: 'Challenges', desc: 'Quizz & Tests', path: '/quizz', icon: Trophy }
       ]
-    }
+    },
+    { name: 'Espace Étudiant', path: '/dashboard', icon: LayoutDashboard, isButton: true }
   ];
 
-  // Fusion des menus si connecté
-  const navLinks = user ? [...visitorLinks, ...studentLinks] : visitorLinks;
+  const navLinks = user ? [...commonLinks, ...studentLinks] : commonLinks;
 
   return (
     <>
-      {/* --- BARRE DE NAVIGATION DESKTOP --- */}
-      <nav className="hidden lg:flex fixed top-0 w-full z-50 bg-white/90 dark:bg-[#0b0f19]/90 backdrop-blur-xl border-b border-gray-200/50 dark:border-white/5 h-20 items-center justify-between px-8 transition-all">
-        
-        {/* LOGO */}
-        <Link to="/" className="flex items-center gap-3">
-          <img src={logoUcak} alt="Logo" className="w-8 h-8" />
-          <div className="flex flex-col leading-none">
-            <span className="text-xl font-black text-ucak-blue dark:text-white tracking-tight">CLUB MET</span>
-            <span className="text-[10px] font-bold text-gray-400 tracking-[0.2em] uppercase">UFR MET</span>
-          </div>
-        </Link>
-
-        {/* LIENS */}
-        <div className="flex items-center gap-1 bg-gray-100/50 dark:bg-white/5 p-1.5 rounded-full border border-gray-200/50 dark:border-white/5">
-          {navLinks.map((link, idx) => {
-            
-            // Gestion Dropdown
-            if (link.type === 'dropdown') {
-              return (
-                <div key={idx} className="relative" onMouseEnter={() => setActiveDropdown(link.id)} onMouseLeave={() => setActiveDropdown(null)}>
-                  <button className={`px-4 py-2.5 rounded-full text-xs font-bold uppercase tracking-wide flex items-center gap-2 transition-all ${activeDropdown === link.id ? 'bg-white dark:bg-white/10 text-ucak-blue dark:text-white shadow-sm' : 'text-gray-500 hover:text-ucak-blue dark:text-gray-400 dark:hover:text-white'}`}>
-                    <link.icon size={16} /> {link.name} <ChevronDown size={12} className={`transition-transform ${activeDropdown === link.id ? 'rotate-180' : ''}`}/>
-                  </button>
-                  
-                  <AnimatePresence>
-                    {activeDropdown === link.id && (
-                      <motion.div 
-                        initial={{ opacity: 0, y: 10, scale: 0.95 }} 
-                        animate={{ opacity: 1, y: 0, scale: 1 }} 
-                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        className="absolute top-full left-0 mt-2 w-56 bg-white dark:bg-[#1a1f2e] rounded-2xl shadow-xl border border-gray-100 dark:border-white/10 overflow-hidden p-2 z-50"
-                      >
-                        {link.items.map((subItem, subIdx) => (
-                          <Link key={subIdx} to={subItem.path} className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group">
-                            <div className="p-2 bg-ucak-blue/10 rounded-lg text-ucak-blue group-hover:bg-ucak-blue group-hover:text-white transition-colors">
-                              <subItem.icon size={16} />
-                            </div>
-                            <span className="text-xs font-bold text-gray-700 dark:text-gray-200 uppercase">{subItem.title}</span>
-                          </Link>
-                        ))}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              );
-            }
-
-            // Lien Simple
-            return (
-              <Link 
-                key={idx} 
-                to={link.path} 
-                className={`px-4 py-2.5 rounded-full text-xs font-bold uppercase tracking-wide flex items-center gap-2 transition-all 
-                  ${link.style === 'btn-primary' 
-                    ? 'bg-ucak-blue text-white shadow-md hover:bg-ucak-green hover:shadow-lg scale-105 mx-2' 
-                    : location.pathname === link.path 
-                      ? 'bg-white dark:bg-white/10 text-ucak-blue dark:text-white shadow-sm' 
-                      : 'text-gray-500 hover:text-ucak-blue dark:text-gray-400 dark:hover:text-white'
-                  }`}
-              >
-                <link.icon size={16} /> {link.name}
-              </Link>
-            );
-          })}
-        </div>
-
-        {/* PROFIL / CONNEXION */}
-        <div>
-          {user ? (
-            <div className="flex items-center gap-3 pl-4 border-l border-gray-200 dark:border-white/10">
-              <div className="text-right hidden xl:block">
-                <p className="text-xs font-black text-gray-900 dark:text-white">{user.full_name}</p>
-              </div>
-              <button onClick={handleLogout} className="p-2.5 rounded-full bg-red-50 text-red-500 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/40 transition-colors" title="Déconnexion">
-                <LogOut size={18} />
-              </button>
+      {/* === NAVBAR FLOTTANTE (Desktop) === */}
+      <motion.nav 
+        initial={{ y: -100 }} animate={{ y: 0 }} transition={{ type: 'spring', damping: 20, stiffness: 100 }}
+        className={`hidden lg:flex fixed top-6 inset-x-0 mx-auto w-[90%] max-w-7xl z-50 transition-all duration-500 ${
+          scrolled 
+            ? 'bg-white/80 dark:bg-[#0f172a]/80 backdrop-blur-xl rounded-full shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] border border-white/20 dark:border-white/5 py-3 px-6'
+            : 'bg-transparent py-4 px-0'
+        }`}
+      >
+        <div className="w-full flex items-center justify-between">
+          
+          {/* Logo Animé */}
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="relative">
+              <div className="absolute inset-0 bg-ucak-blue blur-lg opacity-20 group-hover:opacity-40 transition-opacity rounded-full"></div>
+              <img src={logoUcak} alt="Logo" className="w-10 h-10 relative z-10 drop-shadow-md group-hover:scale-110 transition-transform duration-300" />
             </div>
-          ) : (
-            <Link to="/login" className="flex items-center gap-2 px-6 py-3 bg-ucak-blue text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-ucak-green transition-all shadow-lg">
-              <User size={16} /> Connexion
-            </Link>
-          )}
-        </div>
-      </nav>
+            <div className="flex flex-col leading-none">
+              <span className="text-xl font-black text-gray-900 dark:text-white tracking-tighter">CLUB MET</span>
+              <span className="text-[9px] font-bold text-ucak-blue dark:text-ucak-gold tracking-[0.3em] uppercase">UFR MET</span>
+            </div>
+          </Link>
 
-      {/* --- MENU MOBILE --- */}
+          {/* Navigation Centrale */}
+          <div className="flex items-center gap-1 bg-white/50 dark:bg-white/5 p-1.5 rounded-full border border-white/20 dark:border-white/5 shadow-inner">
+            {navLinks.map((link, idx) => {
+              if (link.isButton) return null; // On gère le bouton à part
+              
+              if (link.type === 'dropdown') {
+                return (
+                  <div key={idx} className="relative" onMouseEnter={() => setActiveDropdown(link.id)} onMouseLeave={() => setActiveDropdown(null)}>
+                    <button className={`relative flex items-center gap-2 px-4 py-2 rounded-full transition-all text-sm font-bold tracking-wide ${activeDropdown === link.id ? 'text-ucak-blue dark:text-white bg-white dark:bg-white/10 shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-ucak-blue dark:hover:text-white'}`}>
+                      <link.icon size={16} /> {link.name} <ChevronDown size={12} className={`transition-transform duration-300 ${activeDropdown === link.id ? 'rotate-180' : ''}`}/>
+                    </button>
+                    <DropdownMenu items={link.items} parentId={link.id} activeDropdown={activeDropdown} />
+                  </div>
+                );
+              }
+
+              return (
+                <NavItem key={idx} to={link.path} icon={link.icon} isActive={location.pathname === link.path}>
+                  {link.name}
+                </NavItem>
+              );
+            })}
+          </div>
+
+          {/* Actions Droite (Thème + User) */}
+          <div className="flex items-center gap-4">
+            
+            {/* Toggle Thème (Visible Desktop) */}
+            <button 
+              onClick={toggleTheme} 
+              className="p-2.5 rounded-full bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-ucak-gold hover:bg-ucak-blue/10 hover:text-ucak-blue transition-all active:scale-90"
+            >
+              <motion.div initial={false} animate={{ rotate: theme === 'dark' ? 180 : 0 }}>
+                {theme === 'dark' ? <Moon size={20} /> : <Sun size={20} />}
+              </motion.div>
+            </button>
+
+            {/* Bouton Espace / Connexion */}
+            {user ? (
+              <div className="flex items-center gap-3 pl-4 border-l border-gray-200 dark:border-white/10">
+                <Link to="/dashboard" className="hidden xl:flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-ucak-blue to-blue-600 text-white rounded-full text-xs font-black uppercase tracking-widest shadow-lg hover:shadow-ucak-blue/30 hover:scale-105 transition-all">
+                  <LayoutDashboard size={16} /> Espace
+                </Link>
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-white/10 dark:to-white/5 border border-white/20 flex items-center justify-center text-sm font-black text-ucak-blue dark:text-white cursor-pointer" onClick={() => navigate('/dashboard')}>
+                  {user.full_name?.charAt(0)}
+                </div>
+              </div>
+            ) : (
+              <Link to="/login" className="flex items-center gap-2 px-6 py-3 bg-gray-900 dark:bg-white text-white dark:text-black rounded-full text-xs font-black uppercase tracking-widest hover:scale-105 hover:shadow-xl transition-all">
+                <User size={16} /> Connexion
+              </Link>
+            )}
+          </div>
+        </div>
+      </motion.nav>
+
+      {/* === HEADER MOBILE (Fixe en haut) === */}
       <div className="lg:hidden fixed top-0 w-full z-50 bg-white/90 dark:bg-[#0b0f19]/90 backdrop-blur-xl border-b border-gray-200/50 dark:border-white/5 h-16 flex items-center justify-between px-4">
         <Link to="/" className="flex items-center gap-2">
           <img src={logoUcak} alt="Logo" className="w-8 h-8" />
-          <span className="font-black text-ucak-blue dark:text-white">CLUB MET</span>
+          <span className="font-black text-lg text-ucak-blue dark:text-white">CLUB MET</span>
         </Link>
-        <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 text-gray-600 dark:text-white">
-          <Menu size={24} />
-        </button>
+        
+        <div className="flex items-center gap-3">
+          {/* Toggle Thème (Visible Mobile) */}
+          <button onClick={toggleTheme} className="p-2 rounded-full bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-yellow-400">
+            {theme === 'dark' ? <Moon size={18} /> : <Sun size={18} />}
+          </button>
+          
+          <button onClick={() => setIsMobileMenuOpen(true)} className="p-2.5 bg-ucak-blue/10 dark:bg-white/10 text-ucak-blue dark:text-white rounded-xl active:scale-95 transition-transform">
+            <Menu size={22} strokeWidth={2.5} />
+          </button>
+        </div>
       </div>
 
-      {/* OVERLAY MOBILE */}
+      {/* === MENU MOBILE OVERLAY === */}
       <AnimatePresence>
         {isMobileMenuOpen && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="lg:hidden fixed inset-0 z-[60] bg-white dark:bg-[#0b0f19] flex flex-col overflow-y-auto">
-            <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-white/5">
-              <span className="text-lg font-black text-ucak-blue dark:text-white">MENU</span>
-              <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 bg-gray-100 dark:bg-white/10 rounded-full"><X size={24} /></button>
+          <motion.div 
+            initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            className="lg:hidden fixed inset-0 z-[60] bg-white dark:bg-[#0b0f19] flex flex-col"
+          >
+            {/* Header Menu */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-white/5">
+              <div>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Navigation</p>
+                <h2 className="text-2xl font-black text-gray-900 dark:text-white">MENU</h2>
+              </div>
+              <button onClick={() => setIsMobileMenuOpen(false)} className="p-3 bg-gray-100 dark:bg-white/10 rounded-full text-gray-600 dark:text-white active:rotate-90 transition-all">
+                <X size={24} />
+              </button>
             </div>
             
-            <div className="flex-1 p-6 space-y-6">
+            {/* Contenu Scrollable */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-2">
               {navLinks.map((link, idx) => {
+                // Dropdown Mobile
                 if (link.type === 'dropdown') {
                   return (
-                    <div key={idx} className="space-y-3 bg-gray-50 dark:bg-white/5 p-4 rounded-2xl">
-                      <p className="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-2"><link.icon size={14}/> {link.name}</p>
-                      <div className="grid gap-2 pl-4 border-l-2 border-gray-200 dark:border-white/10">
-                        {link.items.map((subItem, subIdx) => (
-                          <Link key={subIdx} to={subItem.path} className="block text-sm font-bold text-gray-700 dark:text-gray-300 py-1">
-                            {subItem.title}
+                    <div key={idx} className="bg-gray-50 dark:bg-white/5 p-4 rounded-3xl mb-2">
+                      <p className="flex items-center gap-3 text-sm font-black text-gray-400 uppercase tracking-wider mb-4 px-2">
+                        <link.icon size={16} /> {link.name}
+                      </p>
+                      <div className="space-y-1">
+                        {link.items.map((sub, i) => (
+                          <Link key={i} to={sub.path} onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-4 p-3 rounded-2xl bg-white dark:bg-white/5 border border-gray-100 dark:border-white/5">
+                            <div className="p-2 bg-ucak-blue/10 rounded-xl text-ucak-blue"><sub.icon size={18}/></div>
+                            <span className="font-bold text-gray-800 dark:text-white">{sub.title}</span>
                           </Link>
                         ))}
                       </div>
                     </div>
                   );
                 }
+                
+                // Lien Simple Mobile
                 return (
-                  <Link key={idx} to={link.path} className={`flex items-center gap-4 text-lg font-bold p-2 ${link.style === 'btn-primary' ? 'text-ucak-blue' : 'text-gray-800 dark:text-white'}`}>
-                    <link.icon size={20} /> {link.name}
+                  <Link 
+                    key={idx} 
+                    to={link.path} 
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`flex items-center gap-4 p-4 rounded-3xl transition-all ${
+                      location.pathname === link.path 
+                        ? 'bg-ucak-blue text-white shadow-lg shadow-ucak-blue/30' 
+                        : 'bg-white dark:bg-white/5 border border-gray-100 dark:border-white/5 text-gray-700 dark:text-gray-200'
+                    }`}
+                  >
+                    <link.icon size={22} strokeWidth={2.5} />
+                    <span className="text-lg font-bold">{link.name}</span>
                   </Link>
                 );
               })}
+            </div>
 
-              <div className="h-px bg-gray-100 dark:bg-white/5 my-6"></div>
-
+            {/* Footer Menu */}
+            <div className="p-6 border-t border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-white/5">
               {user ? (
-                <button onClick={handleLogout} className="w-full py-4 bg-red-50 text-red-500 rounded-xl font-bold flex items-center justify-center gap-2">
-                  <LogOut size={20} /> Se déconnecter
+                <button onClick={() => { logout(); navigate('/'); }} className="w-full py-4 bg-red-500/10 text-red-500 rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-2">
+                  <LogOut size={20} /> Déconnexion
                 </button>
               ) : (
-                <Link to="/login" className="w-full py-4 bg-ucak-blue text-white rounded-xl font-bold flex items-center justify-center gap-2">
+                <Link to="/login" onClick={() => setIsMobileMenuOpen(false)} className="w-full py-4 bg-gray-900 dark:bg-white text-white dark:text-black rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-2">
                   <User size={20} /> Se connecter
                 </Link>
               )}
