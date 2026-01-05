@@ -4,7 +4,6 @@ import {
   Briefcase, TrendingUp, PieChart, 
   CheckCircle2, ArrowRight, Download 
 } from 'lucide-react';
-// IMPORT CORRIGÉ
 import { generateSyllabusPDF } from '../utils/pdfGenerator';
 
 const SemesterCard = ({ id, title, courses, color }) => (
@@ -38,53 +37,22 @@ const SemesterCard = ({ id, title, courses, color }) => (
 export default function HECCurriculum() {
   const [l3Option, setL3Option] = useState('CCG'); 
 
-  // Données HEC complètes
+  // Données officielles HEC
   const commonCurriculum = [
     {
       year: "Première Année (L1)",
+      desc: "Tronc Commun - Fondamentaux",
       semesters: [
-        {
-          id: "S1", title: "Introduction & Droit", color: "bg-ucak-blue",
-          courses: [
-            "Introduction au Droit & Éco d'Entreprise",
-            "Mathématiques & Statistiques",
-            "Économie Générale & Comptabilité I",
-            "Informatique, Comm. & Anglais"
-          ]
-        },
-        {
-          id: "S2", title: "Outils de Gestion", color: "bg-ucak-gold",
-          courses: [
-            "Stratégie & Gouvernance, GRH",
-            "Maths & Info Appliquées à la gestion",
-            "Comptabilité Générale II & Marketing",
-            "Anglais des Affaires & Culture Générale"
-          ]
-        }
+        { id: "S1", title: "Introduction & Droit", color: "bg-ucak-blue", courses: ["Introduction au Droit & Éco d'Entreprise", "Mathématiques & Statistiques", "Économie Générale & Comptabilité I", "Informatique, Comm. & Anglais"] },
+        { id: "S2", title: "Outils de Gestion", color: "bg-ucak-gold", courses: ["Stratégie & Gouvernance, GRH", "Maths & Info Appliquées à la gestion", "Comptabilité Générale II & Marketing", "Anglais des Affaires & Culture Générale"] }
       ]
     },
     {
       year: "Deuxième Année (L2)",
+      desc: "Approfondissement Gestion",
       semesters: [
-        {
-          id: "S3", title: "Comptabilité & Analyse", color: "bg-blue-600",
-          courses: [
-            "Comptabilité Analytique & Analyse Fin. I",
-            "Gestion Prévisionnelle & Info Gestion I",
-            "Économie Sénégalaise & Conjoncture",
-            "Droit I & Fiscalité Entreprise I"
-          ]
-        },
-        {
-          id: "S4", title: "Finance & Organisation", color: "bg-purple-600",
-          courses: [
-            "Analyse Fin. II & Finance d'entreprise",
-            "Éco d'Entreprise & Fiscalité II",
-            "Analyse de Données & Maths Fin.",
-            "Info Gestion II & Logiciel SAARI",
-            "Droit II & Management Stratégique"
-          ]
-        }
+        { id: "S3", title: "Comptabilité & Analyse", color: "bg-blue-600", courses: ["Comptabilité Analytique & Analyse Fin. I", "Gestion Prévisionnelle & Info Gestion I", "Économie Sénégalaise & Conjoncture", "Droit I & Fiscalité Entreprise I"] },
+        { id: "S4", title: "Finance & Organisation", color: "bg-purple-600", courses: ["Analyse Fin. II & Finance d'entreprise", "Éco d'Entreprise & Fiscalité II", "Analyse de Données & Maths Fin.", "Info Gestion II & Logiciel SAARI", "Droit II & Management Stratégique"] }
       ]
     }
   ];
@@ -93,53 +61,20 @@ export default function HECCurriculum() {
     CCG: {
       year: "Troisième Année (L3) - Option CCG",
       semesters: [
-        { 
-          id: "S5-CCG", title: "Audit & Comptabilité", color: "bg-red-500", 
-          courses: [
-            "Compta Approfondie & des Sociétés",
-            "Initiation Audit & Comm. Financière",
-            "Compta Analytique I & Contrôle de Gestion I",
-            "Compta sur Ordi & Projet Pro I"
-          ] 
-        },
-        { 
-          id: "S6-CCG", title: "Expertise & Synthèse", color: "bg-indigo-500", 
-          courses: [
-            "Compta Analytique II & Bancaire",
-            "Contrôle de Gestion II & Audit",
-            "Conférence & Éthique",
-            "Méthodologie & Projet Fin de Cycle"
-          ] 
-        }
+        { id: "S5-CCG", title: "Audit & Comptabilité", color: "bg-red-500", courses: ["Compta Approfondie & des Sociétés", "Initiation Audit & Comm. Financière", "Compta Analytique I & Contrôle de Gestion I", "Compta sur Ordi & Projet Pro I"] },
+        { id: "S6-CCG", title: "Expertise & Synthèse", color: "bg-indigo-500", courses: ["Compta Analytique II & Bancaire", "Contrôle de Gestion II & Audit", "Conférence & Éthique", "Méthodologie & Projet Fin de Cycle"] }
       ]
     },
     ECE: {
       year: "Troisième Année (L3) - Option ECE",
       semesters: [
-        { 
-          id: "S5-ECE", title: "Culture Entrepreneuriale", color: "bg-green-500", 
-          courses: [
-            "Entrepreneuriat & Incubateur",
-            "Politique Générale d'Entreprise",
-            "Sociologie Orga & Marketing Approfondi",
-            "Pilotage de Projets & Projet Pro"
-          ] 
-        },
-        { 
-          id: "S6-ECE", title: "Lancement & Stratégie", color: "bg-orange-500", 
-          courses: [
-            "Levée de Fonds & Fiscalité",
-            "Compta Sociétés & Gestion Entreprises",
-            "Plaidoyer - Lobbying",
-            "Projet de Fin de Cycle (Business Plan)"
-          ] 
-        }
+        { id: "S5-ECE", title: "Culture Entrepreneuriale", color: "bg-green-500", courses: ["Entrepreneuriat & Incubateur", "Politique Générale d'Entreprise", "Sociologie Orga & Marketing Approfondi", "Pilotage de Projets & Projet Pro"] },
+        { id: "S6-ECE", title: "Lancement & Stratégie", color: "bg-orange-500", courses: ["Levée de Fonds & Fiscalité", "Compta Sociétés & Gestion Entreprises", "Plaidoyer - Lobbying", "Projet de Fin de Cycle (Business Plan)"] }
       ]
     }
   };
 
   const handleDownloadPDF = () => {
-    // Construction des données pour le PDF
     const fullData = [...commonCurriculum, l3Specialities[l3Option]];
     const title = `Licence HEC - Option ${l3Option === 'CCG' ? 'Comptabilité' : 'Entrepreneuriat'}`;
     generateSyllabusPDF(title, "Maquette Pédagogique Officielle", fullData);
@@ -159,33 +94,22 @@ export default function HECCurriculum() {
       <section className="relative pt-32 pb-20 px-6">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/diamond-upholstery.png')] opacity-5 dark:opacity-10 pointer-events-none"></div>
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-ucak-gold/10 dark:bg-ucak-gold/20 rounded-full blur-[120px] pointer-events-none"></div>
-        
         <div className="container mx-auto max-w-7xl relative z-10 text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="inline-block mb-6">
             <span className="py-2 px-6 rounded-full border border-ucak-blue/30 bg-ucak-blue/10 text-ucak-blue dark:text-white text-xs font-black uppercase tracking-[0.3em] backdrop-blur-md">
               École de Management
             </span>
           </motion.div>
-          
-          <motion.h1 
-            initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
-            className="text-5xl md:text-7xl font-black mb-8 leading-[0.9] tracking-tighter text-gray-900 dark:text-white"
-          >
+          <motion.h1 initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-5xl md:text-7xl font-black mb-8 leading-[0.9] tracking-tighter text-gray-900 dark:text-white">
             Hautes Études <br/>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-ucak-gold via-yellow-500 to-ucak-gold">
-              Commerciales
-            </span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-ucak-gold via-yellow-500 to-ucak-gold">Commerciales</span>
           </motion.h1>
-
           <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto mb-12 leading-relaxed">
             Formez-vous aux métiers de la décision. Une excellence académique alliant <span className="font-bold text-ucak-blue dark:text-white">Finance, Audit et Entrepreneuriat</span>.
           </p>
-
           <div className="flex flex-wrap justify-center gap-4">
             {debouches.map((job, idx) => (
-              <div key={idx} className="flex flex-col items-center gap-2 px-6 py-4 rounded-2xl border transition-colors 
-                bg-white border-gray-200 shadow-sm
-                dark:bg-white/5 dark:border-white/10 dark:backdrop-blur-sm dark:shadow-none">
+              <div key={idx} className="flex flex-col items-center gap-2 px-6 py-4 rounded-2xl border transition-colors bg-white border-gray-200 shadow-sm dark:bg-white/5 dark:border-white/10 dark:backdrop-blur-sm dark:shadow-none">
                 <job.icon className="text-ucak-gold" size={24} />
                 <span className="text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">{job.title}</span>
               </div>
@@ -194,21 +118,18 @@ export default function HECCurriculum() {
         </div>
       </section>
 
-      {/* PROGRAMME */}
+      {/* PROGRAMME ACADÉMIQUE */}
       <section className="py-20 px-6 relative">
         <div className="container mx-auto max-w-7xl">
           <div className="space-y-24">
-            {/* L1 & L2 */}
             {commonCurriculum.map((year, idx) => (
               <div key={idx} className="relative">
                 <div className="sticky top-24 z-20 mb-8 pl-4 border-l-4 border-ucak-blue backdrop-blur-md py-2">
                   <h3 className="text-4xl font-black text-gray-900 dark:text-white">{year.year}</h3>
-                  <p className="text-ucak-gold font-bold uppercase tracking-widest text-sm mt-2">Tronc Commun</p>
+                  <p className="text-ucak-gold font-bold uppercase tracking-widest text-sm mt-2">{year.desc}</p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {year.semesters.map((sem) => (
-                    <SemesterCard key={sem.id} {...sem} />
-                  ))}
+                  {year.semesters.map((sem) => <SemesterCard key={sem.id} {...sem} />)}
                 </div>
               </div>
             ))}
@@ -217,7 +138,7 @@ export default function HECCurriculum() {
             <div className="relative">
               <div className="sticky top-24 z-20 mb-8 pl-4 border-l-4 border-ucak-blue backdrop-blur-md py-2">
                 <h3 className="text-4xl font-black text-gray-900 dark:text-white">Troisième Année (L3)</h3>
-                <p className="text-ucak-gold font-bold uppercase tracking-widest text-sm mt-2">Spécialisation</p>
+                <p className="text-ucak-gold font-bold uppercase tracking-widest text-sm mt-2">Spécialisation & Professionnalisation</p>
               </div>
               
               <div className="flex justify-center mb-10">
@@ -228,10 +149,42 @@ export default function HECCurriculum() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {l3Specialities[l3Option].semesters.map((sem) => (
-                   <SemesterCard key={sem.id} {...sem} />
-                ))}
+                {l3Specialities[l3Option].semesters.map((sem) => <SemesterCard key={sem.id} {...sem} />)}
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION ADMISSION & PARTENAIRES (Ajoutée selon analyse) */}
+      <section className="py-20 px-6 bg-white dark:bg-ucak-dark-card border-y border-gray-100 dark:border-white/5">
+        <div className="container mx-auto max-w-7xl grid grid-cols-1 md:grid-cols-2 gap-12">
+          <div>
+            <h3 className="text-2xl font-black text-ucak-blue dark:text-white mb-6 flex items-center gap-3">
+              <span className="w-10 h-10 rounded-xl bg-ucak-blue text-white flex items-center justify-center text-sm">01</span>
+              Conditions d'Admission
+            </h3>
+            <div className="prose text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
+              <p className="mb-4">La sélection se fait par une <strong>commission de recrutement</strong> rigoureuse. Nous acceptons les profils suivants :</p>
+              <ul className="space-y-2">
+                <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-ucak-gold"/> Bacheliers Séries L (Littéraires)</li>
+                <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-ucak-gold"/> Bacheliers Séries S (Scientifiques)</li>
+                <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-ucak-gold"/> Bacheliers Séries G (Techniques de Gestion)</li>
+              </ul>
+            </div>
+          </div>
+          <div>
+            <h3 className="text-2xl font-black text-ucak-blue dark:text-white mb-6 flex items-center gap-3">
+              <span className="w-10 h-10 rounded-xl bg-ucak-gold text-white flex items-center justify-center text-sm">02</span>
+              Partenaires Académiques
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">Nos diplômes sont reconnus grâce à nos partenariats stratégiques :</p>
+            <div className="grid grid-cols-2 gap-4">
+              {['UCAD Dakar', 'UGB Saint-Louis', 'UIDT Thiès', 'UAS Ziguinchor'].map(partner => (
+                <div key={partner} className="px-4 py-3 rounded-lg bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 text-xs font-bold text-center text-gray-600 dark:text-gray-300">
+                  {partner}
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -246,10 +199,7 @@ export default function HECCurriculum() {
             </div>
             <h2 className="text-3xl font-black text-gray-900 dark:text-white mb-6">Syllabus HEC 2026</h2>
             <p className="text-gray-500 dark:text-gray-400 mb-10">Document officiel complet avec la maquette pédagogique.</p>
-            <button 
-              onClick={handleDownloadPDF}
-              className="inline-flex items-center gap-3 px-8 py-4 rounded-xl font-bold uppercase tracking-widest transition-all shadow-lg hover:-translate-y-1 bg-ucak-blue text-white hover:bg-ucak-gold"
-            >
+            <button onClick={handleDownloadPDF} className="inline-flex items-center gap-3 px-8 py-4 rounded-xl font-bold uppercase tracking-widest transition-all shadow-lg hover:-translate-y-1 bg-ucak-blue text-white hover:bg-ucak-gold">
               Générer le PDF <ArrowRight size={18} />
             </button>
           </motion.div>

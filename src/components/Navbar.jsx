@@ -9,7 +9,7 @@ import logoUcak from '../assets/logo-ucak.png';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // ==========================================
-// 1. SOUS-COMPOSANTS (Définis avant l'usage)
+// 1. SOUS-COMPOSANTS (Définis AVANT l'usage)
 // ==========================================
 
 const FormationsDropdown = () => (
@@ -63,9 +63,7 @@ const DesktopProfileMenu = ({ user, isAdmin, logout }) => (
         <Link to="/career" className="flex items-center gap-3 px-4 py-3 text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl transition-colors">
           <Briefcase size={16} className="text-ucak-gold"/> Stages
         </Link>
-        
         <div className="h-px bg-gray-100 dark:bg-white/5 my-2 mx-2"></div>
-        
         <button onClick={logout} className="w-full flex items-center gap-3 px-4 py-3 text-xs font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-xl transition-colors">
           <LogOut size={16}/> Déconnexion
         </button>
@@ -75,18 +73,12 @@ const DesktopProfileMenu = ({ user, isAdmin, logout }) => (
 
 const MobileMenuButton = ({ icon: Icon, label, to, visible = true, onClick }) => {
   if (!visible) return null;
-  
-  if (onClick) {
-    return (
-      <button onClick={onClick} className="flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-white/5 rounded-2xl active:scale-95 transition-all w-full h-full">
-         <Icon size={24} className="mb-2 text-ucak-blue dark:text-gray-200" />
-         <span className="text-xs font-bold text-gray-600 dark:text-gray-400">{label}</span>
-      </button>
-    );
-  }
-
   return (
-    <Link to={to} className="flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-white/5 rounded-2xl active:scale-95 transition-all h-full">
+    <Link 
+      to={to} 
+      onClick={onClick} // Correction : Ferme le menu au clic
+      className="flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-white/5 rounded-2xl active:scale-95 transition-all w-full h-full"
+    >
        <Icon size={24} className="mb-2 text-ucak-blue dark:text-gray-200" />
        <span className="text-xs font-bold text-gray-600 dark:text-gray-400">{label}</span>
     </Link>
@@ -94,7 +86,7 @@ const MobileMenuButton = ({ icon: Icon, label, to, visible = true, onClick }) =>
 };
 
 // ==========================================
-// 2. COMPOSANT PRINCIPAL NAVBAR
+// 2. COMPOSANT PRINCIPAL
 // ==========================================
 
 export default function Navbar() {
@@ -107,7 +99,6 @@ export default function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Gestion du Thème
   useEffect(() => {
     if (theme === 'dark') document.documentElement.classList.add('dark');
     else document.documentElement.classList.remove('dark');
@@ -130,24 +121,19 @@ export default function Navbar() {
     setShowMobileMenu(false);
   };
 
-  // --- CONFIGURATION DES LIENS ---
-
-  // Liens Desktop (Visiteur)
-  const visitorDesktopLinks = [
+  const desktopLinks = [
     { name: 'Accueil', path: '/', icon: Home },
     { type: 'dropdown', name: 'Formations', icon: GraduationCap },
     { name: 'Infos', path: '/news', icon: Newspaper },
   ];
 
-  // Liens Mobile (Visiteur) : Plat (Pas de dropdown)
-  const visitorMobileLinks = [
+  const guestMobileLinks = [
     { name: 'Accueil', path: '/', icon: Home },
     { name: 'Info', path: '/formation/informatique', icon: GraduationCap },
     { name: 'HEC', path: '/formation/hec', icon: Briefcase },
     { name: 'Login', path: '/login', icon: LogIn },
   ];
 
-  // Liens Mobile (Étudiant) : Bottom Bar
   const studentMobileLinks = [
     { name: 'Accueil', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Cours', path: '/knowledge', icon: BookOpen },
@@ -155,16 +141,12 @@ export default function Navbar() {
     { name: 'Menu', path: '#', action: 'menu', icon: MoreHorizontal },
   ];
 
-  const currentMobileLinks = user ? studentMobileLinks : visitorMobileLinks;
+  const currentMobileLinks = user ? studentMobileLinks : guestMobileLinks;
 
   return (
     <>
-      {/* =======================
-          A. DESKTOP NAVBAR (Hidden on Mobile)
-         ======================= */}
+      {/* A. DESKTOP NAVBAR */}
       <nav className="hidden md:flex fixed w-full z-50 bg-white/90 dark:bg-ucak-dark/90 backdrop-blur-xl border-b border-gray-100 dark:border-white/5 transition-all duration-300 h-20 items-center justify-between px-6">
-          
-          {/* LOGO */}
           <Link to={user ? "/dashboard" : "/"} className="flex items-center gap-3 group">
             <div className="p-1.5 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-100 dark:border-white/5 group-hover:border-ucak-blue/30 transition-colors">
                <img src={logoUcak} alt="Logo" className="w-8 h-8 object-contain" />
@@ -175,10 +157,8 @@ export default function Navbar() {
             </div>
           </Link>
 
-          {/* MENU CENTRAL DESKTOP */}
           <div className="flex items-center gap-1 bg-gray-50 dark:bg-white/5 p-1.5 rounded-full border border-gray-100 dark:border-white/5">
             {user ? (
-               // MENU ÉTUDIANT
                [{ name: 'Tableau de bord', path: '/dashboard', icon: LayoutDashboard }, { name: 'Bibliothèque', path: '/knowledge', icon: BookOpen }, { name: 'Carrière', path: '/career', icon: Briefcase }].map(link => (
                   <Link key={link.path} to={link.path} className={`px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wide transition-all flex items-center gap-2 ${isActive(link.path) ? 'bg-white dark:bg-ucak-dark-card text-ucak-blue dark:text-white shadow-sm scale-105' : 'text-gray-500 hover:text-ucak-blue dark:text-gray-400'}`}>
                     <link.icon size={14} className={isActive(link.path) ? 'text-ucak-green' : 'opacity-70'} />
@@ -186,8 +166,7 @@ export default function Navbar() {
                   </Link>
                ))
             ) : (
-               // MENU VISITEUR (AVEC DROPDOWN)
-               visitorDesktopLinks.map((link, idx) => {
+               desktopLinks.map((link, idx) => {
                  if (link.type === 'dropdown') {
                    return (
                      <div key={idx} className="relative" onMouseEnter={() => setIsFormationOpen(true)} onMouseLeave={() => setIsFormationOpen(false)}>
@@ -210,7 +189,6 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* ACTIONS DROITE (THEME & USER) */}
           <div className="flex items-center gap-3">
             <button onClick={toggleTheme} className="p-2.5 rounded-full text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 hover:text-ucak-blue transition-colors">
               {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
@@ -242,15 +220,12 @@ export default function Navbar() {
           </div>
       </nav>
 
-      {/* =======================
-          B. MOBILE HEADER (Top Bar)
-         ======================= */}
+      {/* B. MOBILE HEADER */}
       <div className="md:hidden fixed top-0 w-full z-40 bg-white/80 dark:bg-ucak-dark/80 backdrop-blur-md border-b border-gray-100 dark:border-white/5 px-4 h-16 flex items-center justify-between transition-colors duration-300">
          <Link to={user ? "/dashboard" : "/"} className="flex items-center gap-2">
             <img src={logoUcak} alt="Logo" className="w-8 h-8" />
             <span className="font-black text-ucak-blue dark:text-white tracking-tight">CLUB MET</span>
          </Link>
-         
          <div className="flex items-center gap-2">
             <button onClick={toggleTheme} className="p-2 rounded-full bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-gray-200">
                {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
@@ -263,65 +238,38 @@ export default function Navbar() {
          </div>
       </div>
 
-      {/* =======================
-          C. MOBILE BOTTOM NAV
-         ======================= */}
+      {/* C. MOBILE BOTTOM NAV */}
       <nav className="md:hidden fixed bottom-0 w-full z-50 bg-white dark:bg-[#0f141f] border-t border-gray-200 dark:border-white/5 pb-safe-area-inset-bottom transition-colors duration-300">
          <div className="flex justify-around items-center h-16 px-2">
             {currentMobileLinks.map((link, index) => {
                const active = isActive(link.path);
-               
-               // Cas spécial : Bouton Menu "Plus"
                if (link.action === 'menu') {
                  return (
-                   <button 
-                     key={index}
-                     onClick={() => setShowMobileMenu(true)}
-                     className={`flex flex-col items-center justify-center w-full h-full gap-1 transition-colors ${showMobileMenu ? 'text-ucak-blue dark:text-white' : 'text-gray-400'}`}
-                   >
+                   <button key={index} onClick={() => setShowMobileMenu(true)} className={`flex flex-col items-center justify-center w-full h-full gap-1 transition-colors ${showMobileMenu ? 'text-ucak-blue dark:text-white' : 'text-gray-400'}`}>
                       <MoreHorizontal size={24} />
                       <span className="text-[10px] font-bold">Menu</span>
                    </button>
                  )
                }
-
                return (
-                 <Link 
-                   key={index} 
-                   to={link.path}
-                   className={`flex flex-col items-center justify-center w-full h-full gap-1 transition-all relative group`}
-                 >
+                 <Link key={index} to={link.path} className={`flex flex-col items-center justify-center w-full h-full gap-1 transition-all relative group`}>
                     {active && <motion.div layoutId="mobileNavIndicator" className="absolute -top-[1px] w-8 h-1 bg-ucak-blue rounded-b-full" />}
-                    
                     <div className={`p-1.5 rounded-xl transition-all ${active ? 'bg-blue-50 dark:bg-white/10 text-ucak-blue dark:text-white -translate-y-1' : 'text-gray-400'}`}>
                        <link.icon size={20} strokeWidth={active ? 2.5 : 2} />
                     </div>
-                    <span className={`text-[10px] font-bold ${active ? 'text-ucak-blue dark:text-white' : 'text-gray-400'}`}>
-                       {link.name}
-                    </span>
+                    <span className={`text-[10px] font-bold ${active ? 'text-ucak-blue dark:text-white' : 'text-gray-400'}`}>{link.name}</span>
                  </Link>
                );
             })}
          </div>
       </nav>
 
-      {/* =======================
-          D. MOBILE MENU OVERLAY (Modal)
-         ======================= */}
+      {/* D. MOBILE MENU OVERLAY */}
       <AnimatePresence>
         {showMobileMenu && (
-           <motion.div 
-             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-             className="md:hidden fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm flex items-end justify-center"
-             onClick={() => setShowMobileMenu(false)}
-           >
-              <motion.div 
-                initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
-                className="w-full bg-white dark:bg-ucak-dark-card rounded-t-[2rem] p-6 pb-10"
-                onClick={e => e.stopPropagation()}
-              >
+           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="md:hidden fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm flex items-end justify-center" onClick={() => setShowMobileMenu(false)}>
+              <motion.div initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }} className="w-full bg-white dark:bg-ucak-dark-card rounded-t-[2rem] p-6 pb-10" onClick={e => e.stopPropagation()}>
                  <div className="w-12 h-1.5 bg-gray-200 dark:bg-white/10 rounded-full mx-auto mb-6"></div>
-                 
                  {user && (
                     <div className="flex items-center gap-4 mb-6 pb-6 border-b border-gray-100 dark:border-white/5">
                        <div className="w-14 h-14 bg-ucak-blue text-white rounded-full flex items-center justify-center text-xl font-black">
@@ -333,21 +281,15 @@ export default function Navbar() {
                        </div>
                     </div>
                  )}
-
                  <div className="grid grid-cols-2 gap-3 mb-6">
-                    {/* Liens supplémentaires du menu mobile */}
-                    <MobileMenuButton icon={User} label="Mon Profil" to="/dashboard" />
-                    <MobileMenuButton icon={Briefcase} label="Stages" to="/career" />
-                    <MobileMenuButton icon={Users} label="Réseau Alumni" to="/network" />
-                    <MobileMenuButton icon={Newspaper} label="News" to="/news" />
-                    <MobileMenuButton icon={ShieldAlert} label="Admin" to="/admin/courses" visible={isAdmin} />
+                    <MobileMenuButton icon={User} label="Mon Profil" to="/dashboard" onClick={() => setShowMobileMenu(false)} />
+                    <MobileMenuButton icon={Briefcase} label="Stages" to="/career" onClick={() => setShowMobileMenu(false)} />
+                    <MobileMenuButton icon={Users} label="Réseau Alumni" to="/network" onClick={() => setShowMobileMenu(false)} />
+                    <MobileMenuButton icon={Newspaper} label="News" to="/news" onClick={() => setShowMobileMenu(false)} />
+                    <MobileMenuButton icon={ShieldAlert} label="Admin" to="/admin/courses" visible={isAdmin} onClick={() => setShowMobileMenu(false)} />
                  </div>
-
                  {user ? (
-                   <button 
-                     onClick={handleLogout}
-                     className="w-full py-4 bg-red-50 dark:bg-red-900/10 text-red-500 font-black rounded-2xl flex items-center justify-center gap-2 hover:bg-red-100 transition-colors"
-                   >
+                   <button onClick={handleLogout} className="w-full py-4 bg-red-50 dark:bg-red-900/10 text-red-500 font-black rounded-2xl flex items-center justify-center gap-2 hover:bg-red-100 transition-colors">
                       <LogOut size={20} /> Se déconnecter
                    </button>
                  ) : (

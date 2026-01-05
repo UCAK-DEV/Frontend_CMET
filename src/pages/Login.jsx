@@ -1,112 +1,154 @@
-import { motion } from 'framer-motion';
-import { ChevronRight, Sparkles, ShieldCheck, Zap, Briefcase, LayoutDashboard } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
 import { useUser } from '../context/UserContext';
+import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+// Vérifiez bien que toutes ces icônes sont importées
+import { Mail, Lock, ArrowRight, Loader2, User, Hash, AlertTriangle, CheckCircle2, GraduationCap } from 'lucide-react';
+import logoUcak from '../assets/logo-ucak.png';
 
-export default function Hero() {
-  const { user } = useUser();
+const InputField = ({ icon: Icon, ...props }) => (
+  <div className="group relative">
+    <Icon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-ucak-blue transition-colors" size={20} />
+    <input 
+      {...props}
+      className="w-full pl-12 pr-4 py-4 rounded-xl font-medium outline-none transition-all placeholder:text-gray-400
+        bg-gray-50 border border-gray-200 text-gray-900 focus:border-ucak-blue focus:bg-white focus:ring-4 focus:ring-ucak-blue/10
+        dark:bg-white/5 dark:border-white/10 dark:text-white dark:focus:border-ucak-blue dark:focus:bg-black/40"
+    />
+  </div>
+);
+
+const SelectField = ({ icon: Icon, children, ...props }) => (
+  <div className="relative">
+    {Icon && <Icon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />}
+    <select 
+      {...props}
+      className={`w-full py-4 rounded-xl font-medium outline-none transition-all appearance-none cursor-pointer
+        bg-gray-50 border border-gray-200 text-gray-900 focus:border-ucak-blue
+        dark:bg-white/5 dark:border-white/10 dark:text-white dark:focus:border-ucak-blue
+        ${Icon ? 'pl-12 pr-4' : 'px-4'}`}
+    >
+      {children}
+    </select>
+  </div>
+);
+
+export default function Login() {
+  const [isRegister, setIsRegister] = useState(false);
+  const [formData, setFormData] = useState({ 
+    email: '', password: '', full_name: '', matricule: '', 
+    filiere: 'Informatique & Télécoms', promo: 'Licence 1' 
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
+  
+  const { login, register } = useUser();
+  const navigate = useNavigate();
+
+  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
+    
+    // Simulation délai
+    await new Promise(r => setTimeout(r, 800));
+
+    try {
+      if (isRegister) {
+        const res = await register(formData);
+        if (res.success) {
+           setSuccessMsg("Bienvenue ! Redirection...");
+           setTimeout(() => navigate('/dashboard'), 1500);
+        } else setError(res.message || "Échec de l'inscription");
+      } else {
+        const res = await login(formData.email, formData.password);
+        if (res.success) navigate('/dashboard');
+        else setError("Identifiants incorrects");
+      }
+    } catch (err) { setError("Erreur de connexion au serveur"); } 
+    finally { setIsLoading(false); }
+  };
 
   return (
-    <div className="overflow-hidden">
-      <section className="relative pt-36 pb-24 min-h-[95vh] flex items-center">
-        {/* Fond */}
-        <div className="absolute inset-0 ucak-pattern opacity-20 pointer-events-none"></div>
-        <div className="absolute top-20 left-0 w-[600px] h-[600px] bg-ucak-green/10 rounded-full blur-[120px] -z-10 pointer-events-none"></div>
+    // min-h-[80vh] permet d'éviter que la page soit trop grande sur mobile avec la barre de nav
+    <div className="min-h-[80vh] flex items-center justify-center relative overflow-hidden transition-colors duration-500">
+      
+      {/* Background Effect */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-ucak-blue/5 rounded-full blur-[100px] dark:hidden"></div>
+        <div className="hidden dark:block absolute bottom-0 right-0 w-[500px] h-[500px] bg-ucak-blue/10 rounded-full blur-[120px]"></div>
+      </div>
+
+      <div className="container mx-auto px-4 relative z-10 flex justify-center py-10">
         
-        <div className="container mx-auto px-6 text-center relative z-10">
-          
-          {/* LOGIQUE DYNAMIQUE DU CONTENU */}
-          {user ? (
-            // === VUE ÉTUDIANT (Si SmartHome est désactivé ou lien direct) ===
-            <>
-              <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="inline-flex items-center gap-2 py-2 px-6 rounded-full bg-ucak-blue/10 text-ucak-blue dark:text-ucak-gold font-bold text-xs mb-8 uppercase tracking-widest">
-                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Session Active
-              </motion.div>
-              
-              <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="text-5xl md:text-7xl font-black text-ucak-blue dark:text-white mb-6">
-                Bon retour, <span className="text-transparent bg-clip-text bg-gradient-to-r from-ucak-green to-ucak-gold">{user.full_name.split(' ')[0]}</span>.
-              </motion.h1>
-              
-              <p className="text-xl text-gray-500 dark:text-gray-300 max-w-2xl mx-auto mb-10">
-                Votre espace numérique est prêt. Reprenez vos cours là où vous les avez laissés ou consultez vos dernières notifications.
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="w-full max-w-[500px] rounded-[2.5rem] shadow-2xl overflow-hidden relative
+            bg-white border border-gray-100
+            dark:bg-[#111] dark:border-white/10 dark:shadow-black/50"
+        >
+          <div className="h-2 w-full bg-gradient-to-r from-ucak-blue via-ucak-green to-ucak-gold"></div>
+
+          <div className="p-8 md:p-12">
+            <div className="text-center mb-10">
+              <div className="w-20 h-20 mx-auto mb-6 rounded-3xl flex items-center justify-center p-4 shadow-inner bg-gray-50 dark:bg-white/5">
+                <img src={logoUcak} alt="Logo" className="w-full h-full object-contain drop-shadow-lg" />
+              </div>
+              <h1 className="text-3xl font-black mb-2 text-gray-900 dark:text-white">
+                {isRegister ? "Rejoindre" : "Connexion"}
+              </h1>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Accédez à votre espace étudiant.
               </p>
+            </div>
 
-              <div className="flex justify-center gap-4">
-                <Link to="/dashboard">
-                  <button className="px-10 py-5 bg-ucak-blue text-white rounded-2xl font-black uppercase tracking-widest shadow-xl hover:scale-105 transition-transform flex items-center gap-3">
-                    <LayoutDashboard size={20} /> Mon Tableau de Bord
-                  </button>
-                </Link>
-              </div>
-            </>
-          ) : (
-            // === VUE VISITEUR (Marketing) ===
-            <>
-              <motion.div
-                initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}
-                className="inline-flex items-center gap-3 py-2 px-6 rounded-full bg-white/40 dark:bg-ucak-dark-card/40 border border-ucak-gold/20 backdrop-blur-xl text-ucak-blue dark:text-ucak-gold font-black text-xs mb-10 uppercase tracking-[0.2em] shadow-xl"
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <AnimatePresence mode="wait">
+                {isRegister && (
+                  <motion.div 
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="space-y-4 overflow-hidden"
+                  >
+                    <div className="grid grid-cols-2 gap-4">
+                      <InputField icon={User} name="full_name" placeholder="Prénom" required onChange={handleChange} />
+                      <InputField icon={Hash} name="matricule" placeholder="Matricule" required onChange={handleChange} />
+                    </div>
+                    <SelectField icon={GraduationCap} name="filiere" onChange={handleChange}>
+                      <option>Informatique</option>
+                      <option>HEC</option>
+                    </SelectField>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <InputField icon={Mail} type="email" name="email" placeholder="Email" required onChange={handleChange} />
+              <InputField icon={Lock} type="password" name="password" placeholder="Mot de passe" required onChange={handleChange} />
+
+              {error && <p className="text-red-500 text-xs font-bold text-center">{error}</p>}
+              {successMsg && <p className="text-green-500 text-xs font-bold text-center">{successMsg}</p>}
+
+              <button type="submit" disabled={isLoading} className="w-full py-4 mt-2 bg-ucak-blue text-white rounded-xl font-black uppercase tracking-widest shadow-lg hover:bg-ucak-green transition-all flex justify-center items-center gap-2">
+                {isLoading ? <Loader2 className="animate-spin" /> : (isRegister ? "S'inscrire" : "Se Connecter")}
+              </button>
+            </form>
+
+            <div className="mt-8 text-center">
+              <button 
+                onClick={() => { setError(''); setIsRegister(!isRegister); }}
+                className="text-sm font-bold text-ucak-blue dark:text-white hover:underline decoration-ucak-gold"
               >
-                <Sparkles size={14} className="animate-pulse" /> <span>Technologie • Management • Innovation</span>
-              </motion.div>
-
-              <motion.h1 
-                initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}
-                className="text-6xl md:text-[7rem] font-black text-ucak-blue dark:text-white mb-8 leading-[0.9] tracking-tighter"
-              >
-                L'Excellence <br/> 
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-ucak-green via-ucak-gold to-ucak-green bg-[length:200%_auto] animate-gradient-x">
-                  Pluridisciplinaire
-                </span>
-              </motion.h1>
-
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="max-w-4xl mx-auto mb-14">
-                <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 font-medium leading-relaxed italic">
-                  "De l'Ingénierie Informatique aux Hautes Études Commerciales, formez-vous aux métiers de demain avec éthique et rigueur."
-                </p>
-              </motion.div>
-
-              <div className="flex flex-col md:flex-row justify-center gap-6 mb-24">
-                <Link to="/login">
-                  <button className="px-10 py-5 bg-ucak-blue dark:bg-ucak-green text-white font-black rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.2)] hover:shadow-ucak-green/40 hover:-translate-y-2 transition-all flex items-center justify-center gap-3 uppercase tracking-widest text-xs">
-                    Devenir un Leader <ChevronRight size={18} />
-                  </button>
-                </Link>
-                <Link to="/about">
-                  <button className="px-10 py-5 bg-white dark:bg-white/5 text-ucak-blue dark:text-white border border-gray-200 dark:border-white/10 font-black rounded-2xl hover:bg-gray-50 dark:hover:bg-white/10 transition-all backdrop-blur-xl uppercase tracking-widest text-xs">
-                    Découvrir l'Institution
-                  </button>
-                </Link>
-              </div>
-            </>
-          )}
-
-        </div>
-      </section>
-
-      {/* Piliers (Visible pour tous, rassurant pour l'image de marque) */}
-      {!user && (
-        <section className="py-24 bg-gray-50 dark:bg-ucak-dark-card/20 relative border-t border-gray-100 dark:border-gray-800">
-          <div className="container mx-auto px-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <motion.div whileHover={{ y: -15 }} className="bg-white dark:bg-ucak-dark-card p-10 rounded-[3rem] shadow-xl border border-gray-100 dark:border-gray-800 relative overflow-hidden group">
-                <div className="w-16 h-16 bg-ucak-blue/10 rounded-2xl flex items-center justify-center mb-8 text-ucak-blue"><Zap size={32} /></div>
-                <h3 className="text-2xl font-black text-ucak-blue dark:text-white mb-4">Savoir Utile</h3>
-                <p className="text-gray-500 dark:text-gray-300 leading-relaxed mb-6">Sciences, Technologie et Gestion pour servir la communauté.</p>
-              </motion.div>
-              <motion.div whileHover={{ y: -15 }} className="bg-ucak-blue p-10 rounded-[3rem] shadow-2xl relative overflow-hidden group text-white">
-                <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-8 text-white"><ShieldCheck size={32} /></div>
-                <h3 className="text-2xl font-black mb-4">Action Vertueuse</h3>
-                <p className="text-white/80 leading-relaxed mb-6">Un engagement éthique dans le monde professionnel.</p>
-              </motion.div>
-              <motion.div whileHover={{ y: -15 }} className="bg-white dark:bg-ucak-dark-card p-10 rounded-[3rem] shadow-xl border border-gray-100 dark:border-gray-800 relative overflow-hidden group">
-                <div className="w-16 h-16 bg-ucak-gold/10 rounded-2xl flex items-center justify-center mb-8 text-ucak-gold"><Briefcase size={32} /></div>
-                <h3 className="text-2xl font-black text-ucak-blue dark:text-white mb-4">Leadership</h3>
-                <p className="text-gray-500 dark:text-gray-300 leading-relaxed mb-6">Entrepreneuriat et Innovation au cœur de la formation.</p>
-              </motion.div>
+                {isRegister ? "J'ai déjà un compte" : "Créer un compte"}
+              </button>
             </div>
           </div>
-        </section>
-      )}
+        </motion.div>
+      </div>
     </div>
   );
 }

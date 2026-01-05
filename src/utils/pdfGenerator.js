@@ -12,10 +12,10 @@ const COLORS = {
 
 export const generateSyllabusPDF = (programTitle, description, curriculumData) => {
   try {
-    // Initialisation correcte
+    // 1. Initialisation
     const doc = new jsPDF();
 
-    // --- 1. EN-TÊTE (HEADER) ---
+    // 2. EN-TÊTE (HEADER)
     // Bandeau Bleu
     doc.setFillColor(...COLORS.BLUE);
     doc.rect(0, 0, 210, 40, 'F');
@@ -39,7 +39,7 @@ export const generateSyllabusPDF = (programTitle, description, curriculumData) =
 
     let finalY = 50;
 
-    // --- 2. BOUCLE SUR LES ANNÉES ---
+    // 3. BOUCLE SUR LES ANNÉES
     curriculumData.forEach((year) => {
       
       // Titre de l'année (ex: LICENCE 1)
@@ -71,7 +71,7 @@ export const generateSyllabusPDF = (programTitle, description, curriculumData) =
           // Préparation des données pour le tableau
           const tableBody = sem.courses ? sem.courses.map(course => [course]) : [];
 
-          // Génération du tableau avec autoTable (Fonction importée)
+          // Génération du tableau
           autoTable(doc, {
             startY: finalY,
             head: [['Unités d\'Enseignement (UE) & Modules']],
@@ -94,11 +94,9 @@ export const generateSyllabusPDF = (programTitle, description, curriculumData) =
             margin: { left: 14, right: 14 },
           });
 
-          // Mise à jour de la position Y pour la suite
-          // (jspdf-autotable ajoute la propriété lastAutoTable à l'objet doc)
           finalY = doc.lastAutoTable.finalY + 12;
           
-          // Gestion saut de page manuel si on arrive en bas
+          // Saut de page si nécessaire
           if (finalY > 250) {
             doc.addPage();
             finalY = 20;
@@ -109,27 +107,23 @@ export const generateSyllabusPDF = (programTitle, description, curriculumData) =
       finalY += 5; // Espace entre années
     });
 
-    // --- 3. PIED DE PAGE (FOOTER) ---
+    // 4. PIED DE PAGE (FOOTER)
     const pageCount = doc.internal.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
       doc.setFontSize(8);
       doc.setTextColor(150);
-      
-      // Ligne séparatrice
       doc.setDrawColor(200);
       doc.line(14, 285, 196, 285);
-      
-      // Texte Footer
       doc.text(`Club MET - UFR Sciences & Technologies - ${new Date().getFullYear()}`, 14, 290);
       doc.text(`Page ${i} / ${pageCount}`, 196, 290, { align: 'right' });
     }
 
-    // --- 4. SAUVEGARDE ---
+    // 5. SAUVEGARDE
     doc.save(`Syllabus_${programTitle.replace(/\s+/g, '_')}.pdf`);
 
   } catch (error) {
     console.error("Erreur génération PDF:", error);
-    alert("Erreur lors de la génération du PDF. Vérifiez la console.");
+    alert("Impossible de générer le PDF. Veuillez vérifier la console.");
   }
 };
