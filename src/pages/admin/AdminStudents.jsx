@@ -10,7 +10,8 @@ export default function AdminStudents() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await api.get('/api/v1/users');
+        // CORRECTION ICI : Ajout de /students à la fin
+        const res = await api.get('/api/v1/users/students');
         setStudents(res.data);
       } catch (e) { 
         console.error("Erreur chargement étudiants", e); 

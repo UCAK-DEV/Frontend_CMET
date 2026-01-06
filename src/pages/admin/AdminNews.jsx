@@ -10,7 +10,8 @@ export default function AdminNews() {
 
   const fetchNews = async () => {
     try {
-      const res = await api.get('/api/v1/news');
+      // CORRECTION : /news au lieu de /api/v1/news
+      const res = await api.get('/news');
       setNewsList(res.data);
     } catch (e) { console.error(e); }
   };
@@ -21,7 +22,8 @@ export default function AdminNews() {
     e.preventDefault();
     setStatus('loading');
     try {
-      await api.post('/api/v1/news', formData);
+      // CORRECTION : /news au lieu de /api/v1/news
+      await api.post('/news', formData);
       setStatus('success');
       setFormData({ title: '', content: '', type: 'INFO', event_date: '', location: '', image_url: '' });
       fetchNews();
@@ -30,7 +32,11 @@ export default function AdminNews() {
 
   const deleteNews = async (id) => {
     if(!confirm("Supprimer ?")) return;
-    try { await api.delete(`/api/v1/news/${id}`); fetchNews(); } catch(e){}
+    try { 
+      // CORRECTION : /news au lieu de /api/v1/news
+      await api.delete(`/news/${id}`); 
+      fetchNews(); 
+    } catch(e){}
   };
 
   return (
