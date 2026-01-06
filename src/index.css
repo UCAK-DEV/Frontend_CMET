@@ -2,80 +2,43 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  font-family: 'Inter', system-ui, sans-serif;
+/* === CUSTOM SCROLLBAR (Pour Webkit/Chrome) === */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent; 
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1; 
+  border-radius: 4px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #334155; 
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8; 
 }
 
-/* --- LE MOTIF UNIQUE UCAK (Pattern) --- */
-/* Ce motif utilise des dégradés radiaux pour créer une géométrie subtile 
-   inspirée de la lumière (Nuur) et des courbes du livre ouvert */
-.ucak-pattern {
-    background-color: transparent;
-    background-image:  
-        radial-gradient(at 100% 0%, hsla(215,100%,20%,0.03) 0px, transparent 50%), 
-        radial-gradient(at 0% 100%, hsla(146,100%,27%,0.03) 0px, transparent 50%),
-        repeating-linear-gradient(45deg, rgba(0, 51, 102, 0.01) 0px, rgba(0, 51, 102, 0.01) 2px, transparent 2px, transparent 12px),
-        repeating-linear-gradient(135deg, rgba(0, 138, 69, 0.01) 0px, rgba(0, 138, 69, 0.01) 2px, transparent 2px, transparent 12px);
+/* === UTILITY: HIDE SCROLLBAR (Pour les filtres horizontaux) === */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
 
-/* Motif adapté pour le mode sombre (plus de doré et de lumière) */
-.dark .ucak-pattern {
-    background-image:  
-        radial-gradient(at 100% 0%, hsla(45, 65%, 53%, 0.05) 0px, transparent 50%), /* Lueur dorée en haut à droite */
-        radial-gradient(at 0% 50%, hsla(146, 100%, 27%, 0.04) 0px, transparent 50%), /* Lueur verte à gauche */
-        repeating-linear-gradient(45deg, rgba(212, 175, 55, 0.02) 0px, rgba(212, 175, 55, 0.02) 1px, transparent 1px, transparent 16px); /* Fines lignes dorées */
-}
-
-/* --- UTILITAIRES MOBILES --- */
-/* Gestion de la zone de sécurité en bas (iPhone X et plus récents) pour la barre de nav */
-.pb-safe-area-inset-bottom {
+/* === IOS SAFE AREA (Pour ne pas coller au "Home Indicator" sur iPhone) === */
+.pb-safe {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-/* --- Styles Globaux --- */
+/* === BACKGROUND ANIMATION (Optionnel mais stylé) === */
 body {
-    /* Application du motif sur le fond */
-    @apply bg-ucak-light text-ucak-blue transition-colors duration-500 ucak-pattern min-h-screen;
-    /* Empêche le motif de se répéter de façon moche */
-    background-attachment: fixed; 
+  @apply bg-gray-50 text-gray-900 transition-colors duration-300;
 }
-
 .dark body {
-    /* Fond bleu nuit profond en mode sombre */
-    @apply bg-ucak-dark text-gray-100;
-}
-
-/* --- SCROLLBAR PERSONNALISÉE --- */
-/* Pour Chrome, Edge, Safari */
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  @apply bg-gray-300 dark:bg-white/10 rounded-full border-2 border-transparent bg-clip-content;
-}
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-ucak-blue dark:bg-ucak-gold;
-}
-
-/* --- Composants Pro --- */
-
-/* Cartes modernes avec effet de profondeur */
-.card-base {
-  @apply bg-white/95 backdrop-blur-sm border border-gray-100 shadow-sm shadow-ucak-blue/5
-         dark:bg-ucak-dark-card/90 dark:border-ucak-blue/20 dark:shadow-black/30 dark:text-gray-100 
-         transition-all duration-300;
-}
-
-/* Effet de survol "Divin" pour les éléments interactifs */
-.hover-glow:hover {
-    @apply shadow-lg shadow-ucak-gold/20 border-ucak-gold/40 dark:shadow-ucak-gold/10;
-    transform: translateY(-2px);
-}
-
-/* Titres avec dégradé subtil en mode sombre */
-.title-gradient {
-    @apply dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-white dark:to-ucak-gold/80;
+  @apply bg-[#0b0f19] text-gray-100;
 }

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, GraduationCap, Video, ArrowRight } from 'lucide-react';
+import { Search, GraduationCap, Video, ArrowRight, FolderOpen, Filter } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { db } from '../firebase'; 
 import { collection, getDocs } from 'firebase/firestore'; 
@@ -11,21 +11,13 @@ export default function Knowledge() {
   const [activeFiliere, setActiveFiliere] = useState('Tous');
   const [search, setSearch] = useState('');
 
-  // LECTURE DEPUIS FIREBASE
   useEffect(() => {
     const fetchCourses = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "courses"));
-        const coursesList = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
+        const coursesList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setCourses(coursesList);
-      } catch (error) {
-        console.error("Erreur lecture:", error);
-      } finally {
-        setLoading(false);
-      }
+      } catch (error) { console.error(error); } finally { setLoading(false); }
     };
     fetchCourses();
   }, []);
@@ -37,56 +29,73 @@ export default function Knowledge() {
     return matchLevel && matchFiliere && matchSearch;
   });
 
-  if (loading) return <div className="min-h-screen pt-32 text-center text-gray-500">Chargement...</div>;
-
   return (
-    <div className="min-h-screen pt-32 pb-20 bg-gray-50 dark:bg-ucak-dark px-6">
+    // Padding-bottom ajouté pour ne pas cacher le contenu derrière la barre mobile
+    <div className="min-h-screen pt-24 pb-24 bg-gray-50 dark:bg-ucak-dark px-4 sm:px-6">
       <div className="container mx-auto max-w-7xl">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-end mb-8 gap-6">
-          <div>
-            <h1 className="text-4xl font-black text-ucak-blue dark:text-white mb-2">Bibliothèque</h1>
-            <p className="text-gray-500">Cours et ressources mis à jour en temps réel.</p>
-          </div>
-          <div className="relative w-full md:w-auto">
-            <Search className="absolute left-3 top-3.5 text-gray-400" size={18} />
-            <input type="text" placeholder="Rechercher..." className="w-full md:w-80 pl-10 pr-4 py-3 bg-white dark:bg-ucak-dark-card border border-gray-200 dark:border-white/10 rounded-xl outline-none focus:border-ucak-blue shadow-sm" value={search} onChange={(e) => setSearch(e.target.value)} />
+        
+        {/* Header Mobile-Friendly */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-black text-ucak-blue dark:text-white mb-2">Bibliothèque</h1>
+          <p className="text-sm text-gray-500 mb-6">Ressources mises à jour en temps réel.</p>
+          
+          {/* Barre de recherche */}
+          <div className="relative w-full">
+            <Search className="absolute left-4 top-3.5 text-gray-400" size={18} />
+            <input 
+              type="text" 
+              placeholder="Rechercher un cours..."
+              className="w-full pl-12 pr-4 py-3 bg-white dark:bg-ucak-dark-card border border-gray-200 dark:border-white/10 rounded-2xl outline-none focus:border-ucak-blue shadow-sm text-sm"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
           </div>
         </div>
 
-        {/* Filtres */}
-        <div className="flex flex-wrap gap-4 mb-8">
-            <div className="flex bg-white dark:bg-ucak-dark-card p-1 rounded-xl border border-gray-200 dark:border-white/10">
-                {['Tous', 'Informatique', 'HEC'].map(fil => (
-                    <button key={fil} onClick={() => setActiveFiliere(fil)} className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${activeFiliere === fil ? 'bg-ucak-blue text-white shadow' : 'text-gray-500 hover:text-ucak-blue'}`}>{fil}</button>
+        {/* Filtres avec Scroll Horizontal (Stories style) */}
+        <div className="space-y-4 mb-8">
+            
+            {/* Filières */}
+            <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
+                {['Tous', 'Informatique', 'HEC', 'Génie Civil'].map(fil => (
+                    <button key={fil} onClick={() => setActiveFiliere(fil)} className={`flex-shrink-0 px-5 py-2.5 rounded-full text-xs font-bold transition-all ${activeFiliere === fil ? 'bg-ucak-blue text-white shadow-lg' : 'bg-white dark:bg-white/5 text-gray-500 border border-gray-100 dark:border-white/10'}`}>
+                        {fil}
+                    </button>
                 ))}
             </div>
-            <div className="flex gap-2">
+
+            {/* Niveaux */}
+            <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+                <div className="flex items-center pr-2 text-gray-400"><Filter size={16}/></div>
                 {['Tous', 'L1', 'L2', 'L3', 'M1'].map(lvl => (
-                <button key={lvl} onClick={() => setFilterLevel(lvl)} className={`px-4 py-2 rounded-lg text-xs font-bold border transition-all ${filterLevel === lvl ? 'bg-white dark:bg-white/10 border-ucak-blue text-ucak-blue' : 'border-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5'}`}>{lvl}</button>
+                <button key={lvl} onClick={() => setFilterLevel(lvl)} className={`flex-shrink-0 w-10 h-10 rounded-full text-xs font-bold flex items-center justify-center transition-all ${filterLevel === lvl ? 'bg-black dark:bg-white text-white dark:text-black' : 'bg-gray-100 dark:bg-white/10 text-gray-500'}`}>
+                    {lvl}
+                </button>
                 ))}
             </div>
         </div>
 
         {/* Grille */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredItems.map(course => (
-            <Link to={`/course/${course.id}`} key={course.id} className="bg-white dark:bg-ucak-dark-card p-6 rounded-[2rem] border border-gray-100 dark:border-white/5 hover:border-ucak-blue/30 hover:shadow-xl transition-all group flex flex-col h-full">
-                <div className="flex justify-between items-start mb-6">
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-lg ${course.filiere_tag === 'Informatique' ? 'bg-blue-600' : 'bg-purple-600'}`}><GraduationCap size={24} /></div>
-                <span className="px-3 py-1 bg-gray-50 dark:bg-white/5 rounded-full text-[10px] font-black uppercase tracking-widest text-gray-500">{course.level}</span>
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 leading-tight group-hover:text-ucak-blue transition-colors line-clamp-2">{course.title}</h3>
-                <div className="flex items-center gap-2 text-xs text-gray-400 mb-6 font-medium">
-                <span>{course.instructor_name}</span>
-                </div>
-                <div className="mt-auto pt-6 border-t border-gray-100 dark:border-white/5 flex items-center justify-between">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-gray-500 bg-gray-50 dark:bg-white/5 px-2 py-1 rounded-lg"><Video size={14} className="text-ucak-blue"/>{course.modules?.length || 0} Modules</div>
-                <div className="w-8 h-8 rounded-full bg-ucak-blue text-white flex items-center justify-center group-hover:scale-110 transition-transform"><ArrowRight size={14} /></div>
-                </div>
-            </Link>
-            ))}
-        </div>
+        {loading ? (
+            <div className="text-center py-20 text-gray-400">Chargement...</div>
+        ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filteredItems.map(course => (
+                <Link to={`/course/${course.id}`} key={course.id} className="bg-white dark:bg-ucak-dark-card p-5 rounded-3xl border border-gray-100 dark:border-white/5 shadow-sm active:scale-95 transition-transform flex flex-col h-full">
+                    <div className="flex justify-between items-start mb-4">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-md ${course.filiere_tag === 'Informatique' ? 'bg-blue-600' : 'bg-purple-600'}`}><GraduationCap size={20} /></div>
+                    <span className="px-3 py-1 bg-gray-50 dark:bg-white/5 rounded-full text-[10px] font-black uppercase text-gray-500">{course.level}</span>
+                    </div>
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1 leading-tight line-clamp-2">{course.title}</h3>
+                    <p className="text-xs text-gray-400 mb-4">{course.instructor_name}</p>
+                    <div className="mt-auto pt-4 border-t border-gray-100 dark:border-white/5 flex items-center justify-between">
+                    <div className="flex items-center gap-1.5 text-[10px] font-bold text-gray-500 bg-gray-50 dark:bg-white/5 px-2 py-1 rounded-lg"><Video size={12}/> {course.modules?.length || 0} Modules</div>
+                    <div className="w-8 h-8 rounded-full bg-gray-50 dark:bg-white/10 text-gray-400 flex items-center justify-center"><ArrowRight size={14} /></div>
+                    </div>
+                </Link>
+                ))}
+            </div>
+        )}
       </div>
     </div>
   );
