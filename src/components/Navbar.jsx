@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Home, GraduationCap, Newspaper, LayoutDashboard, 
-  BookOpen, Briefcase, FileText, Trophy, 
+  BookOpen, Briefcase, FileText, Trophy, MonitorPlay,
   Menu, X, ChevronDown, User, LogOut, Construction, Rocket,
   Sun, Moon, Settings, ShieldCheck, Users, Vote, Layers
 } from 'lucide-react';
@@ -127,7 +127,7 @@ export default function Navbar() {
       ]
     },
     { name: 'Actualités', path: '/news', icon: Newspaper },
-    { name: 'Showroom', path: '/showroom', icon: Construction },
+   { name: 'Showroom', path: '/showroom', icon: MonitorPlay },
   ];
 
   const studentLinks = [
