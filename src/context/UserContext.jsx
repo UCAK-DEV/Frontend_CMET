@@ -3,7 +3,7 @@ import axios from 'axios';
 
 const UserContext = createContext();
 
-// Export de l'instance API pour l'utiliser ailleurs
+// Instance API connectée à votre Backend local
 export const api = axios.create({
   baseURL: 'http://localhost:3000', 
   headers: {
@@ -15,10 +15,8 @@ export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // --- LOGIQUE ADMIN ---
-  // On vérifie si le rôle est strictement 'ADMIN'
+  // Vérification Admin via le rôle renvoyé par votre Backend
   const isAdmin = user?.role === 'ADMIN'; 
-  // ---------------------
 
   useEffect(() => {
     const initializeAuth = () => {
@@ -66,7 +64,6 @@ export function UserProvider({ children }) {
   };
 
   return (
-    // On expose 'isAdmin' à toute l'application
     <UserContext.Provider value={{ user, login, register, logout, loading, isAdmin }}>
       {children}
     </UserContext.Provider>

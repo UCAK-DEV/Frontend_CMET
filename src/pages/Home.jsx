@@ -1,78 +1,73 @@
 import { Link } from 'react-router-dom';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { 
   Sparkles, ShieldCheck, Zap, LayoutDashboard, Briefcase, 
   ExternalLink, Quote, Globe, ChevronRight
 } from 'lucide-react';
-import banner from '../assets/images/banner.svg';
 import presidentImg from '../assets/images/president.jpeg';
 import { useUser } from '../context/UserContext';
 
 export default function Home() {
   const { user } = useUser();
-  const { scrollY } = useScroll();
-  const y = useTransform(scrollY, [0, 500], [0, 150]); // Effet parallaxe
 
   return (
     <div className="overflow-hidden bg-gray-50 dark:bg-ucak-dark">
       
-      {/* === 1. HERO SECTION AVEC BANNIÈRE PRO === */}
-      <section className="relative min-h-[95vh] flex items-center justify-center overflow-hidden">
+      {/* === 1. HERO SECTION === */}
+      <section className="relative pt-36 pb-24 min-h-[95vh] flex items-center bg-white dark:bg-ucak-dark">
+        <div className="absolute inset-0 ucak-pattern opacity-20 pointer-events-none"></div>
+        <div className="absolute top-20 left-0 w-[600px] h-[600px] bg-ucak-green/10 rounded-full blur-[120px] -z-10 pointer-events-none"></div>
         
-        {/* IMAGE BACKGROUND */}
-        <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-b from-ucak-dark/80 via-ucak-dark/60 to-ucak-dark z-10"></div>
-          <img src={banner} alt="Campus UFR" className="w-full h-full object-cover scale-105" />
-        </div>
-
-        {/* CONTENU */}
-        <div className="container mx-auto px-6 text-center relative z-20 pt-20">
-          <motion.div style={{ y }} initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-            
-            <div className="inline-flex items-center gap-3 py-2 px-6 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white font-black text-xs mb-10 uppercase tracking-[0.2em] shadow-2xl">
-              <Sparkles size={14} className="text-ucak-gold animate-pulse" /> <span>Excellence • Innovation • Leadership</span>
-            </div>
-
-            <h1 className="text-6xl md:text-[7rem] font-black text-white mb-8 leading-[0.9] tracking-tighter drop-shadow-2xl">
-              UFR <br/> 
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-ucak-gold via-white to-ucak-gold">
-                MET
-              </span>
-            </h1>
-
-            <div className="max-w-3xl mx-auto mb-14">
-              <h2 className="text-2xl font-bold text-gray-200 uppercase tracking-widest mb-4">Métiers, Économie et Technologies</h2>
-              <p className="text-xl md:text-2xl text-gray-300 font-medium leading-relaxed italic drop-shadow-lg">
-                "De l'Ingénierie Informatique aux Hautes Études Commerciales, nous formons l'élite technique de demain."
-              </p>
-            </div>
-
-            <div className="flex flex-col md:flex-row justify-center gap-6">
-              {user ? (
-                <Link to="/dashboard">
-                  <button className="px-10 py-5 bg-ucak-blue text-white font-black rounded-2xl shadow-[0_0_40px_rgba(37,99,235,0.5)] hover:bg-ucak-green hover:scale-105 transition-all flex items-center justify-center gap-3 uppercase tracking-widest text-xs">
-                    Accéder au Club MET <LayoutDashboard size={18} />
-                  </button>
-                </Link>
-              ) : (
-                <Link to="/login">
-                  <button className="px-10 py-5 bg-ucak-blue text-white font-black rounded-2xl shadow-[0_0_40px_rgba(37,99,235,0.5)] hover:bg-ucak-green hover:scale-105 transition-all flex items-center justify-center gap-3 uppercase tracking-widest text-xs">
-                    Rejoindre le Club MET <ChevronRight size={18} />
-                  </button>
-                </Link>
-              )}
-              
-              <a href="#ufr-met">
-                <button className="px-10 py-5 bg-white/10 backdrop-blur-md text-white border border-white/20 font-black rounded-2xl hover:bg-white/20 transition-all uppercase tracking-widest text-xs">
-                  Découvrir l'UFR
-                </button>
-              </a>
-            </div>
+        <div className="container mx-auto px-6 text-center relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}
+            className="inline-flex items-center gap-3 py-2 px-6 rounded-full bg-white/40 dark:bg-ucak-dark-card/40 border border-ucak-gold/20 backdrop-blur-xl text-ucak-blue dark:text-ucak-gold font-black text-xs mb-10 uppercase tracking-[0.2em] shadow-xl"
+          >
+            <Sparkles size={14} className="animate-pulse" /> <span>Technologie • Management • Innovation</span>
           </motion.div>
+
+          <motion.h1 
+            initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}
+            className="text-6xl md:text-[7rem] font-black text-ucak-blue dark:text-white mb-8 leading-[0.9] tracking-tighter"
+          >
+            CLUB <br/> 
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-ucak-green via-ucak-gold to-ucak-green bg-[length:200%_auto] animate-gradient-x">
+              MET
+            </span>
+          </motion.h1>
+
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="max-w-4xl mx-auto mb-14">
+            <h2 className="text-2xl font-bold text-ucak-blue dark:text-gray-200 uppercase tracking-widest mb-4">Métiers et Technologies</h2>
+            {/* <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 font-medium leading-relaxed italic">
+              " nous formons l'élite technique de demain."
+            </p> */}
+          </motion.div>
+
+          <div className="flex flex-col md:flex-row justify-center gap-6 mb-24">
+            {user ? (
+              <Link to="/dashboard">
+                <button className="px-10 py-5 bg-ucak-blue dark:bg-ucak-green text-white font-black rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.2)] hover:shadow-ucak-green/40 hover:-translate-y-2 transition-all flex items-center justify-center gap-3 uppercase tracking-widest text-xs">
+                  Accéder au Club MET <LayoutDashboard size={18} />
+                </button>
+              </Link>
+            ) : (
+              <Link to="/login">
+                <button className="px-10 py-5 bg-ucak-blue dark:bg-ucak-green text-white font-black rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.2)] hover:shadow-ucak-green/40 hover:-translate-y-2 transition-all flex items-center justify-center gap-3 uppercase tracking-widest text-xs">
+                  Rejoindre le Club MET <ChevronRight size={18} />
+                </button>
+              </Link>
+            )}
+            
+            <a href="#ufr-met">
+              <button className="px-10 py-5 bg-white dark:bg-white/5 text-ucak-blue dark:text-white border border-gray-200 dark:border-white/10 font-black rounded-2xl hover:bg-gray-50 dark:hover:bg-white/10 transition-all backdrop-blur-xl uppercase tracking-widest text-xs">
+                Découvrir l'UFR
+              </button>
+            </a>
+          </div>
         </div>
       </section>
 
-      {/* === 2. PILIERS (Valeurs) === */}
+      {/* === 2. PILIERS (Section Institution - ID pour l'ancre) === */}
       <section id="ufr-met" className="py-24 bg-gray-50 dark:bg-ucak-dark-card/20 relative border-t border-gray-100 dark:border-gray-800">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
