@@ -40,6 +40,7 @@ const AdminCourses = lazy(() => import('./pages/admin/AdminCourses'));
 const AdminStudents = lazy(() => import('./pages/admin/AdminStudents'));
 const AdminElections = lazy(() => import('./pages/admin/AdminElections'));
 const AdminNews = lazy(() => import('./pages/admin/AdminNews'));
+import AdminQuizzes from './pages/admin/AdminQuizzes';
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -81,7 +82,14 @@ function AnimatedRoutes() {
               <Route path="/admin/students" element={<AdminRoute><PageWrapper><AdminStudents /></PageWrapper></AdminRoute>} />
               <Route path="/admin/elections" element={<AdminRoute><PageWrapper><AdminElections /></PageWrapper></AdminRoute>} />
               <Route path="/admin/news" element={<AdminRoute><PageWrapper><AdminNews /></PageWrapper></AdminRoute>} />
-              
+              <Route 
+  path="/admin/quizzes" 
+  element={
+    <AdminRoute>
+      <AdminQuizzes />
+    </AdminRoute>
+  } 
+/>
               <Route path="*" element={<NotFound />} />
 
             </Routes>

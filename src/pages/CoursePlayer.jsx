@@ -1,24 +1,25 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { db } from '../firebase'; 
-import { doc, getDoc } from 'firebase/firestore'; 
-import { ChevronLeft, Menu, X, FileText } from 'lucide-react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { api } from '../context/UserContext';
+import { motion } from 'framer-motion';
+import { 
+  ArrowLeft, FileText, Download, Share2, 
+  ExternalLink, GraduationCap, Clock, Calendar
+} from 'lucide-react';
 
 export default function CoursePlayer() {
   const { id } = useParams();
-  const [courseData, setCourseData] = useState(null);
+  const navigate = useNavigate();
+  const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isSidebarOpen, setSidebarOpen] = useState(true);
 
-  // CHARGEMENT
   useEffect(() => {
     const fetchCourse = async () => {
       try {
-        const docRef = doc(db, "courses", id);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) setCourseData(docSnap.data());
-      } catch (error) {
-        console.error("Erreur:", error);
+        const res = await api.get(`/api/v1/courses/${id}`);
+        setCourse(res.data);
+      } catch (err) {
+        console.error("Erreur:", err);
       } finally {
         setLoading(false);
       }
@@ -26,62 +27,95 @@ export default function CoursePlayer() {
     fetchCourse();
   }, [id]);
 
-  if (loading) return <div className="h-screen bg-[#0f1117] text-white flex items-center justify-center">Chargement...</div>;
-  if (!courseData) return <div className="h-screen bg-[#0f1117] text-white flex items-center justify-center">Cours introuvable.</div>;
-
-  const activeModule = courseData.modules && courseData.modules.length > 0 ? courseData.modules[0] : null;
-  const videoUrl = activeModule && activeModule.video_url ? `https://www.youtube.com/embed/${activeModule.video_url}` : null;
+  if (loading) return <div className="min-h-screen flex items-center justify-center dark:bg-ucak-dark text-ucak-blue animate-pulse font-black">Chargement du module...</div>;
+  if (!course) return <div className="min-h-screen flex items-center justify-center dark:bg-ucak-dark dark:text-white">Module introuvable.</div>;
 
   return (
-    <div className="h-screen bg-[#0f1117] text-gray-300 flex overflow-hidden font-sans">
-      {/* GAUCHE */}
-      <div className={`flex-grow flex flex-col relative transition-all duration-300 ${isSidebarOpen ? 'mr-0 md:mr-[400px]' : 'mr-0'}`}>
-        <div className="absolute top-0 left-0 w-full p-6 z-20 flex items-center justify-between pointer-events-none">
-           <Link to="/knowledge" className="pointer-events-auto flex items-center gap-2 bg-black/40 hover:bg-black/60 backdrop-blur-md px-4 py-2 rounded-lg text-white font-medium text-sm transition-all border border-white/10">
-              <ChevronLeft size={16} /> <span className="hidden sm:inline">Retour</span>
-           </Link>
-           <div className="pointer-events-auto bg-ucak-blue/90 backdrop-blur-md px-4 py-2 rounded-lg text-xs font-bold text-white shadow-lg">
-              {courseData.filiere_tag} • {courseData.level}
-           </div>
-        </div>
+    <div className="min-h-screen bg-gray-50 dark:bg-ucak-dark pt-28 pb-20 px-4">
+      <div className="max-w-5xl mx-auto">
+        
+        {/* Barre de retour */}
+        <button 
+          onClick={() => navigate('/knowledge')}
+          className="flex items-center gap-2 text-gray-500 hover:text-ucak-blue font-bold mb-8 transition-colors group"
+        >
+          <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" /> Retour à la bibliothèque
+        </button>
 
-        <div className="flex-grow bg-black relative flex items-center justify-center">
-           {videoUrl ? (
-             <iframe width="100%" height="100%" src={videoUrl} title="Video" frameBorder="0" allowFullScreen className="w-full h-full"></iframe>
-           ) : (
-             <div className="text-gray-500">Aucune vidéo.</div>
-           )}
-        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          
+          {/* Contenu Principal */}
+          <div className="lg:col-span-2 space-y-8">
+            <div className="bg-white dark:bg-ucak-dark-card p-8 rounded-[2.5rem] shadow-xl border border-white/5">
+              <div className="flex items-center gap-3 mb-6">
+                <span className="px-4 py-1.5 bg-ucak-blue/10 text-ucak-blue text-[10px] font-black uppercase rounded-full">
+                  {course.category}
+                </span>
+                <span className="text-gray-400 text-sm font-bold">• {course.level}</span>
+              </div>
+              
+              <h1 className="text-3xl md:text-4xl font-black text-gray-900 dark:text-white mb-6 leading-tight">
+                {course.title}
+              </h1>
 
-        <div className="h-16 bg-[#0f1117] border-t border-gray-800 flex items-center justify-between px-6 z-10">
-           <h1 className="text-white font-bold text-lg truncate">{courseData.title}</h1>
-           <button onClick={() => setSidebarOpen(!isSidebarOpen)} className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-white transition-colors">{isSidebarOpen ? <X size={20}/> : <Menu size={20}/>}</button>
-        </div>
-      </div>
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-10 whitespace-pre-line">
+                {course.description}
+              </p>
 
-      {/* DROITE */}
-      <div className={`fixed right-0 top-0 h-full w-full md:w-[400px] bg-[#161b22] border-l border-gray-800 shadow-2xl transform transition-transform duration-300 z-30 flex flex-col ${isSidebarOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-         <div className="h-16 border-b border-gray-800 flex items-center px-6 bg-[#0f1117]">
-            <span className="font-bold text-white tracking-wide text-sm uppercase">Contenu</span>
-         </div>
-         <div className="flex-grow overflow-y-auto p-4 custom-scrollbar space-y-6">
-            <div className="bg-[#1f2937] p-4 rounded-xl border border-gray-700">
-                <h3 className="text-white font-bold mb-2">Description</h3>
-                <p className="text-sm text-gray-400 leading-relaxed">{courseData.description}</p>
-                <div className="mt-4 pt-4 border-t border-gray-700 flex items-center justify-between text-xs text-gray-500">
-                    <span>Prof: {courseData.instructor_name}</span>
+              {/* Aperçu / Lien vers le fichier */}
+              <div className="bg-gray-50 dark:bg-white/5 rounded-3xl p-10 border-2 border-dashed border-gray-200 dark:border-white/10 flex flex-col items-center text-center">
+                <div className="w-20 h-20 bg-red-500/10 text-red-500 rounded-3xl flex items-center justify-center mb-6">
+                  <FileText size={40} />
                 </div>
+                <h3 className="text-lg font-bold dark:text-white mb-2">Support de Cours Disponible</h3>
+                <p className="text-sm text-gray-500 mb-8">Consultez ou téléchargez le document PDF complet pour ce module.</p>
+                <a 
+                  href={course.file_url} 
+                  target="_blank" 
+                  rel="noreferrer"
+                  className="px-10 py-4 bg-ucak-blue text-white rounded-2xl font-black uppercase tracking-widest flex items-center gap-3 hover:bg-ucak-green transition-all shadow-lg shadow-ucak-blue/20"
+                >
+                  <ExternalLink size={20} /> Ouvrir le document
+                </a>
+              </div>
             </div>
-            <div className="space-y-2">
-                <h4 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Modules</h4>
-                {courseData.modules.map((mod, idx) => (
-                    <div key={idx} className="bg-[#0f1117] p-3 rounded-lg border border-gray-800 flex items-center justify-between">
-                        <span className="text-sm text-gray-300">{mod.title}</span>
-                        {mod.pdf_url && <a href={mod.pdf_url} target="_blank" rel="noreferrer" className="text-blue-400 text-xs font-bold hover:underline">PDF</a>}
-                    </div>
-                ))}
-            </div>
-         </div>
+          </div>
+
+          {/* Sidebar Info */}
+          <div className="space-y-6">
+            <section className="bg-white dark:bg-ucak-dark-card p-8 rounded-[2rem] shadow-lg border border-white/5">
+              <h3 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-6">À propos du cours</h3>
+              <div className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-gray-50 dark:bg-white/5 flex items-center justify-center text-ucak-blue">
+                    <GraduationCap size={20} />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-gray-400 uppercase font-black">Niveau requis</p>
+                    <p className="text-sm font-bold dark:text-white">{course.level}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-gray-50 dark:bg-white/5 flex items-center justify-center text-ucak-blue">
+                    <Calendar size={20} />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-gray-400 uppercase font-black">Publié le</p>
+                    <p className="text-sm font-bold dark:text-white">{new Date(course.created_at).toLocaleDateString()}</p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <button 
+              onClick={() => { /* Logique de partage */ }}
+              className="w-full py-4 bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 text-gray-500 dark:text-gray-300 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-gray-50 transition-all"
+            >
+              <Share2 size={18} /> Partager la ressource
+            </button>
+          </div>
+
+        </div>
       </div>
     </div>
   );
