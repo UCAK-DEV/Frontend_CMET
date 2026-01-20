@@ -1,3 +1,4 @@
+// src/context/UserContext.jsx
 import { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 
@@ -15,7 +16,7 @@ export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Vérification Admin via le rôle renvoyé par votre Backend
+  // Vérification Admin via le rôle renvoyé par le Backend
   const isAdmin = user?.role === 'ADMIN'; 
 
   useEffect(() => {
@@ -48,7 +49,16 @@ export function UserProvider({ children }) {
 
   const register = async (registerData) => {
     try {
-      await api.post('/api/v1/auth/register', registerData);
+      // On récupère la réponse qui contient le token et l'utilisateur
+      const response = await api.post('/api/v1/auth/register', registerData);
+      const { access_token, user: userData } = response.data;
+
+      // Connexion automatique après inscription
+      localStorage.setItem('token', access_token);
+      localStorage.setItem('club_met_user', JSON.stringify(userData));
+      api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+      setUser(userData);
+
       return { success: true };
     } catch (error) {
       const message = error.response?.data?.message;
