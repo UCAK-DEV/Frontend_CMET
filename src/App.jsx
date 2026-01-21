@@ -23,6 +23,7 @@ const ProjectDetails = lazy(() => import('./pages/ProjectDetails'));
 const VerifyStudent = lazy(() => import('./pages/VerifyStudent'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
+const AcademyGuide = lazy(() => import('./pages/AcademyGuide'));
 const Profile = lazy(() => import('./pages/Profile'));
 
 // Pages Étudiant
@@ -74,6 +75,7 @@ function AnimatedRoutes() {
               <Route path="/cv-builder" element={<ProtectedRoute><PageWrapper><CVGenerator /></PageWrapper></ProtectedRoute>} />
               <Route path="/quizz" element={<ProtectedRoute><PageWrapper><Challenges /></PageWrapper></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+              <Route path="/academy-guide" element={<AcademyGuide />} />
               <Route path="/network" element={<ProtectedRoute><PageWrapper><Networking /></PageWrapper></ProtectedRoute>} />
               <Route path="/elections" element={<ProtectedRoute><PageWrapper><Elections /></PageWrapper></ProtectedRoute>} />
 

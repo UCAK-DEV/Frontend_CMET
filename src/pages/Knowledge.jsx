@@ -1,126 +1,96 @@
 import { useState, useEffect } from 'react';
 import { api } from '../context/UserContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
-import { 
-  FileText, Search, BookOpen, GraduationCap, 
-  ChevronRight, PlayCircle, Clock, Layout
-} from 'lucide-react';
+import { Folder, Search, Cpu, BarChart3, ExternalLink, GraduationCap, LayoutGrid } from 'lucide-react';
 
 export default function Knowledge() {
-  const [courses, setCourses] = useState([]);
+  const [folders, setFolders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeCategory, setActiveCategory] = useState('Tous');
-  const [searchQuery, setSearchQuery] = useState('');
-  const navigate = useNavigate();
-
-  const categories = ['Tous', 'Informatique', 'Management', 'Réseaux', 'Mathématiques'];
+  const [activeFiliere, setActiveFiliere] = useState('Tous');
 
   useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const res = await api.get('/api/v1/courses');
-        setCourses(res.data);
-      } catch (err) {
-        console.error("Erreur lors de la récupération des cours:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchCourses();
-  }, []);
+    fetchFolders();
+  }, [activeFiliere]);
 
-  const filteredCourses = courses.filter(course => {
-    const matchesCategory = activeCategory === 'Tous' || course.category === activeCategory;
-    const matchesSearch = course.title.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+  const fetchFolders = async () => {
+    try {
+      const res = await api.get(`/api/v1/courses?category=${activeFiliere}`);
+      setFolders(res.data);
+    } catch (err) { console.error(err); }
+    finally { setLoading(false); }
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-ucak-dark pt-28 pb-20 px-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#05070a] pt-32 pb-20 px-6 transition-colors">
       <div className="max-w-7xl mx-auto">
         
-        {/* En-tête avec Recherche */}
-        <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-12">
-          <div>
-            <h1 className="text-4xl font-black text-gray-900 dark:text-white mb-2 flex items-center gap-3">
-              <Layout className="text-ucak-blue" size={32} /> Académie <span className="text-ucak-blue">MET</span>
-            </h1>
-            <p className="text-gray-500 text-sm">Accédez aux ressources pédagogiques partagées par la communauté.</p>
+        {/* --- HEADER --- */}
+        <header className="mb-20">
+          <div className="flex items-center gap-3 text-ucak-blue mb-6">
+            <GraduationCap size={24} />
+            <span className="text-[10px] font-black uppercase tracking-[0.4em]">Bibliothèques Numériques</span>
           </div>
+          <h1 className="text-5xl md:text-7xl font-black dark:text-white tracking-tighter mb-12 leading-none">
+            Accédez à vos <br /> <span className="text-ucak-blue text-transparent bg-clip-text bg-gradient-to-r from-ucak-blue to-ucak-green">Ressources.</span>
+          </h1>
 
-          <div className="relative w-full md:w-80">
-            <Search className="absolute left-4 top-3.5 text-gray-400" size={18} />
-            <input 
-              placeholder="Rechercher un module..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-3.5 bg-white dark:bg-ucak-dark-card border border-gray-100 dark:border-white/5 rounded-2xl outline-none focus:ring-2 ring-ucak-blue/30 dark:text-white shadow-sm"
-            />
+          {/* Sélecteur de filière Bento */}
+          <div className="flex flex-wrap gap-4">
+            {['Tous', 'IR', 'HEC'].map((f) => (
+              <button 
+                key={f}
+                onClick={() => setActiveFiliere(f)}
+                className={`px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all
+                  ${activeFiliere === f 
+                    ? 'bg-ucak-blue text-white shadow-xl shadow-ucak-blue/20' 
+                    : 'bg-white dark:bg-white/5 text-gray-400 hover:bg-gray-100'}`}
+              >
+                {f === 'Tous' ? 'Toutes les filières' : f === 'IR' ? 'Informatique & Réseaux' : 'Haute Étude Commerciale'}
+              </button>
+            ))}
           </div>
-        </div>
+        </header>
 
-        {/* Filtres par catégories */}
-        <div className="flex gap-2 overflow-x-auto pb-4 mb-8 scrollbar-hide">
-          {categories.map(cat => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`px-6 py-2.5 rounded-full text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap
-                ${activeCategory === cat 
-                  ? 'bg-ucak-blue text-white shadow-lg' 
-                  : 'bg-white dark:bg-white/5 text-gray-500 hover:bg-gray-100 dark:hover:bg-white/10'}`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
+        {/* --- GRILLE DE DOSSIERS --- */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <AnimatePresence mode="popLayout">
+            {folders.map((folder, index) => (
+              <motion.div
+                key={folder.id}
+                layout
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: index * 0.05 }}
+                className="group relative bg-white dark:bg-white/2 rounded-[3rem] border border-gray-100 dark:border-white/5 p-10 hover:border-ucak-blue/30 transition-all shadow-sm hover:shadow-2xl"
+              >
+                <div className="flex justify-between items-start mb-10">
+                  <div className={`p-4 rounded-2xl ${folder.category === 'IR' ? 'bg-ucak-blue text-white shadow-lg shadow-ucak-blue/20' : 'bg-ucak-gold text-white shadow-lg shadow-ucak-gold/20'}`}>
+                    <Folder size={24} />
+                  </div>
+                  <span className="px-4 py-2 bg-gray-50 dark:bg-white/10 rounded-full text-[10px] font-black text-gray-500 uppercase tracking-widest">
+                    Niveau {folder.level}
+                  </span>
+                </div>
 
-        {/* Grille des modules */}
-        {loading ? (
-          <div className="flex flex-col items-center py-20 gap-4">
-            <div className="w-12 h-12 border-4 border-ucak-blue border-t-transparent rounded-full animate-spin"></div>
-            <p className="text-gray-500 font-bold animate-pulse">Chargement des modules...</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <AnimatePresence mode='popLayout'>
-              {filteredCourses.map((course) => (
-                <motion.div
-                  key={course.id}
-                  layout
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  onClick={() => navigate(`/course/${course.id}`)}
-                  className="bg-white dark:bg-ucak-dark-card rounded-[2.5rem] p-6 border border-gray-100 dark:border-white/5 shadow-xl hover:shadow-2xl transition-all cursor-pointer group flex flex-col h-full"
+                <h3 className="text-2xl font-black dark:text-white mb-3 group-hover:text-ucak-blue transition-colors">
+                  {folder.title}
+                </h3>
+                <p className="text-gray-500 text-sm font-medium leading-relaxed mb-10 line-clamp-2">
+                  {folder.description}
+                </p>
+
+                <a 
+                  href={folder.file_url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="w-full py-5 bg-gray-50 dark:bg-white/5 rounded-2xl flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-ucak-blue group-hover:bg-ucak-blue group-hover:text-white transition-all shadow-inner"
                 >
-                  <div className="flex justify-between items-start mb-6">
-                    <div className="p-4 bg-ucak-blue/10 text-ucak-blue rounded-2xl group-hover:bg-ucak-blue group-hover:text-white transition-colors">
-                      <BookOpen size={24} />
-                    </div>
-                    <span className="text-[10px] font-black bg-gray-100 dark:bg-white/10 text-gray-400 px-3 py-1 rounded-full uppercase">
-                      {course.level}
-                    </span>
-                  </div>
-
-                  <h3 className="text-xl font-black text-gray-900 dark:text-white mb-2 line-clamp-2">{course.title}</h3>
-                  <p className="text-sm text-gray-500 mb-8 line-clamp-2">{course.description}</p>
-
-                  <div className="mt-auto pt-6 border-t border-gray-50 dark:border-white/5 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <GraduationCap size={16} className="text-ucak-blue" />
-                      <span className="text-xs font-bold text-gray-400">{course.category}</span>
-                    </div>
-                    <div className="text-ucak-blue flex items-center gap-1 text-sm font-black group-hover:translate-x-1 transition-transform">
-                      Étudier <ChevronRight size={16} />
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
-        )}
+                  Ouvrir le Dossier <ExternalLink size={16} />
+                </a>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
       </div>
     </div>
   );

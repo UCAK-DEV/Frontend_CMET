@@ -1,242 +1,185 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { api } from '../context/UserContext';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Newspaper, Globe, Zap, Calendar, ExternalLink, 
-  TrendingUp, RefreshCw, Layers, DollarSign, Cpu 
+  Newspaper, Calendar, Tag, ArrowRight, 
+  Search, Filter, Sparkles, Clock 
 } from 'lucide-react';
-
-// --- CONFIGURATION DES SOURCES RSS (Ajoutez-en autant que vous voulez) ---
-const RSS_SOURCES = [
-  {
-    name: "Agence Ecofin (Telecom)",
-    url: "https://www.agenceecofin.com/fil-telecom?format=feed",
-    category: "Tech Afrique",
-    color: "bg-blue-600"
-  },
-  {
-    name: "Le Monde Informatique",
-    url: "https://www.lemondeinformatique.fr",
-    category: "IT & Dév",
-    color: "bg-red-600"
-  },
-  {
-    name: "Compta Online",
-    url: "https://www.compta-online.com",
-    category: "Compta/Gestion",
-    color: "bg-green-600"
-  },
-  {
-    name: "Agence Ecofin (Finance)",
-    url: "https://www.agenceecofin.com/",
-    category: "Finance",
-    color: "bg-yellow-600"
-  },
-  {
-    name: "Journal du Geek",
-    url: "https://www.journaldugeek.com/",
-    category: "Tech Général",
-    color: "bg-purple-600"
-  }
-];
+import { Link } from 'react-router-dom';
 
 export default function News() {
-  const [news, setNews] = useState([]);
+  const [newsList, setNewsList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('Tous');
 
-  // --- MOTEUR D'ASPIRATION DES NEWS ---
+  // --- DONNÉES MOCKÉES (S'afficheront si le backend est vide) ---
+  const mockNews = [
+    {
+      id: 'mock-1',
+      title: "Lancement du Hub Métiers & Tech : Une nouvelle ère pour l'UFR",
+      content: "Le Club MET lance officiellement sa plateforme numérique pour centraliser les ressources pédagogiques et les opportunités de carrière...",
+      type: "Événement",
+      createdAt: new Date().toISOString(),
+      image_url: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=2070&auto=format&fit=crop"
+    },
+    {
+      id: 'mock-2',
+      title: "Hackathon DAR 2026 : Inscrivez votre équipe !",
+      content: "Étudiants en L3 DAR, préparez-vous pour 48h d'innovation intensive sur le thème de la Smart City à Touba...",
+      type: "Hackathon",
+      createdAt: new Date().toISOString(),
+      image_url: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=2070&auto=format&fit=crop"
+    },
+    {
+      id: 'mock-3',
+      title: "Séminaire : L'Intelligence Artificielle au Sénégal",
+      content: "Une conférence exclusive avec des experts du secteur pour discuter de l'impact de l'IA dans le développement local.",
+      type: "Conférence",
+      createdAt: new Date().toISOString(),
+      image_url: "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2070&auto=format&fit=crop"
+    }
+  ];
+
   useEffect(() => {
-    const fetchAllNews = async () => {
-      setLoading(true);
-      let aggregatedNews = [];
-
-      // On boucle sur chaque source
-      const promises = RSS_SOURCES.map(async (source) => {
-        try {
-          // On utilise un proxy 'allorigins' pour éviter les blocages CORS
-          const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(source.url)}`;
-          const response = await fetch(proxyUrl);
-          const data = await response.json();
-          
-          if (data.contents) {
-            // Parsing du XML (Le format brut des RSS)
-            const parser = new DOMParser();
-            const xmlDoc = parser.parseFromString(data.contents, "text/xml");
-            const items = xmlDoc.querySelectorAll("item");
-
-            items.forEach((item) => {
-              // Extraction sécurisée des données
-              const title = item.querySelector("title")?.textContent || "Sans titre";
-              const link = item.querySelector("link")?.textContent || "#";
-              const pubDate = item.querySelector("pubDate")?.textContent;
-              const description = item.querySelector("description")?.textContent || "";
-              
-              // Tentative d'extraction d'image (Souvent cachée dans la description ou enclosure)
-              let image = "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&q=80"; // Image par défaut
-              
-              const enclosure = item.querySelector("enclosure");
-              if (enclosure) image = enclosure.getAttribute("url");
-              else {
-                // Cherche une balise img dans la description HTML
-                const imgMatch = description.match(/src="([^"]+)"/);
-                if (imgMatch) image = imgMatch[1];
-              }
-
-              // Nettoyage de la description (retirer le HTML)
-              const cleanDesc = description.replace(/<[^>]*>?/gm, '').slice(0, 140) + "...";
-
-              aggregatedNews.push({
-                id: link, // L'URL sert d'ID unique
-                title,
-                link,
-                date: new Date(pubDate),
-                description: cleanDesc,
-                image,
-                source: source.name,
-                category: source.category,
-                color: source.color
-              });
-            });
-          }
-        } catch (err) {
-          console.warn(`Erreur sur le flux ${source.name}:`, err);
-          // On continue même si un flux plante
-        }
-      });
-
-      // Attendre que tous les flux aient répondu
-      await Promise.all(promises);
-
-      // Trier par date (du plus récent au plus vieux)
-      aggregatedNews.sort((a, b) => b.date - a.date);
-      
-      setNews(aggregatedNews);
-      setLoading(false);
+    const fetchNews = async () => {
+      try {
+        const res = await api.get('/news');
+        // Si le tableau est vide, on garde un état vide pour déclencher le mock
+        setNewsList(res.data.length > 0 ? res.data : []);
+      } catch (err) {
+        console.error("Backend inaccessible, passage en mode démo.");
+        setNewsList([]);
+      } finally {
+        setLoading(false);
+      }
     };
-
-    fetchAllNews();
+    fetchNews();
   }, []);
 
-  // Filtrage
-  const filteredNews = filter === 'Tous' 
-    ? news 
-    : news.filter(item => item.category.includes(filter) || item.category === filter);
-
-  // Catégories uniques pour les boutons
-  const categories = ['Tous', 'Tech Afrique', 'IT & Dév', 'Finance', 'Compta/Gestion'];
+  // Logique : Si newsList est vide, on utilise mockNews
+  const displayData = newsList.length > 0 ? newsList : mockNews;
+  const categories = ['Tous', 'Événement', 'Hackathon', 'Conférence', 'Pédagogie'];
+  
+  const filteredData = filter === 'Tous' 
+    ? displayData 
+    : displayData.filter(item => item.type === filter);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-ucak-dark pt-28 pb-24 px-4 sm:px-6">
-      
-      {/* HEADER */}
-      <div className="max-w-7xl mx-auto mb-10">
-        <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-8">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-[10px] font-black uppercase tracking-widest mb-3 animate-pulse">
-              <Zap size={12} /> News Feed Aggregator
-            </div>
-            <h1 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white mb-2">
-              L'Actualité <span className="text-ucak-blue">360°</span>
+    <div className="min-h-screen bg-gray-50 dark:bg-[#05070a] pt-32 pb-20 px-6">
+      <div className="max-w-7xl mx-auto">
+        
+        {/* --- HEADER --- */}
+        <header className="mb-16">
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
+            className="flex items-center gap-3 text-ucak-blue mb-4"
+          >
+            <div className="h-[2px] w-12 bg-ucak-blue"></div>
+            <span className="text-xs font-black uppercase tracking-[0.4em]">Le Journal du Hub</span>
+          </motion.div>
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8">
+            <h1 className="text-5xl md:text-7xl font-black dark:text-white tracking-tighter">
+              Actualités <span className="text-ucak-blue">MET.</span>
             </h1>
-            <p className="text-gray-500 max-w-xl text-sm md:text-base">
-              Tech, Finance, Gestion : Nous agrégeons en temps réel les meilleurs articles du web pour vous.
-            </p>
+            
+            {/* Filtres Pro */}
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide w-full md:w-auto">
+              {categories.map(cat => (
+                <button
+                  key={cat}
+                  onClick={() => setFilter(cat)}
+                  className={`px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap
+                    ${filter === cat 
+                      ? 'bg-ucak-blue text-white shadow-lg shadow-ucak-blue/20' 
+                      : 'bg-white dark:bg-white/5 text-gray-400 hover:bg-gray-100'}`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
           </div>
+        </header>
 
-          {/* Filtres (Scrollable sur mobile) */}
-          <div className="w-full md:w-auto overflow-x-auto pb-2 no-scrollbar">
-             <div className="flex gap-2">
-                {categories.map(cat => (
-                  <button
-                    key={cat}
-                    onClick={() => setFilter(cat)}
-                    className={`whitespace-nowrap px-5 py-2.5 rounded-full text-xs font-bold transition-all ${
-                      filter === cat 
-                        ? 'bg-ucak-blue text-white shadow-lg' 
-                        : 'bg-white dark:bg-white/5 text-gray-500 hover:bg-gray-100 dark:hover:bg-white/10'
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                ))}
-             </div>
-          </div>
-        </div>
-
-        {/* GRILLE */}
+        {/* --- NEWS GRID --- */}
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-             {[1,2,3,4,5,6].map(i => (
-               <div key={i} className="h-80 bg-white dark:bg-white/5 rounded-3xl animate-pulse"></div>
-             ))}
+            {[1,2,3].map(i => <div key={i} className="h-[450px] bg-gray-200 dark:bg-white/5 rounded-[3rem] animate-pulse" />)}
           </div>
-        ) : filteredNews.length === 0 ? (
-           <div className="text-center py-20">
-             <RefreshCw className="mx-auto text-gray-300 animate-spin mb-4" size={40} />
-             <p className="text-gray-500">Chargement des flux en cours ou erreur de connexion...</p>
-           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredNews.map((item) => (
-              <NewsCard key={item.id} data={item} />
-            ))}
+            <AnimatePresence mode="popLayout">
+              {filteredData.map((news, index) => (
+                <motion.article
+                  key={news.id}
+                  layout
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="group bg-white dark:bg-white/2 rounded-[3rem] border border-gray-100 dark:border-white/5 overflow-hidden hover:border-ucak-blue/30 transition-all duration-500 shadow-xl shadow-gray-200/50 dark:shadow-none"
+                >
+                  {/* Image Container */}
+                  <div className="relative h-64 overflow-hidden">
+                    <img 
+                      src={news.image_url} 
+                      alt={news.title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
+                    <div className="absolute top-6 left-6">
+                      <span className="px-4 py-2 bg-white/90 dark:bg-black/70 backdrop-blur-md rounded-2xl text-[10px] font-black uppercase tracking-widest text-ucak-blue">
+                        {news.type}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Content */}
+                  <div className="p-10">
+                    <div className="flex items-center gap-4 text-gray-400 mb-6">
+                      <div className="flex items-center gap-1.5 text-[10px] font-bold">
+                        <Calendar size={14} /> {new Date(news.createdAt).toLocaleDateString('fr-FR')}
+                      </div>
+                      <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+                      <div className="flex items-center gap-1.5 text-[10px] font-bold">
+                        <Clock size={14} /> 5 min read
+                      </div>
+                    </div>
+
+                    <h2 className="text-2xl font-black dark:text-white mb-4 leading-tight group-hover:text-ucak-blue transition-colors">
+                      {news.title}
+                    </h2>
+                    
+                    <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed mb-8 line-clamp-3 font-medium">
+                      {news.content}
+                    </p>
+
+                    <Link 
+                      to={`/news/${news.id}`}
+                      className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-ucak-blue group-hover:gap-4 transition-all"
+                    >
+                      Lire la suite <ArrowRight size={16} />
+                    </Link>
+                  </div>
+                </motion.article>
+              ))}
+            </AnimatePresence>
           </div>
+        )}
+
+        {/* --- INFO BOX POUR L'ADMIN --- */}
+        {!loading && newsList.length === 0 && (
+          <motion.div 
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+            className="mt-20 p-8 rounded-[2rem] bg-ucak-blue/5 border border-dashed border-ucak-blue/30 text-center"
+          >
+            <Sparkles className="mx-auto text-ucak-blue mb-4" />
+            <p className="text-sm font-bold text-ucak-blue uppercase tracking-widest">
+              Mode Démo Activé
+            </p>
+            <p className="text-xs text-gray-500 mt-2">
+              Ces informations sont fictives. Connectez-vous en tant qu'admin pour publier vos premières actualités.
+            </p>
+          </motion.div>
         )}
       </div>
     </div>
   );
 }
-
-// --- CARTE D'ACTUALITÉ ---
-const NewsCard = ({ data }) => {
-  return (
-    <motion.a 
-      href={data.link}
-      target="_blank"
-      rel="noopener noreferrer"
-      initial={{ opacity: 0, y: 20 }} 
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      className="group flex flex-col bg-white dark:bg-[#161b22] rounded-[2rem] overflow-hidden border border-gray-100 dark:border-white/5 shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 h-full"
-    >
-      {/* Image */}
-      <div className="h-48 overflow-hidden relative">
-        <img 
-          src={data.image} 
-          alt="News Cover" 
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-          onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1000&auto=format&fit=crop"; }} // Fallback image si erreur
-        />
-        <div className="absolute top-4 left-4">
-          <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest text-white shadow-md ${data.color}`}>
-            {data.category}
-          </span>
-        </div>
-        <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-black/80 to-transparent"></div>
-      </div>
-
-      {/* Contenu */}
-      <div className="p-6 flex flex-col flex-grow">
-        <div className="flex items-center justify-between mb-3 text-[10px] font-bold text-gray-400 uppercase tracking-wide">
-            <span className="flex items-center gap-1"><Layers size={12}/> {data.source}</span>
-            <span className="flex items-center gap-1"><Calendar size={12}/> {data.date.toLocaleDateString()}</span>
-        </div>
-
-        <h3 className="text-lg font-black text-gray-900 dark:text-white mb-3 leading-tight line-clamp-2 group-hover:text-ucak-blue transition-colors">
-          {data.title}
-        </h3>
-
-        <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-3 mb-6 flex-grow">
-          {data.description}
-        </p>
-
-        <div className="pt-4 border-t border-gray-100 dark:border-white/5 flex items-center justify-between">
-            <span className="text-xs font-bold text-gray-400 group-hover:text-ucak-blue transition-colors">Lire l'article complet</span>
-            <div className="w-8 h-8 rounded-full bg-gray-50 dark:bg-white/10 flex items-center justify-center text-gray-400 group-hover:bg-ucak-blue group-hover:text-white transition-all">
-                <ExternalLink size={14} />
-            </div>
-        </div>
-      </div>
-    </motion.a>
-  );
-};
