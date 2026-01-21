@@ -1,115 +1,220 @@
 import { useState, useEffect } from 'react';
 import { api } from '../../context/UserContext';
-import { Newspaper, Calendar, MapPin, Image as ImageIcon, Save, Trash2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Plus, Trash2, Youtube, Newspaper, ShieldCheck, 
+  Image as ImageIcon, Send, Sparkles, LayoutDashboard, 
+  CheckCircle, AlertCircle, Loader2, Play
+} from 'lucide-react';
 
 export default function AdminNews() {
-  const [newsList, setNewsList] = useState([]);
-  // type: 'INFO' ou 'EVENT'
-  const [formData, setFormData] = useState({ title: '', content: '', type: 'INFO', event_date: '', location: '', image_url: '' });
-  const [status, setStatus] = useState(null);
+  const [news, setNews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [status, setStatus] = useState(null); // { type: 'success' | 'error', message: '' }
 
-  const fetchNews = async () => {
-    try {
-      // CORRECTION : /news au lieu de /api/v1/news
-      const res = await api.get('/news');
-      setNewsList(res.data);
-    } catch (e) { console.error(e); }
-  };
+  // Formulaire initial
+  const [formData, setFormData] = useState({
+    title: '',
+    content: '',
+    type: 'ARTICLE',
+    imageUrl: '',
+    videoUrl: '',
+    isOfficial: false
+  });
 
   useEffect(() => { fetchNews(); }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setStatus('loading');
+  const fetchNews = async () => {
     try {
-      // CORRECTION : /news au lieu de /api/v1/news
-      await api.post('/news', formData);
-      setStatus('success');
-      setFormData({ title: '', content: '', type: 'INFO', event_date: '', location: '', image_url: '' });
-      fetchNews();
-    } catch (e) { setStatus('error'); }
+      const res = await api.get('/api/v1/news');
+      setNews(res.data);
+    } catch (err) { console.error(err); }
+    finally { setLoading(false); }
   };
 
-  const deleteNews = async (id) => {
-    if(!confirm("Supprimer ?")) return;
-    try { 
-      // CORRECTION : /news au lieu de /api/v1/news
-      await api.delete(`/news/${id}`); 
-      fetchNews(); 
-    } catch(e){}
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setStatus(null);
+    try {
+      await api.post('/api/v1/news', formData);
+      setStatus({ type: 'success', message: 'Actualité publiée avec succès !' });
+      setFormData({ title: '', content: '', type: 'ARTICLE', imageUrl: '', videoUrl: '', isOfficial: false });
+      fetchNews();
+    } catch (err) {
+      setStatus({ type: 'error', message: "Erreur lors de la publication." });
+    } finally { setSubmitting(false); }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Supprimer cette actualité ?")) return;
+    try {
+      await api.delete(`/api/v1/news/${id}`);
+      fetchNews();
+    } catch (err) { console.error(err); }
+  };
+
+  // Helper pour l'aperçu YouTube
+  const getYTThumb = (url) => {
+    const id = url?.split('v=')[1]?.split('&')[0] || url?.split('/').pop();
+    return id ? `https://img.youtube.com/vi/${id}/maxresdefault.jpg` : null;
   };
 
   return (
-    <div className="min-h-screen pt-32 pb-20 bg-[#0f172a] text-white px-6">
-      <div className="container mx-auto max-w-5xl">
-        <div className="flex items-center gap-3 mb-8 border-b border-white/10 pb-6">
-          <div className="p-3 bg-purple-500/20 text-purple-400 rounded-xl"><Newspaper size={24} /></div>
-          <div><h1 className="text-3xl font-black">Actualités & Agenda</h1><p className="text-gray-400 text-sm">Publiez les infos du campus.</p></div>
+    <div className="min-h-screen bg-gray-50 dark:bg-[#05070a] pt-32 pb-20 px-6">
+      <div className="max-w-7xl mx-auto">
+        
+        {/* --- HEADER --- */}
+        <div className="flex items-center justify-between mb-12">
+          <div>
+            <h1 className="text-4xl font-black dark:text-white tracking-tighter">Éditeur de <span className="text-ucak-blue">News & Médias</span></h1>
+            <p className="text-gray-500 text-sm font-bold uppercase tracking-widest mt-2">Gestion du flux multimédia de l'UFR MET</p>
+          </div>
+          <div className="hidden md:flex items-center gap-4 text-xs font-black uppercase text-gray-400">
+            <LayoutDashboard size={16} /> Dashboard Admin
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-1">
-            <div className="bg-white/5 p-6 rounded-2xl border border-white/10 sticky top-32">
-              <h3 className="font-bold text-lg mb-4">Nouvelle Publication</h3>
-              <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+          
+          {/* --- COLONNE GAUCHE : FORMULAIRE --- */}
+          <div className="lg:col-span-7">
+            <form onSubmit={handleSubmit} className="bg-white dark:bg-white/5 p-10 rounded-[3rem] border border-gray-100 dark:border-white/5 shadow-xl">
+              <div className="space-y-6">
                 
-                {/* Sélecteur de Type */}
-                <div className="flex p-1 bg-black/20 rounded-xl">
-                  <button type="button" onClick={()=>setFormData({...formData, type:'INFO'})} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${formData.type==='INFO' ? 'bg-ucak-blue text-white shadow' : 'text-gray-500'}`}>INFO</button>
-                  <button type="button" onClick={()=>setFormData({...formData, type:'EVENT'})} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${formData.type==='EVENT' ? 'bg-purple-600 text-white shadow' : 'text-gray-500'}`}>ÉVÉNEMENT</button>
-                </div>
-
-                <input required value={formData.title} onChange={e=>setFormData({...formData, title: e.target.value})} className="w-full p-3 bg-black/20 rounded-xl border border-white/10 text-sm focus:border-white/30 outline-none" placeholder="Titre..." />
-                
-                <textarea required value={formData.content} onChange={e=>setFormData({...formData, content: e.target.value})} className="w-full p-3 bg-black/20 rounded-xl border border-white/10 text-sm focus:border-white/30 outline-none h-32" placeholder="Contenu..." />
-
-                {/* Champs spécifiques Événements */}
-                {formData.type === 'EVENT' && (
-                  <div className="p-3 bg-purple-500/10 rounded-xl border border-purple-500/20 space-y-3">
-                    <div className="flex items-center gap-2 border-b border-purple-500/10 pb-2 mb-2 text-purple-300 text-xs font-bold uppercase"><Calendar size={12}/> Détails Agenda</div>
-                    <input type="datetime-local" required value={formData.event_date} onChange={e=>setFormData({...formData, event_date: e.target.value})} className="w-full p-2 bg-black/20 rounded-lg border border-white/10 text-xs focus:border-purple-500 outline-none" />
-                    <div className="relative">
-                      <MapPin size={14} className="absolute left-2.5 top-2.5 text-gray-500"/>
-                      <input value={formData.location} onChange={e=>setFormData({...formData, location: e.target.value})} className="w-full pl-8 p-2 bg-black/20 rounded-lg border border-white/10 text-xs focus:border-purple-500 outline-none" placeholder="Lieu (ex: Amphi A)" />
-                    </div>
+                {/* Type & Officiel */}
+                <div className="flex flex-wrap gap-4 items-center justify-between pb-6 border-b border-gray-50 dark:border-white/5">
+                  <div className="flex bg-gray-100 dark:bg-white/5 p-1 rounded-xl">
+                    {['ARTICLE', 'VIDEO', 'EVENT'].map(t => (
+                      <button 
+                        key={t} type="button" onClick={() => setFormData({...formData, type: t})}
+                        className={`px-4 py-2 rounded-lg text-[10px] font-black transition-all ${formData.type === t ? 'bg-white dark:bg-white/10 text-ucak-blue shadow-sm' : 'text-gray-400'}`}
+                      >
+                        {t}
+                      </button>
+                    ))}
                   </div>
-                )}
-
-                <div className="relative">
-                   <ImageIcon size={14} className="absolute left-3 top-3.5 text-gray-500"/>
-                   <input value={formData.image_url} onChange={e=>setFormData({...formData, image_url: e.target.value})} className="w-full pl-9 p-3 bg-black/20 rounded-xl border border-white/10 text-sm focus:border-white/30 outline-none" placeholder="URL Image (Optionnel)" />
+                  
+                  <label className="flex items-center gap-3 cursor-pointer group">
+                    <span className="text-[10px] font-black uppercase text-gray-400 group-hover:text-ucak-gold transition-colors">Information Officielle ?</span>
+                    <input 
+                      type="checkbox" checked={formData.isOfficial} 
+                      onChange={(e) => setFormData({...formData, isOfficial: e.target.checked})}
+                      className="w-5 h-5 rounded-lg border-gray-300 text-ucak-blue focus:ring-ucak-blue"
+                    />
+                  </label>
                 </div>
 
-                <button type="submit" disabled={status === 'loading'} className="w-full py-3 bg-white text-black hover:bg-gray-200 rounded-xl font-bold uppercase text-xs tracking-widest transition-all flex items-center justify-center gap-2">
-                  {status === 'loading' ? '...' : <><Save size={16}/> Publier</>}
+                {/* Champs texte */}
+                <div className="space-y-4">
+                  <input 
+                    placeholder="Titre de l'actualité..." required
+                    className="w-full bg-gray-50 dark:bg-white/5 border-none rounded-2xl px-6 py-4 text-lg font-bold outline-none focus:ring-2 ring-ucak-blue/20 dark:text-white"
+                    value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})}
+                  />
+                  <textarea 
+                    placeholder="Contenu de l'article ou description de la vidéo..." required rows={5}
+                    className="w-full bg-gray-50 dark:bg-white/5 border-none rounded-3xl px-6 py-4 text-sm font-medium outline-none focus:ring-2 ring-ucak-blue/20 dark:text-white"
+                    value={formData.content} onChange={(e) => setFormData({...formData, content: e.target.value})}
+                  />
+                </div>
+
+                {/* Médias */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="relative">
+                    <ImageIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                    <input 
+                      placeholder="URL de l'image (Optionnel)"
+                      className="w-full pl-12 pr-6 py-4 bg-gray-50 dark:bg-white/5 rounded-2xl text-xs outline-none focus:ring-2 ring-ucak-blue/20 dark:text-white"
+                      value={formData.imageUrl} onChange={(e) => setFormData({...formData, imageUrl: e.target.value})}
+                    />
+                  </div>
+                  <div className="relative">
+                    <Youtube className="absolute left-4 top-1/2 -translate-y-1/2 text-red-500" size={18} />
+                    <input 
+                      placeholder="Lien YouTube (Si type VIDEO)"
+                      className="w-full pl-12 pr-6 py-4 bg-gray-50 dark:bg-white/5 rounded-2xl text-xs outline-none focus:ring-2 ring-ucak-blue/20 dark:text-white"
+                      value={formData.videoUrl} onChange={(e) => setFormData({...formData, videoUrl: e.target.value})}
+                    />
+                  </div>
+                </div>
+
+                {/* Bouton de validation */}
+                <button 
+                  disabled={submitting}
+                  className="w-full py-5 bg-ucak-blue text-white rounded-[2rem] font-black uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-ucak-blue/20"
+                >
+                  {submitting ? <Loader2 className="animate-spin" /> : <><Send size={18} /> Publier maintenant</>}
                 </button>
-              </form>
-            </div>
+
+                {status && (
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className={`p-4 rounded-2xl text-center text-xs font-bold ${status.type === 'success' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
+                    {status.message}
+                  </motion.div>
+                )}
+              </div>
+            </form>
           </div>
 
-          <div className="lg:col-span-2 space-y-4">
-            {newsList.map(item => (
-              <div key={item.id} className="bg-white/5 p-5 rounded-2xl border border-white/10 flex gap-4 hover:bg-white/10 transition-colors">
-                {item.image_url && <img src={item.image_url} alt="" className="w-20 h-20 object-cover rounded-xl bg-black/20" />}
-                <div className="flex-1">
-                  <div className="flex justify-between items-start">
-                    <h4 className="font-bold text-lg leading-tight mb-1">{item.title}</h4>
-                    {item.type === 'EVENT' && <span className="px-2 py-0.5 bg-purple-500/20 text-purple-300 text-[10px] font-black uppercase rounded">Agenda</span>}
-                  </div>
-                  <p className="text-sm text-gray-400 line-clamp-2 mb-2">{item.content}</p>
-                  
-                  {item.type === 'EVENT' && item.event_date && (
-                    <div className="flex gap-3 text-xs text-purple-300 font-medium">
-                      <span className="flex items-center gap-1"><Calendar size={12}/> {new Date(item.event_date).toLocaleDateString()}</span>
-                      <span className="flex items-center gap-1"><MapPin size={12}/> {item.location}</span>
+          {/* --- COLONNE DROITE : APERÇU TEMPS RÉEL --- */}
+          <div className="lg:col-span-5 sticky top-32 h-fit">
+            <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-6 flex items-center gap-2">
+              <Sparkles size={14} className="text-ucak-gold" /> Aperçu du rendu
+            </h3>
+            
+            <div className={`overflow-hidden rounded-[3rem] border border-gray-100 dark:border-white/5 shadow-2xl transition-all ${formData.isOfficial ? 'bg-ucak-blue text-white' : 'bg-white dark:bg-white/5'}`}>
+               <div className="relative h-48 overflow-hidden bg-gray-200 dark:bg-white/10">
+                  <img 
+                    src={formData.type === 'VIDEO' ? getYTThumb(formData.videoUrl) : formData.imageUrl || 'https://via.placeholder.com/800x400'} 
+                    className="w-full h-full object-cover" alt=""
+                  />
+                  {formData.type === 'VIDEO' && formData.videoUrl && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                      <Play fill="white" size={40} className="text-white" />
                     </div>
                   )}
-                </div>
-                <button onClick={() => deleteNews(item.id)} className="text-gray-600 hover:text-red-500 self-start"><Trash2 size={18}/></button>
-              </div>
-            ))}
+                  {formData.isOfficial && (
+                    <div className="absolute top-4 left-4 bg-ucak-gold text-black px-3 py-1.5 rounded-xl text-[8px] font-black uppercase tracking-widest flex items-center gap-1.5 shadow-xl">
+                      <ShieldCheck size={12} /> Officiel
+                    </div>
+                  )}
+               </div>
+               <div className="p-8">
+                  <h4 className={`text-xl font-black mb-3 ${formData.isOfficial ? 'text-white' : 'dark:text-white'}`}>
+                    {formData.title || "Titre de votre actualité"}
+                  </h4>
+                  <p className={`text-xs line-clamp-2 ${formData.isOfficial ? 'text-white/70' : 'text-gray-500'}`}>
+                    {formData.content || "Le contenu de votre article apparaîtra ici..."}
+                  </p>
+               </div>
+            </div>
           </div>
         </div>
+
+        {/* --- LISTE DES ACTUALITÉS EXISTANTES --- */}
+        <div className="mt-24">
+           <h3 className="text-2xl font-black dark:text-white mb-8">Articles publiés ({news.length})</h3>
+           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {news.map(item => (
+                <div key={item.id} className="bg-white dark:bg-white/2 p-6 rounded-3xl border border-gray-100 dark:border-white/5 flex items-center justify-between">
+                   <div className="flex items-center gap-4">
+                      <div className={`p-3 rounded-xl ${item.type === 'VIDEO' ? 'bg-red-500/10 text-red-500' : 'bg-ucak-blue/10 text-ucak-blue'}`}>
+                        {item.type === 'VIDEO' ? <Youtube size={20} /> : <Newspaper size={20} />}
+                      </div>
+                      <div>
+                        <h5 className="text-sm font-bold dark:text-white truncate max-w-[150px]">{item.title}</h5>
+                        <p className="text-[10px] text-gray-400 font-bold uppercase">{item.type}</p>
+                      </div>
+                   </div>
+                   <button onClick={() => handleDelete(item.id)} className="p-3 text-gray-400 hover:text-red-500 transition-colors">
+                      <Trash2 size={18} />
+                   </button>
+                </div>
+              ))}
+           </div>
+        </div>
+
       </div>
     </div>
   );

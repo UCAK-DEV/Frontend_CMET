@@ -2,184 +2,189 @@ import { useState, useEffect } from 'react';
 import { api } from '../context/UserContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Newspaper, Calendar, Tag, ArrowRight, 
-  Search, Filter, Sparkles, Clock 
+  Play, ShieldCheck, Newspaper, Calendar, 
+  X, ExternalLink, Activity, Youtube, ArrowRight,
+  Bell, Zap, Filter
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
 
 export default function News() {
-  const [newsList, setNewsList] = useState([]);
+  const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('Tous');
+  const [activeFilter, setActiveFilter] = useState('ALL');
+  const [selectedVideo, setSelectedVideo] = useState(null);
 
-  // --- DONNÉES MOCKÉES (S'afficheront si le backend est vide) ---
-  const mockNews = [
-    {
-      id: 'mock-1',
-      title: "Lancement du Hub Métiers & Tech : Une nouvelle ère pour l'UFR",
-      content: "Le Club MET lance officiellement sa plateforme numérique pour centraliser les ressources pédagogiques et les opportunités de carrière...",
-      type: "Événement",
-      createdAt: new Date().toISOString(),
-      image_url: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=2070&auto=format&fit=crop"
-    },
-    {
-      id: 'mock-2',
-      title: "Hackathon DAR 2026 : Inscrivez votre équipe !",
-      content: "Étudiants en L3 DAR, préparez-vous pour 48h d'innovation intensive sur le thème de la Smart City à Touba...",
-      type: "Hackathon",
-      createdAt: new Date().toISOString(),
-      image_url: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=2070&auto=format&fit=crop"
-    },
-    {
-      id: 'mock-3',
-      title: "Séminaire : L'Intelligence Artificielle au Sénégal",
-      content: "Une conférence exclusive avec des experts du secteur pour discuter de l'impact de l'IA dans le développement local.",
-      type: "Conférence",
-      createdAt: new Date().toISOString(),
-      image_url: "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2070&auto=format&fit=crop"
-    }
-  ];
+  useEffect(() => { fetchNews(); }, []);
 
-  useEffect(() => {
-    const fetchNews = async () => {
-      try {
-        const res = await api.get('/news');
-        // Si le tableau est vide, on garde un état vide pour déclencher le mock
-        setNewsList(res.data.length > 0 ? res.data : []);
-      } catch (err) {
-        console.error("Backend inaccessible, passage en mode démo.");
-        setNewsList([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchNews();
-  }, []);
+  const fetchNews = async () => {
+    try {
+      const res = await api.get('/api/v1/news');
+      setNews(res.data);
+    } catch (err) { console.error("Erreur API:", err); }
+    finally { setLoading(false); }
+  };
 
-  // Logique : Si newsList est vide, on utilise mockNews
-  const displayData = newsList.length > 0 ? newsList : mockNews;
-  const categories = ['Tous', 'Événement', 'Hackathon', 'Conférence', 'Pédagogie'];
-  
-  const filteredData = filter === 'Tous' 
-    ? displayData 
-    : displayData.filter(item => item.type === filter);
+  const getYTId = (url) => {
+    const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url?.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+  };
+
+  const filteredNews = news.filter(n => 
+    activeFilter === 'ALL' || (activeFilter === 'OFFICIAL' && n.isOfficial) || (activeFilter === 'VIDEO' && n.videoUrl)
+  );
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#05070a] pt-32 pb-20 px-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-[#fafafa] dark:bg-[#020408] pt-32 pb-20 px-6 overflow-hidden">
+      
+      {/* --- BACKGROUND TECH LAYER --- */}
+      <div className="fixed inset-0 ucak-grid-pattern opacity-[0.03] dark:opacity-[0.05] pointer-events-none"></div>
+      <div className="fixed top-[-10%] right-[-10%] w-[500px] h-[500px] bg-ucak-blue/10 rounded-full blur-[120px] pointer-events-none"></div>
+
+      <div className="max-w-7xl mx-auto relative z-10">
         
-        {/* --- HEADER --- */}
-        <header className="mb-16">
-          <motion.div 
-            initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-3 text-ucak-blue mb-4"
-          >
-            <div className="h-[2px] w-12 bg-ucak-blue"></div>
-            <span className="text-xs font-black uppercase tracking-[0.4em]">Le Journal du Hub</span>
-          </motion.div>
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8">
-            <h1 className="text-5xl md:text-7xl font-black dark:text-white tracking-tighter">
-              Actualités <span className="text-ucak-blue">MET.</span>
+        {/* --- HEADER PROFESSIONNEL --- */}
+        <header className="mb-20 flex flex-col md:flex-row justify-between items-start md:items-end gap-10">
+          <div className="space-y-4">
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
+              className="flex items-center gap-2 text-ucak-blue dark:text-ucak-gold font-black text-[10px] uppercase tracking-[0.4em]"
+            >
+              <Activity size={14} className="animate-pulse" /> Centre d'Information Officiel
+            </motion.div>
+            <h1 className="text-5xl md:text-7xl font-black text-gray-900 dark:text-white tracking-tighter leading-none">
+              Actualités <span className="text-ucak-blue">&</span> Médias
             </h1>
-            
-            {/* Filtres Pro */}
-            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide w-full md:w-auto">
-              {categories.map(cat => (
-                <button
-                  key={cat}
-                  onClick={() => setFilter(cat)}
-                  className={`px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap
-                    ${filter === cat 
-                      ? 'bg-ucak-blue text-white shadow-lg shadow-ucak-blue/20' 
-                      : 'bg-white dark:bg-white/5 text-gray-400 hover:bg-gray-100'}`}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
+          </div>
+
+          {/* Filtres High-Tech */}
+          <div className="flex bg-white dark:bg-white/5 p-1 rounded-2xl border border-gray-200 dark:border-white/10 shadow-sm backdrop-blur-md">
+            {['ALL', 'OFFICIAL', 'VIDEO'].map((f) => (
+              <button
+                key={f} onClick={() => setActiveFilter(f)}
+                className={`px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all
+                  ${activeFilter === f 
+                    ? 'bg-ucak-blue text-white shadow-lg shadow-ucak-blue/30' 
+                    : 'text-gray-400 hover:text-ucak-blue dark:hover:text-white'}`}
+              >
+                {f === 'ALL' ? 'Flux Global' : f === 'OFFICIAL' ? 'Annonces UFR' : 'Vidéos UCAK'}
+              </button>
+            ))}
           </div>
         </header>
 
-        {/* --- NEWS GRID --- */}
-        {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[1,2,3].map(i => <div key={i} className="h-[450px] bg-gray-200 dark:bg-white/5 rounded-[3rem] animate-pulse" />)}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <AnimatePresence mode="popLayout">
-              {filteredData.map((news, index) => (
+        {/* --- GRILLE DE NEWS --- */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <AnimatePresence mode="popLayout">
+            {filteredNews.map((item, index) => {
+              const isVideo = !!item.videoUrl;
+              
+              return (
                 <motion.article
-                  key={news.id}
-                  layout
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="group bg-white dark:bg-white/2 rounded-[3rem] border border-gray-100 dark:border-white/5 overflow-hidden hover:border-ucak-blue/30 transition-all duration-500 shadow-xl shadow-gray-200/50 dark:shadow-none"
+                  key={item.id} layout
+                  initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  whileHover={{ y: -8 }}
+                  className="group relative bg-white dark:bg-[#0b101a] rounded-[2rem] border border-gray-200 dark:border-white/5 overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500"
                 >
-                  {/* Image Container */}
-                  <div className="relative h-64 overflow-hidden">
+                  {/* Bordure lumineuse (Glow) sur la carte officielle */}
+                  {item.isOfficial && (
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-ucak-gold via-ucak-blue to-ucak-gold"></div>
+                  )}
+
+                  {/* Zone Média */}
+                  <div className="relative h-56 overflow-hidden bg-gray-100 dark:bg-white/5">
                     <img 
-                      src={news.image_url} 
-                      alt={news.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                      src={isVideo ? `https://img.youtube.com/vi/${getYTId(item.videoUrl)}/maxresdefault.jpg` : item.imageUrl} 
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      alt=""
                     />
-                    <div className="absolute top-6 left-6">
-                      <span className="px-4 py-2 bg-white/90 dark:bg-black/70 backdrop-blur-md rounded-2xl text-[10px] font-black uppercase tracking-widest text-ucak-blue">
-                        {news.type}
-                      </span>
+                    
+                    {/* Overlay Vidéo */}
+                    {isVideo && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/50 transition-colors">
+                        <motion.button 
+                          whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
+                          onClick={() => setSelectedVideo(getYTId(item.videoUrl))}
+                          className="w-16 h-16 bg-ucak-green text-white rounded-full flex items-center justify-center shadow-2xl"
+                        >
+                          <Play fill="white" size={24} className="ml-1" />
+                        </motion.button>
+                      </div>
+                    )}
+
+                    {/* Tag flottant */}
+                    <div className="absolute bottom-4 left-4 flex gap-2">
+                       {item.isOfficial ? (
+                          <span className="px-3 py-1.5 bg-ucak-gold text-black rounded-lg text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 shadow-lg">
+                            <ShieldCheck size={12} /> Certifié
+                          </span>
+                       ) : (
+                          <span className="px-3 py-1.5 bg-white/90 dark:bg-black/80 backdrop-blur-md text-ucak-blue dark:text-white rounded-lg text-[9px] font-black uppercase tracking-widest">
+                            {item.type}
+                          </span>
+                       )}
                     </div>
                   </div>
 
-                  {/* Content */}
-                  <div className="p-10">
-                    <div className="flex items-center gap-4 text-gray-400 mb-6">
-                      <div className="flex items-center gap-1.5 text-[10px] font-bold">
-                        <Calendar size={14} /> {new Date(news.createdAt).toLocaleDateString('fr-FR')}
-                      </div>
-                      <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
-                      <div className="flex items-center gap-1.5 text-[10px] font-bold">
-                        <Clock size={14} /> 5 min read
-                      </div>
+                  {/* Zone Texte */}
+                  <div className="p-8">
+                    <div className="flex items-center gap-4 text-[10px] font-bold text-gray-400 mb-4">
+                      <Calendar size={12} className="text-ucak-blue" />
+                      {new Date(item.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
                     </div>
 
-                    <h2 className="text-2xl font-black dark:text-white mb-4 leading-tight group-hover:text-ucak-blue transition-colors">
-                      {news.title}
-                    </h2>
-                    
+                    <h3 className="text-xl font-black text-gray-900 dark:text-white mb-4 leading-tight group-hover:text-ucak-blue transition-colors">
+                      {item.title}
+                    </h3>
+
                     <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed mb-8 line-clamp-3 font-medium">
-                      {news.content}
+                      {item.content}
                     </p>
 
-                    <Link 
-                      to={`/news/${news.id}`}
-                      className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-ucak-blue group-hover:gap-4 transition-all"
-                    >
-                      Lire la suite <ArrowRight size={16} />
-                    </Link>
+                    <div className="pt-6 border-t border-gray-100 dark:border-white/5 flex items-center justify-between">
+                      <button 
+                        onClick={() => isVideo ? setSelectedVideo(getYTId(item.videoUrl)) : null}
+                        className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-ucak-blue hover:text-ucak-gold transition-colors"
+                      >
+                        {isVideo ? 'Visualiser' : 'Lire le rapport'} <ArrowRight size={14} />
+                      </button>
+                      
+                      {isVideo && <Youtube size={16} className="text-red-500 opacity-50" />}
+                    </div>
                   </div>
                 </motion.article>
-              ))}
-            </AnimatePresence>
-          </div>
-        )}
+              );
+            })}
+          </AnimatePresence>
+        </div>
+      </div>
 
-        {/* --- INFO BOX POUR L'ADMIN --- */}
-        {!loading && newsList.length === 0 && (
+      {/* === MODAL LECTEUR VIDÉO PRO === */}
+      <AnimatePresence>
+        {selectedVideo && (
           <motion.div 
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            className="mt-20 p-8 rounded-[2rem] bg-ucak-blue/5 border border-dashed border-ucak-blue/30 text-center"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-12 bg-[#020408]/95 backdrop-blur-xl"
           >
-            <Sparkles className="mx-auto text-ucak-blue mb-4" />
-            <p className="text-sm font-bold text-ucak-blue uppercase tracking-widest">
-              Mode Démo Activé
-            </p>
-            <p className="text-xs text-gray-500 mt-2">
-              Ces informations sont fictives. Connectez-vous en tant qu'admin pour publier vos premières actualités.
-            </p>
+            <button 
+              onClick={() => setSelectedVideo(null)} 
+              className="absolute top-8 right-8 w-12 h-12 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-red-500 transition-all"
+            >
+              <X size={24} />
+            </button>
+            <motion.div 
+              initial={{ scale: 0.9, y: 30 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 30 }}
+              className="w-full max-w-6xl aspect-video rounded-[2.5rem] overflow-hidden shadow-[0_0_80px_rgba(0,123,255,0.15)] border border-white/10 bg-black"
+            >
+              <iframe
+                src={`https://www.youtube.com/embed/${selectedVideo}?autoplay=1`}
+                className="w-full h-full" allowFullScreen allow="autoplay; encrypted-media"
+              ></iframe>
+            </motion.div>
           </motion.div>
         )}
-      </div>
+      </AnimatePresence>
+
     </div>
   );
 }
