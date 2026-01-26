@@ -73,7 +73,7 @@ export default function Footer() {
         <div className="border-t border-gray-200 dark:border-white/5 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-gray-400">
           <p>© 2025 Club MET UCAK. Tous droits réservés.</p>
           <div className="flex items-center gap-1">
-            Développé avec <Heart size={12} className="text-red-500 fill-red-500" /> par le Pôle Tech
+            Développé par DevUcak
           </div>
         </div>
       </div>
