@@ -1,9 +1,8 @@
-// src/pages/Login.jsx
 import { useState } from 'react';
 import { useUser } from '../context/UserContext';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, Lock, Loader2, User, Hash, GraduationCap, Users } from 'lucide-react';
+import { Mail, Lock, Loader2, User, GraduationCap, Users } from 'lucide-react';
 import logoUcak from '../assets/logo-ucak.png';
 
 const InputField = ({ icon: Icon, ...props }) => (
@@ -39,15 +38,15 @@ export default function Login() {
     email: '', 
     password: '', 
     full_name: '', 
-    matricule: '', 
-    filiere: 'Informatique', // Doit correspondre à l'option par défaut
+    filiere: 'Informatique', 
     promo: 'L1' 
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   
-  const { login, register } = useUser();
+  // Ajout de loginWithGoogle depuis le contexte
+  const { login, register, loginWithGoogle } = useUser();
   const navigate = useNavigate();
 
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -61,7 +60,7 @@ export default function Login() {
       if (isRegister) {
         const res = await register(formData);
         if (res.success) {
-           setSuccessMsg("Bienvenue dans le Club MET ! Redirection...");
+           setSuccessMsg("Bienvenue dans le Club MET ! Matricule généré.");
            setTimeout(() => navigate('/dashboard'), 1500);
         } else setError(res.message || "Échec de l'inscription");
       } else {
@@ -73,6 +72,19 @@ export default function Login() {
         setError("Erreur de connexion au serveur"); 
     } finally { 
         setIsLoading(false); 
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setIsLoading(true);
+    try {
+      const res = await loginWithGoogle();
+      if (res.success) navigate('/dashboard');
+      else setError(res.message || "Échec de la connexion Google");
+    } catch (err) {
+      setError("Service Google indisponible");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -106,14 +118,11 @@ export default function Login() {
                     exit={{ opacity: 0, height: 0 }}
                     className="space-y-4 overflow-hidden"
                   >
-                    <div className="grid grid-cols-2 gap-4">
-                      <InputField icon={User} name="full_name" placeholder="Nom Complet" required onChange={handleChange} />
-                      <InputField icon={Hash} name="matricule" placeholder="Matricule" required onChange={handleChange} />
-                    </div>
+                    <InputField icon={User} name="full_name" placeholder="Nom Complet" required onChange={handleChange} />
                     <div className="grid grid-cols-2 gap-4">
                       <SelectField icon={GraduationCap} name="filiere" onChange={handleChange} value={formData.filiere}>
                         <option value="Informatique">Informatique</option>
-                        <option value="HEC">HEC</option>
+                        <option value="HEC">Hautes Études Commerciales</option>
                       </SelectField>
                       <SelectField icon={Users} name="promo" onChange={handleChange} value={formData.promo}>
                         <option value="L1">Licence 1</option>
@@ -130,17 +139,33 @@ export default function Login() {
               <InputField icon={Mail} type="email" name="email" placeholder="Email" required onChange={handleChange} />
               <InputField icon={Lock} type="password" name="password" placeholder="Mot de passe" required onChange={handleChange} />
 
-              {error && <p className="text-red-500 text-xs font-bold text-center">{error}</p>}
-              {successMsg && <p className="text-green-500 text-xs font-bold text-center">{successMsg}</p>}
+              {error && <p className="text-red-500 text-[10px] font-black uppercase text-center tracking-widest">{error}</p>}
+              {successMsg && <p className="text-green-500 text-[10px] font-black uppercase text-center tracking-widest">{successMsg}</p>}
 
               <button type="submit" disabled={isLoading} className="w-full py-4 mt-2 bg-ucak-blue text-white rounded-xl font-black uppercase tracking-widest shadow-lg hover:bg-ucak-green transition-all flex justify-center items-center gap-2">
                 {isLoading ? <Loader2 className="animate-spin" /> : (isRegister ? "S'inscrire" : "Se Connecter")}
+              </button>
+
+              <div className="relative py-4 flex items-center gap-4">
+                <div className="flex-1 h-[1px] bg-gray-100 dark:bg-white/5"></div>
+                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Ou</span>
+                <div className="flex-1 h-[1px] bg-gray-100 dark:bg-white/5"></div>
+              </div>
+
+              {/* Bouton Google */}
+              <button 
+                type="button" 
+                onClick={handleGoogleLogin}
+                className="w-full py-4 bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-xl flex items-center justify-center gap-3 hover:bg-gray-50 transition-all active:scale-95"
+              >
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/actionbar/google.svg" className="w-5 h-5" alt="G" />
+                <span className="text-sm font-bold dark:text-white">Continuer avec Google</span>
               </button>
             </form>
 
             <div className="mt-8 text-center">
               <button 
-                onClick={() => { setError(''); setIsRegister(!isRegister); }}
+                onClick={() => { setError(''); setSuccessMsg(''); setIsRegister(!isRegister); }}
                 className="text-sm font-bold text-ucak-blue dark:text-white hover:underline decoration-ucak-gold"
               >
                 {isRegister ? "J'ai déjà un compte" : "Créer un compte"}
