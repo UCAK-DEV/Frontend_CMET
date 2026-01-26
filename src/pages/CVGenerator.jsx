@@ -1,163 +1,187 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { api, useUser } from '../context/UserContext';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Plus, Trash2, Save, ArrowLeft, PlusCircle, 
-  Briefcase, Wrench, Download, Loader2, Sparkles 
+  Plus, Trash2, Save, Download, Loader2, Sparkles, 
+  MapPin, Mail, Phone, Globe, GraduationCap, Briefcase, 
+  Award, CheckCircle, PlusCircle, X
 } from 'lucide-react';
-import { useNavigate, useParams } from 'react-router-dom';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
-export default function CVEditor() {
-  const { id } = useParams();
+export default function CVGenerator() {
   const { user } = useUser();
-  const navigate = useNavigate();
-  const printRef = useRef(); // Ref pour capturer le CV
+  const printRef = useRef();
 
   const [loading, setLoading] = useState(false);
   const [exporting, setExporting] = useState(false);
-  const [cvName, setCvName] = useState('Mon Nouveau CV');
+  const [newSkill, setNewSkill] = useState('');
+  
   const [content, setContent] = useState({
-    personal: { full_name: user?.full_name || '', email: user?.email || '', phone: '', address: '' },
-    experiences: [{ id: Date.now(), title: '', company: '', period: '', description: '' }],
-    education: [{ id: Date.now(), school: '', degree: '', year: '' }],
-    skills: ['React', 'Node.js']
+    personal: { 
+      phone: '+221 77 000 00 00', 
+      address: 'Touba, Sénégal',
+      summary: 'Étudiant passionné par le développement d\'applications réparties et l\'innovation technologique.'
+    },
+    experiences: [{ id: Date.now(), title: 'Développeur Fullstack', company: 'Club MET Lab', period: '2025 - Présent', desc: 'Conception d\'interfaces réactives.' }],
+    education: [{ id: Date.now(), school: 'Université Cheikh Ahmadoul Khadim', degree: 'Licence en Informatique (DAR)', year: '2026' }],
+    skills: ['React', 'NestJS', 'PostgreSQL', 'Tailwind CSS']
   });
 
-  // --- LOGIQUE D'EXPORTATION PDF ---
+  // --- EXPORTATION HAUTE DÉFINITION ---
   const downloadPDF = async () => {
     setExporting(true);
-    const element = printRef.current;
-    
-    // On optimise la capture pour la haute définition
-    const canvas = await html2canvas(element, {
-      scale: 2, 
+    const canvas = await html2canvas(printRef.current, {
+      scale: 3, // Qualité maximale
       useCORS: true,
-      logging: false,
       backgroundColor: "#ffffff"
     });
-
     const imgData = canvas.toDataURL('image/png');
     const pdf = new jsPDF('p', 'mm', 'a4');
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
-    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-    pdf.save(`${cvName.replace(/\s+/g, '_')}.pdf`);
+    const width = pdf.internal.pageSize.getWidth();
+    const height = (canvas.height * width) / canvas.width;
+    pdf.addImage(imgData, 'PNG', 0, 0, width, height);
+    pdf.save(`CV_${user?.full_name?.replace(/\s+/g, '_')}.pdf`);
     setExporting(false);
   };
 
-  const handleSave = async () => {
-    setLoading(true);
-    try {
-      const payload = { title: cvName, data: content };
-      if (id) await api.patch(`/api/v1/cvs/${id}`, payload);
-      else await api.post('/api/v1/cvs', payload);
-      alert("CV enregistré avec succès !");
-    } catch (err) {
-      alert("Erreur de sauvegarde");
-    } finally { setLoading(false); }
+  const addSkill = (e) => {
+    if (e.key === 'Enter' && newSkill.trim()) {
+      setContent({...content, skills: [...content.skills, newSkill.trim()]});
+      setNewSkill('');
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-ucak-dark pt-28 pb-20 px-4">
-      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-10">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#05070a] pt-32 pb-20 px-6">
+      <div className="max-w-7xl mx-auto flex flex-col xl:flex-row gap-12">
         
-        {/* COLONNE GAUCHE : FORMULAIRE D'ÉDITION */}
-        <div className="w-full lg:w-1/2 space-y-6">
-          <div className="bg-white dark:bg-ucak-dark-card p-8 rounded-[2.5rem] shadow-xl border border-white/5">
-            <header className="flex justify-between items-center mb-10">
-              <input 
-                value={cvName} 
-                onChange={e => setCvName(e.target.value)}
-                className="text-2xl font-black bg-transparent border-b-2 border-dashed border-gray-200 focus:border-ucak-blue outline-none dark:text-white"
-              />
-              <div className="flex gap-2">
-                <button 
-                  onClick={downloadPDF} 
-                  disabled={exporting}
-                  className="p-3 bg-gray-100 dark:bg-white/5 rounded-2xl text-ucak-blue hover:bg-ucak-blue hover:text-white transition-all shadow-sm"
-                  title="Exporter en PDF"
-                >
-                  {exporting ? <Loader2 className="animate-spin" size={20}/> : <Download size={20}/>}
-                </button>
-                <button 
-                  onClick={handleSave} 
-                  className="p-3 bg-ucak-blue text-white rounded-2xl hover:bg-ucak-green transition-all shadow-lg"
-                  title="Sauvegarder"
-                >
-                  {loading ? <Loader2 className="animate-spin" size={20}/> : <Save size={20}/>}
-                </button>
-              </div>
-            </header>
+        {/* --- ÉDITEUR (GAUCHE) --- */}
+        <div className="w-full xl:w-2/5 space-y-8">
+          <header>
+            <h1 className="text-4xl font-black dark:text-white tracking-tighter">CV <span className="text-ucak-blue">Architect.</span></h1>
+            <p className="text-gray-500 text-sm font-bold uppercase tracking-widest mt-2">Éditeur professionnel UFR MET</p>
+          </header>
 
-            {/* Expériences */}
+          <div className="space-y-6 bg-white dark:bg-white/5 p-8 rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-xl">
+            {/* Infos Personnelles */}
             <div className="space-y-4">
-              <div className="flex justify-between items-center border-b border-gray-100 dark:border-white/5 pb-2">
-                <h3 className="text-xs font-black uppercase tracking-widest text-gray-400">Expériences</h3>
-                <button onClick={() => setContent({...content, experiences: [...content.experiences, {id: Date.now(), title: '', company: '', period: ''}]})} className="text-ucak-blue"><PlusCircle size={18}/></button>
-              </div>
-              {content.experiences.map((exp, i) => (
-                <div key={exp.id} className="grid grid-cols-2 gap-3 p-4 bg-gray-50 dark:bg-white/5 rounded-2xl">
-                   <input placeholder="Poste" className="col-span-2 bg-transparent font-bold dark:text-white outline-none" value={exp.title} onChange={e => {
-                     const exps = [...content.experiences]; exps[i].title = e.target.value; setContent({...content, experiences: exps});
-                   }}/>
-                   <input placeholder="Entreprise" className="bg-transparent text-sm dark:text-gray-400 outline-none" value={exp.company} onChange={e => {
-                     const exps = [...content.experiences]; exps[i].company = e.target.value; setContent({...content, experiences: exps});
-                   }}/>
-                   <input placeholder="Période" className="bg-transparent text-sm text-right dark:text-gray-400 outline-none" value={exp.period} onChange={e => {
-                     const exps = [...content.experiences]; exps[i].period = e.target.value; setContent({...content, experiences: exps});
-                   }}/>
-                </div>
-              ))}
+              <h3 className="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] border-b pb-2">Contact & Bio</h3>
+              <input className="w-full p-4 bg-gray-50 dark:bg-white/5 rounded-xl text-xs outline-none focus:ring-2 ring-ucak-blue/20 dark:text-white" 
+                placeholder="Téléphone" value={content.personal.phone} onChange={e => setContent({...content, personal: {...content.personal, phone: e.target.value}})} />
+              <textarea className="w-full p-4 bg-gray-50 dark:bg-white/5 rounded-xl text-xs outline-none h-24 dark:text-white" 
+                placeholder="Résumé professionnel..." value={content.personal.summary} onChange={e => setContent({...content, personal: {...content.personal, summary: e.target.value}})} />
             </div>
+
+            {/* Skills Dynamiques */}
+            <div className="space-y-4">
+              <h3 className="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] border-b pb-2">Compétences</h3>
+              <div className="flex flex-wrap gap-2">
+                {content.skills.map((s, i) => (
+                  <span key={i} className="px-3 py-1 bg-ucak-blue/10 text-ucak-blue rounded-lg text-[10px] font-bold flex items-center gap-2">
+                    {s} <X size={12} className="cursor-pointer" onClick={() => setContent({...content, skills: content.skills.filter((_, idx) => idx !== i)})} />
+                  </span>
+                ))}
+              </div>
+              <input 
+                value={newSkill} onChange={e => setNewSkill(e.target.value)} onKeyDown={addSkill}
+                placeholder="Ajouter une compétence + Entrée" 
+                className="w-full p-4 bg-gray-50 dark:bg-white/5 rounded-xl text-xs outline-none border border-dashed border-gray-200 dark:border-white/10 dark:text-white" />
+            </div>
+
+            <button onClick={downloadPDF} disabled={exporting} className="w-full py-5 bg-ucak-blue text-white rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 shadow-xl shadow-ucak-blue/20">
+              {exporting ? <Loader2 className="animate-spin" /> : <><Download size={18} /> Générer le PDF HD</>}
+            </button>
           </div>
         </div>
 
-        {/* COLONNE DROITE : PREVIEW (C'est cette zone qui est imprimée) */}
-        <div className="flex-1">
+        {/* --- PREVIEW (DROITE) --- */}
+        <div className="flex-1 bg-gray-200 dark:bg-white/5 p-8 md:p-12 rounded-[3rem] overflow-x-auto">
           <div 
-            ref={printRef} 
-            className="bg-white shadow-2xl p-12 min-h-[842px] w-full max-w-[595px] mx-auto text-gray-800"
+            ref={printRef}
+            className="bg-white w-[210mm] min-h-[297mm] mx-auto p-[20mm] shadow-2xl text-slate-800"
             style={{ fontFamily: "'Inter', sans-serif" }}
           >
-            <div className="border-b-8 border-ucak-blue pb-8 mb-10">
-              <h1 className="text-5xl font-black text-gray-900 tracking-tighter uppercase">{user?.full_name}</h1>
-              <p className="text-ucak-blue font-bold text-xl mt-2">{user?.filiere} • Promo {user?.promo}</p>
-              <div className="flex gap-6 mt-6 text-xs font-medium text-gray-500">
-                <span>{user?.email}</span>
-                <span>Matricule: {user?.matricule}</span>
+            {/* Header CV */}
+            <header className="flex justify-between items-start border-b-4 border-ucak-blue pb-10">
+              <div>
+                <h2 className="text-5xl font-black tracking-tighter text-slate-900 uppercase leading-none">{user?.full_name}</h2>
+                <p className="text-ucak-blue font-bold text-xl mt-2">{user?.filiere} — Promo {user?.promo}</p>
+                <div className="flex gap-6 mt-6 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                  <span className="flex items-center gap-1.5"><Mail size={12} className="text-ucak-blue" /> {user?.email}</span>
+                  <span className="flex items-center gap-1.5"><Phone size={12} className="text-ucak-blue" /> {content.personal.phone}</span>
+                  <span className="flex items-center gap-1.5"><MapPin size={12} className="text-ucak-blue" /> {content.personal.address}</span>
+                </div>
+              </div>
+              {/* INNOVATION : Badge Officiel UFR */}
+              {user?.is_ufr_verified && (
+                <div className="flex flex-col items-center gap-1 text-ucak-gold">
+                  <Award size={48} strokeWidth={1.5} />
+                  <span className="text-[7px] font-black uppercase tracking-tighter text-center">UFR MET<br/>Certified Member</span>
+                </div>
+              )}
+            </header>
+
+            <div className="grid grid-cols-3 gap-12 mt-12">
+              {/* Sidebar Preview */}
+              <div className="col-span-1 space-y-10 border-r pr-8 border-slate-100">
+                <section>
+                  <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300 mb-4">Profil</h4>
+                  <p className="text-[11px] leading-relaxed text-slate-500 font-medium">{content.personal.summary}</p>
+                </section>
+                <section>
+                  <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300 mb-4">Expertise</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {content.skills.map((s, i) => (
+                      <span key={i} className="px-2 py-1 bg-slate-900 text-white text-[8px] font-black uppercase rounded-sm">{s}</span>
+                    ))}
+                  </div>
+                </section>
+              </div>
+
+              {/* Main Content Preview */}
+              <div className="col-span-2 space-y-12">
+                <section>
+                  <div className="flex items-center gap-3 mb-6">
+                    <Briefcase size={18} className="text-ucak-blue" />
+                    <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300">Expériences</h4>
+                  </div>
+                  <div className="space-y-8">
+                    {content.experiences.map((exp) => (
+                      <div key={exp.id}>
+                        <h5 className="font-black text-slate-900 text-base">{exp.title}</h5>
+                        <p className="text-ucak-blue text-[10px] font-bold uppercase tracking-widest mb-2">{exp.company} <span className="text-slate-400 ml-2">| {exp.period}</span></p>
+                        <p className="text-xs text-slate-500 font-medium">{exp.desc}</p>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                <section>
+                  <div className="flex items-center gap-3 mb-6">
+                    <GraduationCap size={18} className="text-ucak-blue" />
+                    <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300">Formation Académique</h4>
+                  </div>
+                  <div className="space-y-6">
+                    {content.education.map((edu) => (
+                      <div key={edu.id} className="border-l-2 border-ucak-blue/20 pl-4">
+                        <h5 className="font-black text-slate-900 text-sm">{edu.degree}</h5>
+                        <p className="text-xs text-slate-500 font-bold">{edu.school} — {edu.year}</p>
+                      </div>
+                    ))}
+                  </div>
+                </section>
               </div>
             </div>
 
-            <div className="space-y-10">
-              <section>
-                <h2 className="text-sm font-black uppercase tracking-[0.3em] text-gray-300 mb-6 border-b pb-2">Parcours Professionnel</h2>
-                <div className="space-y-8">
-                  {content.experiences.map((exp) => (
-                    <div key={exp.id} className="relative pl-6 border-l-2 border-gray-100">
-                      <div className="absolute -left-[9px] top-0 w-4 h-4 bg-ucak-blue rounded-full border-4 border-white"></div>
-                      <h3 className="font-black text-lg text-gray-900 leading-none">{exp.title || "Poste non défini"}</h3>
-                      <p className="text-sm font-bold text-ucak-blue mt-1">{exp.company} <span className="text-gray-400 ml-2">| {exp.period}</span></p>
-                    </div>
-                  ))}
-                </div>
-              </section>
-
-              <section>
-                <h2 className="text-sm font-black uppercase tracking-[0.3em] text-gray-300 mb-6 border-b pb-2">Expertise Technique</h2>
-                <div className="flex flex-wrap gap-2">
-                  {content.skills.map((s, i) => (
-                    <span key={i} className="px-4 py-1.5 bg-gray-900 text-white text-[10px] font-black uppercase tracking-widest rounded-sm">
-                      {s}
-                    </span>
-                  ))}
-                </div>
-              </section>
-            </div>
+            {/* Footer de certification */}
+            <footer className="mt-20 pt-8 border-t border-slate-100 flex justify-between items-center opacity-40 italic text-[8px]">
+               <p>Généré officiellement via le portail numérique Club MET - UCAK</p>
+               <p>Vérifier l'authenticité : ucak-met-hub.vercel.app/verify/{user?.matricule}</p>
+            </footer>
           </div>
         </div>
+
       </div>
     </div>
   );
