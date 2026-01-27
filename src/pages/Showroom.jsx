@@ -39,7 +39,7 @@ export default function Showroom() {
 
   const fetchProjects = async () => {
     try {
-      const res = await api.get('/api/v1/showroom/projects');
+      const res = await api.get('/api/v1/projects');
       setProjects(res.data);
     } catch (error) {
       console.error("Erreur chargement projets:", error);
