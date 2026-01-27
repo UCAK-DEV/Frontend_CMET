@@ -154,8 +154,8 @@ export default function Navbar() {
             </div>
           </Link>
 
-          {/* CONTAINER DES LIENS (Flexible & Scrollable si besoin) */}
-          <div className="flex items-center gap-1 xl:gap-2 bg-gray-50/50 dark:bg-white/5 p-1.5 rounded-full border border-gray-100 dark:border-white/5 mx-4 overflow-x-auto no-scrollbar">
+          {/* CONTAINER DES LIENS (Flexible) */}
+          <div className="flex items-center gap-1 xl:gap-2 bg-gray-50/50 dark:bg-white/5 p-1.5 rounded-full border border-gray-100 dark:border-white/5 mx-4">
             {visiblePublicLinks.map((link, idx) => (
               link.type === 'dropdown' ? (
                 <div key={idx} className="relative shrink-0" onMouseEnter={() => setActiveDropdown(link.id)} onMouseLeave={() => setActiveDropdown(null)}>
