@@ -160,8 +160,19 @@ const DepartmentDrawer = ({ dept, isOpen, onClick }) => {
         {isOpen && (
           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.4 }}>
             <div className="px-8 pb-10 md:pl-[8rem] md:pr-16">
+              
+              {/* TEXTE DESCRIPTIF PRINCIPAL */}
+              <div className="mb-10 prose dark:prose-invert max-w-none text-gray-600 dark:text-gray-300 text-sm md:text-base leading-relaxed text-justify border-l-4 border-ucak-gold pl-6 py-2">
+                <p>{dept.fullText}</p>
+              </div>
+
+              {/* CONTENU SPÉCIFIQUE (Programme) */}
               {dept.type === 'IT' ? <ITExpansion /> : dept.type === 'HEC' ? <HECExpansion /> : (
-                <div className="py-4"><p className="text-gray-600 dark:text-gray-300 text-lg leading-relaxed mb-6">{dept.desc}</p><div className="bg-gray-50 dark:bg-white/5 p-6 rounded-2xl border border-gray-100 dark:border-white/10 flex items-center gap-4 text-gray-500"><Lock size={20} /> <span className="text-sm font-bold">Programme bientôt disponible.</span></div></div>
+                <div className="py-4">
+                  <div className="bg-gray-50 dark:bg-white/5 p-6 rounded-2xl border border-gray-100 dark:border-white/10 flex items-center gap-4 text-gray-500">
+                    <Lock size={20} /> <span className="text-sm font-bold">Programme académique en cours de finalisation.</span>
+                  </div>
+                </div>
               )}
             </div>
           </motion.div>
@@ -179,11 +190,32 @@ export default function About() {
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
   const departments = [
-    { title: "Informatique & Télécoms", shortDesc: "Génie Logiciel, Réseaux & IA", status: "Ouvert", icon: Layout, type: "IT", desc: "Formation complète..." },
-    { title: "Hautes Études Commerciales", shortDesc: "Management & Finance", status: "Ouvert", icon: Building2, type: "HEC", desc: "Formation d'excellence..." },
-    { title: "Génie Électromécanique", shortDesc: "Robotique & Industrie", status: "Bientôt", icon: Award, type: "GEM", desc: "Maintenance industrielle..." },
-    { title: "Génie Civil & BTP", shortDesc: "Construction & Architecture", status: "Bientôt", icon: MapPin, type: "GC", desc: "Construction durable..." },
-    { title: "Artisanat & Industrie", shortDesc: "Métiers Manuels Modernisés", status: "Bientôt", icon: Users, type: "ART", desc: "Valorisation des métiers..." },
+    { 
+      title: "Informatique & Télécommunications", 
+      shortDesc: "Technologies Modernes & Innovation", 
+      status: "Ouvert", 
+      icon: Layout, 
+      type: "IT", 
+      fullText: "Le Département Informatique et Télécommunications répond à la réalité que la connaissance à notre époque circule à travers les réseaux numériques et les systèmes électroniques. Ibn Khaldoun a écrit que « la civilisation et son bien-être dépendent de la productivité et des efforts des gens dans toutes les directions dans leur propre intérêt et profit », et au 21ème siècle, la littératie numérique et la compétence technologique sont des prérequis non négociables pour une participation significative à l'économie mondiale. L'avancement rapide de la technologie ne doit pas contredire les valeurs islamiques ; au contraire, comme l'Imam Al-Ghazali l'a enseigné, « Toute connaissance vient d'Allah », et comprendre les lois de la nature et de la technologie est une façon d'apprécier la sagesse divine manifestée dans la création. Cheikh Ahmadou Bamba lui-même était remarquablement innovant, utilisant les technologies disponibles de son époque pour diffuser ses enseignements et organiser sa communauté. Le département Informatique et Télécommunications prépare ainsi les étudiants à exploiter les outils modernes, du développement de logiciels à l'infrastructure réseau, non pas comme de simples consommateurs de technologie étrangère mais comme des créateurs et innovateurs capables de développer des solutions adaptées aux réalités et aux besoins africains."
+    },
+    { 
+      title: "Hautes Études Commerciales", 
+      shortDesc: "Commerce & Leadership Éthique", 
+      status: "Ouvert", 
+      icon: Building2, 
+      type: "HEC", 
+      fullText: "Le Département Hautes Études Commerciales reconnaît que le développement économique nécessite non seulement des compétences techniques mais aussi un leadership commercial éthique et une perspicacité commerciale. Le Prophète Muhammad (paix et salut sur lui) était connu sous le nom d' « Al-Amin » (le Digne de Confiance) dans ses transactions commerciales, établissant un modèle de commerce enraciné dans l'honnêteté, l'équité et la responsabilité sociale. Cheikh Ahmadou Bamba a enseigné à ses disciples le principe de « barakah » (bénédiction) dans le travail et le commerce, soulignant que la richesse gagnée par des moyens honnêtes et partagée généreusement apporte à la fois le succès mondain et la récompense spirituelle. Le Coran ordonne aux croyants : « Ô vous qui croyez, ne dévorez pas mutuellement vos biens de manière injuste, mais seulement [dans le cadre d'un] commerce licite par consentement mutuel » (4:29), établissant des limites éthiques claires pour l'activité économique. Ce département prépare des leaders d'entreprise qui comprennent que le profit et l'éthique ne sont pas contradictoires mais complémentaires, que le développement économique durable nécessite des gestionnaires et des entrepreneurs qui considèrent leur travail comme une confiance (amanah) et leurs employés, clients et communautés comme des partenaires dans la construction d'une société juste et prospère. En formant de tels leaders, l'UFR MET contribue non seulement au PIB de l'Afrique mais aussi aux fondements moraux et spirituels sur lesquels un développement durable doit être construit."
+    },
+    { 
+      title: "Génie Civil & BTP", 
+      shortDesc: "Infrastructure & Progrès", 
+      status: "Bientôt", 
+      icon: MapPin, 
+      type: "GC", 
+      fullText: "Les Départements d'Artisanat et Industrie, de Génie Civil (Bâtiments et Travaux Publics), et de Génie Électromécanique représentent la fondation matérielle sur laquelle les sociétés progressent. La civilisation islamique a atteint son apogée en partie grâce à la maîtrise de l'ingénierie et de la construction, des merveilles architecturales de la Grande Mosquée de Cordoue aux systèmes d'irrigation sophistiqués d'Al-Andalus. Le Coran lui-même nous rappelle : « C'est Lui qui vous a soumis la terre : parcourez donc ses grandes étendues et mangez de ce qu'Il vous fournit » (67:15), encourageant les croyants à façonner et à utiliser les ressources de la terre pour le bénéfice de l'humanité. Cheikh Ahmadou Bamba, observant l'importance de l'autonomie et du développement communautaire, a enseigné qu' « une nation qui ne peut pas construire sa propre infrastructure reste dépendante des autres », un principe qui résonne profondément dans la quête de développement authentique de l'Afrique contemporaine. Ces départements forment les architectes, ingénieurs et artisans qui construiront littéralement l'avenir de l'Afrique, ses routes, ponts, bâtiments et installations industrielles, transformant les matières premières en manifestations physiques du progrès et de la prospérité."
+    },
+    { title: "Génie Électromécanique", shortDesc: "Ingénierie & Industrie", status: "Bientôt", icon: Award, type: "GEM", fullText: "Partie intégrante du pôle Infrastructure Physique du Progrès." },
+    { title: "Artisanat & Industrie", shortDesc: "Savoir-faire & Excellence", status: "Bientôt", icon: Users, type: "ART", fullText: "Partie intégrante du pôle Infrastructure Physique du Progrès." },
   ];
 
   return (
@@ -202,11 +234,38 @@ export default function About() {
              <a href="https://ccak.edu.sn" target="_blank" className="group relative inline-flex items-center gap-4 bg-white text-ucak-blue px-12 py-6 rounded-[2rem] font-black text-xs uppercase tracking-[0.2em] hover:bg-ucak-gold hover:text-ucak-dark transition-all shadow-2xl hover:-translate-y-2">Site Officiel CCAK <ExternalLink size={20} /></a>
         </motion.div>
       </section>
+
+      {/* --- NOUVELLE SECTION INTRODUCTIVE (TEXTE 1) --- */}
+      <section className="py-24 px-6 bg-gray-50 dark:bg-white/5">
+        <div className="container mx-auto max-w-4xl text-center">
+          <span className="text-ucak-gold font-black text-xs uppercase tracking-[0.5em] block mb-8">Vision & Mission</span>
+          <h2 className="text-3xl md:text-5xl font-black text-ucak-blue dark:text-white mb-10 leading-tight">La Dignité du Travail et la Maîtrise Technique</h2>
+          <div className="prose dark:prose-invert prose-lg mx-auto text-gray-600 dark:text-gray-300 text-justify">
+            <p>
+              L'UFR des Métiers et Technologies (UFR MET) témoigne de la tradition islamique qui honore le travail qualifié et l'expertise technique comme des composantes essentielles d'une société florissante. Cette faculté, dédiée à l'enseignement des métiers émergents dont le Sénégal et l'Afrique ont besoin pour soutenir leur développement économique et social, incarne l'enseignement prophétique selon lequel « Allah aime que lorsque l'un d'entre vous fait quelque chose, il le perfectionne ».
+            </p>
+            <p>
+              Cheikh Ahmadou Bamba Mbacke a souligné la sainteté du travail honnête, enseignant à ses disciples que « travailler de ses mains dans une profession licite est un acte d'adoration », élevant ainsi les compétences techniques d'une simple formation professionnelle à une pratique spirituelle. Le Prophète Muhammad (paix et salut sur lui) lui-même a travaillé comme berger et commerçant, démontrant qu'il'y a aucune honte dans le travail manuel ou le commerce, ce sont plutôt des poursuites nobles lorsqu'elles sont menées avec intégrité et excellence.
+            </p>
+            <p>
+              À travers ses cinq départements spécialisés, l'UFR MET prépare les étudiants non pas simplement à l'emploi mais à la responsabilité sacrée de construire leurs communautés et leurs nations.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section className="py-24 px-6 relative z-20">
         <div className="container mx-auto max-w-5xl">
-           <div className="text-center mb-16"><span className="text-ucak-green font-black text-xs uppercase tracking-[0.5em] block mb-6">Nos Programmes</span><h2 className="text-5xl md:text-6xl font-black text-ucak-blue dark:text-white leading-none tracking-tighter mb-4">Filières d'Excellence</h2></div>
+           <div className="text-center mb-16"><span className="text-ucak-green font-black text-xs uppercase tracking-[0.5em] block mb-6">Nos Départements</span><h2 className="text-5xl md:text-6xl font-black text-ucak-blue dark:text-white leading-none tracking-tighter mb-4">Filières d'Excellence</h2></div>
            <div className="space-y-4">
-              {departments.map((dept, idx) => (<DepartmentDrawer key={idx} dept={dept} isOpen={openIndex === idx} onClick={() => setOpenIndex(idx === openIndex ? -1 : idx)} />))}
+              {departments.map((dept, idx) => (
+                <DepartmentDrawer 
+                  key={idx} 
+                  dept={dept} 
+                  isOpen={openIndex === idx} 
+                  onClick={() => setOpenIndex(idx === openIndex ? -1 : idx)} 
+                />
+              ))}
            </div>
         </div>
       </section>
