@@ -75,21 +75,39 @@ export default function Navbar() {
 
   // --- REORGANISATION : ESSENTIEL EN PREMIER ---
   
-  // 1. Liens Publics (Toujours visibles)
-  const publicLinks = [
+  // 1. Définition des liens de base
+  const basePublicLinks = [
     { name: 'Accueil', path: '/', icon: Home },
     { name: 'Actualités', path: '/news', icon: Newspaper },
     { name: 'Showroom', path: '/showroom', icon: MonitorPlay },
-    { 
-      name: 'Formations', type: 'dropdown', id: 'formations', icon: GraduationCap,
-      items: [
-        { title: 'Informatique', desc: 'Génie Logiciel & IA', path: '/formation/informatique', icon: GraduationCap },
-        { title: 'HEC', desc: 'Gestion & Management', path: '/formation/hec', icon: Briefcase }
-      ]
-    }
   ];
 
-  // 2. Liens Membres (Visibles seulement si user connecté)
+  const formationsLink = { 
+    name: 'Formations', type: 'dropdown', id: 'formations', icon: GraduationCap,
+    items: [
+      { title: 'Informatique', desc: 'Génie Logiciel & IA', path: '/formation/informatique', icon: GraduationCap },
+      { title: 'HEC', desc: 'Gestion & Management', path: '/formation/hec', icon: Briefcase }
+    ]
+  };
+
+  // 2. Logique d'affichage adaptative (RESPONSIVE FIX)
+  // Si connecté : On regroupe "Accueil/News/Showroom" dans un menu "Exploration" pour gagner de la place
+  const visiblePublicLinks = user ? [
+    { 
+      name: 'Exploration', type: 'dropdown', id: 'explore', icon: Globe,
+      items: [
+        { title: 'Accueil', desc: 'Retour page principale', path: '/', icon: Home },
+        { title: 'Actualités', desc: 'Le journal du club', path: '/news', icon: Newspaper },
+        { title: 'Showroom', desc: 'Vitrine projets', path: '/showroom', icon: MonitorPlay }
+      ]
+    },
+    formationsLink
+  ] : [
+    ...basePublicLinks,
+    formationsLink
+  ];
+
+  // 3. Liens Membres (Visibles seulement si user connecté)
   const studentLinks = user ? [
     { name: 'Cours', path: '/knowledge', icon: BookOpen },
     { 
@@ -103,14 +121,16 @@ export default function Navbar() {
     }
   ] : [];
 
-  // 3. Liens Admin (Visibles seulement si isAdmin)
+  // 4. Liens Admin (Visibles seulement si isAdmin)
   const adminLinks = isAdmin ? [
     { 
       name: 'Admin', type: 'dropdown', id: 'admin', icon: ShieldCheck, style: 'admin',
       items: [
         { title: 'Cours', desc: 'Gestion du LMS', path: '/admin/courses', icon: BookOpen, admin: true },
         { title: 'Membres', desc: 'Gestion étudiants', path: '/admin/students', icon: Users, admin: true },
-        { title: 'Annonces', desc: 'Gestion News', path: '/admin/news', icon: Newspaper, admin: true }
+        { title: 'Annonces', desc: 'Gestion News', path: '/admin/news', icon: Newspaper, admin: true },
+        { title: 'Examens', desc: 'Créateur de Quiz', path: '/admin/quizzes', icon: Trophy, admin: true },
+        { title: 'Votes', desc: 'Pilotage Élections', path: '/admin/elections', icon: Vote, admin: true }
       ]
     }
   ] : [];
@@ -126,7 +146,7 @@ export default function Navbar() {
         }`}
       >
         <div className="w-full flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3">
+          <Link to="/" className="flex items-center gap-3 shrink-0">
             <img src={logoUcak} alt="Logo" className="w-10 h-10" />
             <div className="flex flex-col">
               <span className="text-xl font-black dark:text-white tracking-tighter uppercase">Club MET</span>
@@ -134,11 +154,12 @@ export default function Navbar() {
             </div>
           </Link>
 
-          <div className="flex items-center gap-2 bg-gray-50/50 dark:bg-white/5 p-1.5 rounded-full border border-gray-100 dark:border-white/5">
-            {publicLinks.map((link, idx) => (
+          {/* CONTAINER DES LIENS (Flexible & Scrollable si besoin) */}
+          <div className="flex items-center gap-1 xl:gap-2 bg-gray-50/50 dark:bg-white/5 p-1.5 rounded-full border border-gray-100 dark:border-white/5 mx-4 overflow-x-auto no-scrollbar">
+            {visiblePublicLinks.map((link, idx) => (
               link.type === 'dropdown' ? (
-                <div key={idx} className="relative" onMouseEnter={() => setActiveDropdown(link.id)} onMouseLeave={() => setActiveDropdown(null)}>
-                  <button className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all ${activeDropdown === link.id ? 'bg-white dark:bg-white/10 shadow-sm' : 'text-gray-400 hover:text-ucak-blue'}`}>
+                <div key={idx} className="relative shrink-0" onMouseEnter={() => setActiveDropdown(link.id)} onMouseLeave={() => setActiveDropdown(null)}>
+                  <button className={`flex items-center gap-2 px-4 xl:px-5 py-2.5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all ${activeDropdown === link.id ? 'bg-white dark:bg-white/10 shadow-sm' : 'text-gray-400 hover:text-ucak-blue'}`}>
                     <link.icon size={14} /> {link.name} <ChevronDown size={10} className={activeDropdown === link.id ? 'rotate-180' : ''}/>
                   </button>
                   <DropdownMenu items={link.items} parentId={link.id} activeDropdown={activeDropdown} />
@@ -147,12 +168,12 @@ export default function Navbar() {
             ))}
 
             {/* SEPARATION VISUELLE POUR LES MEMBRES */}
-            {user && <div className="w-[1px] h-6 bg-gray-200 dark:bg-white/10 mx-2" />}
+            {user && <div className="w-[1px] h-6 bg-gray-200 dark:bg-white/10 mx-1 shrink-0" />}
 
             {studentLinks.map((link, idx) => (
               link.type === 'dropdown' ? (
-                <div key={idx} className="relative" onMouseEnter={() => setActiveDropdown(link.id)} onMouseLeave={() => setActiveDropdown(null)}>
-                  <button className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all ${activeDropdown === link.id ? 'bg-white dark:bg-white/10 shadow-sm' : 'text-gray-400 hover:text-ucak-blue'}`}>
+                <div key={idx} className="relative shrink-0" onMouseEnter={() => setActiveDropdown(link.id)} onMouseLeave={() => setActiveDropdown(null)}>
+                  <button className={`flex items-center gap-2 px-4 xl:px-5 py-2.5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all ${activeDropdown === link.id ? 'bg-white dark:bg-white/10 shadow-sm' : 'text-gray-400 hover:text-ucak-blue'}`}>
                     <link.icon size={14} /> {link.name} <ChevronDown size={10}/>
                   </button>
                   <DropdownMenu items={link.items} parentId={link.id} activeDropdown={activeDropdown} />
@@ -161,8 +182,8 @@ export default function Navbar() {
             ))}
 
             {adminLinks.map((link, idx) => (
-              <div key={idx} className="relative" onMouseEnter={() => setActiveDropdown(link.id)} onMouseLeave={() => setActiveDropdown(null)}>
-                <button className="flex items-center gap-2 px-5 py-2.5 rounded-full text-[11px] font-black uppercase tracking-widest text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10">
+              <div key={idx} className="relative shrink-0" onMouseEnter={() => setActiveDropdown(link.id)} onMouseLeave={() => setActiveDropdown(null)}>
+                <button className="flex items-center gap-2 px-4 xl:px-5 py-2.5 rounded-full text-[11px] font-black uppercase tracking-widest text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10">
                   <ShieldCheck size={14} /> Admin
                 </button>
                 <DropdownMenu items={link.items} parentId={link.id} activeDropdown={activeDropdown} />
@@ -170,7 +191,7 @@ export default function Navbar() {
             ))}
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 shrink-0">
             <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="p-3 rounded-full bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-ucak-gold">
               {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
             </button>
