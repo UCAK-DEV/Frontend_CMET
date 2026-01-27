@@ -2,11 +2,15 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
-  Sparkles, ShieldCheck, Zap, LayoutDashboard, Briefcase, 
-  ExternalLink, Quote, Globe, ChevronRight, Newspaper, Calendar, ArrowRight, User
+  Sparkles, ShieldCheck, Zap, Briefcase, 
+  Quote, Globe, ChevronRight, Newspaper, Calendar, User
 } from 'lucide-react';
 import presidentImg from '../assets/images/president.jpeg';
 import { useUser, api } from '../context/UserContext';
+
+// Nouveaux composants extraits
+import VisionSection from '../components/VisionSection';
+import DepartmentsList from '../components/DepartmentsList';
 
 export default function Home() {
   const { user } = useUser();
@@ -16,7 +20,7 @@ export default function Home() {
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const res = await api.get('/news');
+        const res = await api.get('/api/v1/news');
         const sorted = res.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         setLatestNews(sorted.slice(0, 3));
       } catch (error) {
@@ -28,7 +32,7 @@ export default function Home() {
     fetchNews();
   }, []);
 
-  // Variantes d'animation pour le Bento Grid
+  // Variantes d'animation
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
@@ -44,7 +48,6 @@ export default function Home() {
       
       {/* --- 1. HERO : ULTRA MODERN --- */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
-        {/* Animated Background Elements */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none">
           <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-ucak-blue/20 rounded-full blur-[120px] animate-pulse"></div>
           <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-ucak-green/10 rounded-full blur-[100px]"></div>
@@ -89,16 +92,19 @@ export default function Home() {
                   {user ? "Accéder au Hub" : "Devenir Membre"} <User size={18} />
                 </button>
               </Link>
-              <a href="#valeurs" className="px-12 py-5 border border-gray-200 dark:border-white/10 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-gray-50 dark:hover:bg-white/5 transition-all">
-                Découvrir l'UFR
-              </a>
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* --- 2. DEVISE : BENTO GRID STYLE --- */}
-      <section id="valeurs" className="py-32 px-6">
+      {/* --- 2. VISION & MISSION (INTEGRATION "ABOUT") --- */}
+      <VisionSection />
+
+      {/* --- 3. DÉPARTEMENTS & FORMATIONS (INTEGRATION "ABOUT") --- */}
+      <DepartmentsList />
+
+      {/* --- 4. VALEURS & DEVISE --- */}
+      <section id="valeurs" className="py-20 px-6 bg-gray-50 dark:bg-[#080a0f]">
         <div className="container mx-auto max-w-7xl">
           <div className="mb-20 text-center md:text-left">
              <h2 className="text-4xl md:text-6xl font-black mb-4">La Devise <span className="text-ucak-blue">UCAK</span></h2>
@@ -110,7 +116,7 @@ export default function Home() {
             className="grid grid-cols-1 md:grid-cols-12 gap-6"
           >
             {/* Savoir Utile */}
-            <motion.div variants={itemVariants} className="md:col-span-8 bg-gray-50 dark:bg-white/5 p-10 rounded-[3rem] border border-gray-100 dark:border-white/5 relative overflow-hidden group">
+            <motion.div variants={itemVariants} className="md:col-span-8 bg-white dark:bg-white/5 p-10 rounded-[3rem] border border-gray-100 dark:border-white/5 relative overflow-hidden group">
               <Zap className="absolute top-[-20px] right-[-20px] size-40 text-ucak-blue/5 group-hover:rotate-12 transition-transform duration-700" />
               <div className="relative z-10">
                 <div className="w-12 h-12 bg-ucak-blue text-white rounded-2xl flex items-center justify-center mb-8 shadow-lg shadow-ucak-blue/20"><Zap size={24} /></div>
@@ -129,7 +135,7 @@ export default function Home() {
             </motion.div>
 
             {/* Conduite Exemplaire */}
-            <motion.div variants={itemVariants} className="md:col-span-12 bg-gray-50 dark:bg-white/5 p-10 rounded-[3rem] border border-gray-100 dark:border-white/5 flex flex-col md:flex-row items-center gap-10 group">
+            <motion.div variants={itemVariants} className="md:col-span-12 bg-white dark:bg-white/5 p-10 rounded-[3rem] border border-gray-100 dark:border-white/5 flex flex-col md:flex-row items-center gap-10 group">
                <div className="w-20 h-20 shrink-0 bg-ucak-gold/10 text-ucak-gold rounded-full flex items-center justify-center group-hover:bg-ucak-gold group-hover:text-white transition-all duration-500"><Briefcase size={32} /></div>
                <div>
                   <h3 className="text-3xl font-black mb-2">Conduite Exemplaire</h3>
@@ -140,9 +146,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- 3. ACTUALITÉS : CLEAN MINIMAL --- */}
+      {/* --- 5. ACTUALITÉS --- */}
       {(latestNews.length > 0 || loadingNews) && (
-        <section className="py-32 bg-gray-50 dark:bg-[#080a0f]">
+        <section className="py-32">
           <div className="container mx-auto px-6 max-w-7xl">
             <div className="flex justify-between items-end mb-16 px-4">
                <h2 className="text-4xl md:text-5xl font-black tracking-tighter">Journal du <span className="text-ucak-gold">Club</span></h2>
@@ -152,17 +158,17 @@ export default function Home() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-              {loadingNews ? [1,2,3].map(i => <div key={i} className="h-80 bg-white dark:bg-white/5 rounded-[2.5rem] animate-pulse" />) :
+              {loadingNews ? [1,2,3].map(i => <div key={i} className="h-80 bg-gray-100 dark:bg-white/5 rounded-[2.5rem] animate-pulse" />) :
                 latestNews.map((news) => (
                   <Link to="/news" key={news.id} className="group bg-white dark:bg-white/5 rounded-[2.5rem] overflow-hidden border border-gray-100 dark:border-white/5 hover:border-ucak-gold/30 transition-all duration-500">
-                    <div className="h-48 overflow-hidden">
-                      <img src={news.image_url || 'https://via.placeholder.com/400x300'} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                    <div className="h-48 overflow-hidden bg-gray-100 dark:bg-white/10">
+                      <img src={news.image_url || news.imageUrl || 'https://via.placeholder.com/400x300'} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="" />
                     </div>
                     <div className="p-8">
                       <div className="flex items-center gap-3 text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">
                         <Calendar size={12} /> {new Date(news.createdAt).toLocaleDateString()}
                       </div>
-                      <h3 className="text-xl font-bold leading-tight group-hover:text-ucak-gold transition-colors">{news.title}</h3>
+                      <h3 className="text-xl font-bold leading-tight group-hover:text-ucak-gold transition-colors line-clamp-2">{news.title}</h3>
                     </div>
                   </Link>
                 ))
@@ -172,8 +178,8 @@ export default function Home() {
         </section>
       )}
 
-      {/* --- 4. MOT DU PRÉSIDENT : L'ÂME --- */}
-      <section className="py-32 px-6">
+      {/* --- 6. MOT DU PRÉSIDENT --- */}
+      <section className="py-32 px-6 bg-ucak-blue/5 border-t border-ucak-blue/10">
         <div className="container mx-auto max-w-6xl">
            <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
               <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="relative">
@@ -192,7 +198,7 @@ export default function Home() {
                  <h2 className="text-5xl md:text-7xl font-black leading-[0.9] tracking-tighter">
                    "Transformer l'apprentissage <span className="text-ucak-blue">en expérience.</span>"
                  </h2>
-                 <div className="space-y-6 text-xl text-gray-500 dark:text-gray-400 leading-relaxed font-medium italic">
+                 <div className="space-y-6 text-xl text-gray-600 dark:text-gray-400 leading-relaxed font-medium italic">
                    <p>Nous sommes nés de la volonté des étudiants de l'UFR Métiers et Technologies. Notre mission est simple : créer un pont entre la théorie académique et la réalité professionnelle.</p>
                    <p>À travers nos activités, nous cultivons l'excellence et la solidarité.</p>
                  </div>
@@ -201,7 +207,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- 5. FOOTER : PORTAIL --- */}
+      {/* --- 7. FOOTER PORTAIL --- */}
       <footer className="bg-gray-50 dark:bg-white/5 py-10 px-6 border-t border-gray-100 dark:border-white/5">
         <div className="container mx-auto max-w-7xl flex flex-col md:flex-row justify-between items-center gap-8">
            <div className="flex items-center gap-6">

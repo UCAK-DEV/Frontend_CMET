@@ -82,14 +82,6 @@ export default function Navbar() {
     { name: 'Showroom', path: '/showroom', icon: MonitorPlay },
   ];
 
-  const formationsLink = { 
-    name: 'Formations', type: 'dropdown', id: 'formations', icon: GraduationCap,
-    items: [
-      { title: 'Informatique', desc: 'Génie Logiciel & IA', path: '/formation/informatique', icon: GraduationCap },
-      { title: 'HEC', desc: 'Gestion & Management', path: '/formation/hec', icon: Briefcase }
-    ]
-  };
-
   // 2. Logique d'affichage adaptative (RESPONSIVE FIX)
   // Si connecté : On regroupe "Accueil/News/Showroom" dans un menu "Exploration" pour gagner de la place
   const visiblePublicLinks = user ? [
@@ -100,12 +92,8 @@ export default function Navbar() {
         { title: 'Actualités', desc: 'Le journal du club', path: '/news', icon: Newspaper },
         { title: 'Showroom', desc: 'Vitrine projets', path: '/showroom', icon: MonitorPlay }
       ]
-    },
-    formationsLink
-  ] : [
-    ...basePublicLinks,
-    formationsLink
-  ];
+    }
+  ] : basePublicLinks;
 
   // 3. Liens Membres (Visibles seulement si user connecté)
   const studentLinks = user ? [

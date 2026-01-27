@@ -14,7 +14,6 @@ import AdminRoute from './components/AdminRoute';
 
 // --- PAGES ---
 const Home = lazy(() => import('./pages/Home')); 
-const About = lazy(() => import('./pages/About'));
 const Login = lazy(() => import('./pages/Login'));
 const ITCurriculum = lazy(() => import('./components/ITCurriculum'));
 const HECCurriculum = lazy(() => import('./components/HECCurriculum'));
@@ -61,7 +60,6 @@ function AnimatedRoutes() {
               
               {/* === VISITEUR & TOUT PUBLIC === */}
               <Route path="/" element={<PageWrapper><Home /></PageWrapper>} />
-              <Route path="/about" element={<PageWrapper><About /></PageWrapper>} />
               <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
               <Route path="/formation/informatique" element={<PageWrapper><ITCurriculum /></PageWrapper>} />
               <Route path="/formation/hec" element={<PageWrapper><HECCurriculum /></PageWrapper>} />
