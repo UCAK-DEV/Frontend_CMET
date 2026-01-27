@@ -156,6 +156,15 @@ export default function Profile() {
                       className="w-full bg-gray-50 dark:bg-white/5 border-none rounded-2xl p-4 dark:text-white outline-none focus:ring-2 ring-ucak-blue"
                     />
                   </div>
+                  <div>
+                    <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">URL Photo de Profil</label>
+                    <input 
+                      value={formData.photo_url}
+                      placeholder="https://..."
+                      onChange={(e) => setFormData({...formData, photo_url: e.target.value})}
+                      className="w-full bg-gray-50 dark:bg-white/5 border-none rounded-2xl p-4 dark:text-white outline-none focus:ring-2 ring-ucak-blue"
+                    />
+                  </div>
                   <button 
                     disabled={saving}
                     className="w-full py-4 bg-ucak-blue text-white font-black rounded-2xl flex items-center justify-center gap-2 hover:bg-ucak-green transition-all"
