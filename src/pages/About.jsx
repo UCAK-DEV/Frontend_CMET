@@ -6,6 +6,9 @@ import {
   Landmark, Briefcase, CheckCircle2, GraduationCap, Scale, FileText,
   Cpu
 } from 'lucide-react';
+// IMPORT DES IMAGES
+import bannerImg from '../assets/images/banner.svg';
+import presidentImg from '../assets/images/president.jpeg';
 // IMPORT DU GÉNÉRATEUR
 import { generateITBrochure, generateHECBrochure } from '../utils/pdfGenerator';
 
@@ -187,7 +190,7 @@ export default function About() {
     <div ref={containerRef} className="min-h-screen bg-white dark:bg-ucak-dark overflow-hidden pt-20">
       <section className="relative h-[85vh] flex items-center justify-center overflow-hidden bg-ucak-blue">
         <motion.div style={{ y }} className="absolute inset-0">
-           <img src="../src/assets/images/banner.svg" alt="Campus" className="w-full h-full object-cover opacity-30 mix-blend-overlay" />
+           <img src={bannerImg} alt="Campus" className="w-full h-full object-cover opacity-30 mix-blend-overlay" />
            <div className="absolute inset-0 bg-gradient-to-b from-ucak-blue/20 via-ucak-blue to-white dark:to-ucak-dark"></div>
         </motion.div>
         <motion.div style={{ opacity }} className="relative z-10 text-center px-6 max-w-5xl">
@@ -211,7 +214,7 @@ export default function About() {
         <div className="container mx-auto max-w-6xl">
            <div className="flex flex-col md:flex-row items-center gap-16">
               <div className="w-full md:w-2/5">
-                 <div className="relative rounded-[3rem] overflow-hidden shadow-2xl aspect-[4/5] group"><img src="../src/assets/images/president.jpeg" alt="Président" className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" /><div className="absolute inset-0 bg-gradient-to-t from-ucak-blue/90 via-transparent to-transparent"></div><div className="absolute bottom-10 left-10 text-white"><h3 className="text-4xl font-black mb-1">Mame Bara Samb</h3><p className="opacity-90 text-sm font-bold tracking-widest uppercase text-ucak-gold">Président du Club MET</p></div></div>
+                 <div className="relative rounded-[3rem] overflow-hidden shadow-2xl aspect-[4/5] group"><img src={presidentImg} alt="Président" className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" /><div className="absolute inset-0 bg-gradient-to-t from-ucak-blue/90 via-transparent to-transparent"></div><div className="absolute bottom-10 left-10 text-white"><h3 className="text-4xl font-black mb-1">Mame Bara Samb</h3><p className="opacity-90 text-sm font-bold tracking-widest uppercase text-ucak-gold">Président du Club MET</p></div></div>
               </div>
               <div className="w-full md:w-3/5">
                  <Quote size={60} className="text-ucak-gold/20 mb-8" />

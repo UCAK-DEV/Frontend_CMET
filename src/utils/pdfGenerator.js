@@ -119,11 +119,68 @@ export const generateSyllabusPDF = (programTitle, description, curriculumData) =
       doc.text(`Page ${i} / ${pageCount}`, 196, 290, { align: 'right' });
     }
 
-    // 5. SAUVEGARDE
-    doc.save(`Syllabus_${programTitle.replace(/\s+/g, '_')}.pdf`);
+        // 5. SAUVEGARDE
 
-  } catch (error) {
-    console.error("Erreur génération PDF:", error);
-    alert("Impossible de générer le PDF. Veuillez vérifier la console.");
-  }
-};
+        doc.save(`Syllabus_${programTitle.replace(/\s+/g, '_')}.pdf`);
+
+    
+
+      } catch (error) {
+
+        console.error("Erreur génération PDF:", error);
+
+        alert("Impossible de générer le PDF. Veuillez vérifier la console.");
+
+      }
+
+    };
+
+    
+
+    /**
+
+     * GÉNÉRATEUR SPÉCIFIQUE INFORMATIQUE
+
+     */
+
+    export const generateITBrochure = () => {
+
+      const data = [
+
+        { year: "Licence 1", semesters: [{ id: "S1", title: "Fondamentaux", courses: ["Algorithmique & C", "Archi Ordinateurs", "Maths Analyse"] }, { id: "S2", title: "Web & Physique", courses: ["HTML/CSS", "Systèmes Exploitation", "Électronique"] }] },
+
+        { year: "Licence 2", semesters: [{ id: "S3", title: "Infrastructures", courses: ["Réseaux TCP/IP", "Bases de Données", "Java POO"] }, { id: "S4", title: "Systèmes Avancés", courses: ["Admin Linux", "Théorie Signal", "Web Dynamique"] }] },
+
+        { year: "Licence 3", semesters: [{ id: "S5", title: "Spécialisation", courses: ["Génie Logiciel", "Cloud Computing", "Sécurité"] }, { id: "S6", title: "Stage & PFE", courses: ["Projet Intégrateur", "Mémoire", "Soutenance"] }] }
+
+      ];
+
+      generateSyllabusPDF("Licence Informatique & Télécoms", "Brochure Officielle - UFR MET", data);
+
+    };
+
+    
+
+    /**
+
+     * GÉNÉRATEUR SPÉCIFIQUE HEC
+
+     */
+
+    export const generateHECBrochure = () => {
+
+      const data = [
+
+        { year: "Licence 1", semesters: [{ id: "S1", title: "Fondamentaux", courses: ["Droit Entreprise", "Maths Stats", "Comptabilité I"] }, { id: "S2", title: "Management", courses: ["Stratégie & GRH", "Marketing", "Comptabilité II"] }] },
+
+        { year: "Licence 2", semesters: [{ id: "S3", title: "Comptabilité", courses: ["Compta Analytique", "Fiscalité I", "Éco Sénégal"] }, { id: "S4", title: "Finance", courses: ["Analyse Financière", "Logiciel SAARI", "Droit Affaires"] }] },
+
+        { year: "Licence 3", semesters: [{ id: "S5", title: "Spécialisation", courses: ["Audit", "Contrôle Gestion", "Compta Sociétés"] }, { id: "S6", title: "Stage & PFE", courses: ["Business Plan", "Mémoire", "Soutenance"] }] }
+
+      ];
+
+      generateSyllabusPDF("Licence HEC", "Brochure Officielle - UFR MET", data);
+
+    };
+
+    

@@ -41,7 +41,7 @@ const AdminCourses = lazy(() => import('./pages/admin/AdminCourses'));
 const AdminStudents = lazy(() => import('./pages/admin/AdminStudents'));
 const AdminElections = lazy(() => import('./pages/admin/AdminElections'));
 const AdminNews = lazy(() => import('./pages/admin/AdminNews'));
-import AdminQuizzes from './pages/admin/AdminQuizzes';
+const AdminQuizzes = lazy(() => import('./pages/admin/AdminQuizzes'));
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -72,7 +72,7 @@ function AnimatedRoutes() {
               <Route path="/knowledge" element={<ProtectedRoute><PageWrapper><Knowledge /></PageWrapper></ProtectedRoute>} />
               <Route path="/course/:id" element={<ProtectedRoute><CoursePlayer /></ProtectedRoute>} />
               <Route path="/career" element={<ProtectedRoute><PageWrapper><CareerCenter /></PageWrapper></ProtectedRoute>} />
-              <Route path="/cv-builder" element={<ProtectedRoute><PageWrapper><CVGenerator /></PageWrapper></ProtectedRoute>} />
+              <Route path="/cv-generator" element={<ProtectedRoute><PageWrapper><CVGenerator /></PageWrapper></ProtectedRoute>} />
               <Route path="/quizz" element={<ProtectedRoute><PageWrapper><Challenges /></PageWrapper></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
               <Route path="/academy-guide" element={<AcademyGuide />} />
@@ -80,6 +80,7 @@ function AnimatedRoutes() {
               <Route path="/elections" element={<ProtectedRoute><PageWrapper><Elections /></PageWrapper></ProtectedRoute>} />
 
               {/* === ADMIN === */}
+              <Route path="/admin" element={<Navigate to="/admin/courses" replace />} />
               <Route path="/admin/courses" element={<AdminRoute><PageWrapper><AdminCourses /></PageWrapper></AdminRoute>} />
               <Route path="/admin/students" element={<AdminRoute><PageWrapper><AdminStudents /></PageWrapper></AdminRoute>} />
               <Route path="/admin/elections" element={<AdminRoute><PageWrapper><AdminElections /></PageWrapper></AdminRoute>} />

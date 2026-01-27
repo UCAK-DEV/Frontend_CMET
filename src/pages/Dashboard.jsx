@@ -112,7 +112,7 @@ export default function Dashboard() {
                 /* --- VUE ÉTUDIANT --- */
                 <>
                   <ActionCard title="Mes Projets DAR" desc="Éditer mes publications Showroom" link="/showroom" icon={<Rocket />} />
-                  <ActionCard title="Générateur de CV" desc="Générer mon profil pro UCAK" link="/cv-builder" icon={<FileText />} />
+                  <ActionCard title="Générateur de CV" desc="Générer mon profil pro UCAK" link="/cv-generator" icon={<FileText />} />
                   <ActionCard title="Bibliothèques L1/L3" desc="Consulter mes supports de cours" link="/knowledge" icon={<BookOpen />} />
                   <ActionCard title="Guide du Hub" desc="Consulter le manuel d'utilisation" link="/academy-guide" icon={<Zap />} />
                 </>
