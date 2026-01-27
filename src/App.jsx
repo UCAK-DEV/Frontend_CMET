@@ -32,7 +32,7 @@ const Knowledge = lazy(() => import('./pages/Knowledge'));
 const CoursePlayer = lazy(() => import('./pages/CoursePlayer'));
 const CareerCenter = lazy(() => import('./pages/CareerCenter'));
 const CVGenerator = lazy(() => import('./pages/CVGenerator'));
-const Challenges = lazy(() => import('./pages/Challenges'));
+const Quizzes = lazy(() => import('./pages/Quizzes'));
 const Networking = lazy(() => import('./pages/Networking'));
 const Elections = lazy(() => import('./pages/Elections'));
 
@@ -73,7 +73,7 @@ function AnimatedRoutes() {
               <Route path="/course/:id" element={<ProtectedRoute><CoursePlayer /></ProtectedRoute>} />
               <Route path="/career" element={<ProtectedRoute><PageWrapper><CareerCenter /></PageWrapper></ProtectedRoute>} />
               <Route path="/cv-generator" element={<ProtectedRoute><PageWrapper><CVGenerator /></PageWrapper></ProtectedRoute>} />
-              <Route path="/quizz" element={<ProtectedRoute><PageWrapper><Challenges /></PageWrapper></ProtectedRoute>} />
+              <Route path="/quizz" element={<ProtectedRoute><PageWrapper><Quizzes /></PageWrapper></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
               <Route path="/academy-guide" element={<AcademyGuide />} />
               <Route path="/network" element={<ProtectedRoute><PageWrapper><Networking /></PageWrapper></ProtectedRoute>} />

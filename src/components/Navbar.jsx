@@ -97,6 +97,7 @@ export default function Navbar() {
       items: [
         { title: 'Générateur CV', desc: 'Architecte Pro', path: '/cv-generator', icon: FileText },
         { title: 'Carrière', desc: 'Stages & Emplois', path: '/career', icon: Rocket },
+        { title: 'Réseau Alumni', desc: 'Mentorat & Annuaire', path: '/network', icon: Users },
         { title: 'Élections', desc: 'Espace de vote', path: '/elections', icon: Vote }
       ]
     }
