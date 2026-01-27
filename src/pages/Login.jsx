@@ -158,7 +158,7 @@ export default function Login() {
                 onClick={handleGoogleLogin}
                 className="w-full py-4 bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-xl flex items-center justify-center gap-3 hover:bg-gray-50 transition-all active:scale-95"
               >
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/actionbar/google.svg" className="w-5 h-5" alt="G" />
+                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" className="w-5 h-5" alt="Google" />
                 <span className="text-sm font-bold dark:text-white">Continuer avec Google</span>
               </button>
             </form>
