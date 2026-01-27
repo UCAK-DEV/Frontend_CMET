@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { api } from '../context/UserContext';
-import { ArrowLeft, Github, Globe, Calendar, User, Loader2, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Github, Globe, Calendar, User, Loader2, AlertCircle, Sparkles, Share2, Layers } from 'lucide-react';
 
 export default function ProjectDetails() {
   const { id } = useParams();
@@ -24,102 +24,141 @@ export default function ProjectDetails() {
     fetchProject();
   }, [id]);
 
+  // Helper pour l'avatar GitHub
+  const getGithubAvatar = (url) => {
+    if (!url || !url.includes('github.com')) return null;
+    const username = url.split('github.com/')[1]?.split('/')[0];
+    return username ? `https://github.com/${username}.png` : null;
+  };
+
   if (loading) return (
-    <div className="min-h-screen pt-28 flex flex-col items-center justify-center text-ucak-blue">
-      <Loader2 size={40} className="animate-spin mb-4" />
-      <p className="text-xs font-black uppercase tracking-widest">Chargement des données...</p>
+    <div className="min-h-screen pt-28 flex flex-col items-center justify-center bg-gray-50 dark:bg-[#020408]">
+      <Loader2 size={40} className="animate-spin text-ucak-blue mb-4" />
+      <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Chargement de l'étude de cas...</p>
     </div>
   );
 
   if (error || !project) return (
-    <div className="min-h-screen pt-28 flex flex-col items-center justify-center text-gray-400">
+    <div className="min-h-screen pt-28 flex flex-col items-center justify-center text-gray-400 bg-gray-50 dark:bg-[#020408]">
       <AlertCircle size={40} className="mb-4" />
       <p className="text-sm font-bold">{error || "Projet introuvable"}</p>
-      <Link to="/showroom" className="mt-6 text-ucak-blue hover:underline">Retour au showroom</Link>
+      <Link to="/showroom" className="mt-6 text-ucak-blue hover:underline text-xs font-black uppercase tracking-widest">Retour au showroom</Link>
     </div>
   );
 
-  return (
-    <div className="pt-28 pb-20 min-h-screen bg-gray-50 dark:bg-[#020408]">
-      <div className="container mx-auto px-6 max-w-4xl">
-        
-        <Link to="/showroom" className="inline-flex items-center gap-2 text-gray-500 hover:text-ucak-blue mb-8 transition-colors group text-sm font-bold">
-          <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" /> Retour au Showroom
-        </Link>
+  const avatarUrl = getGithubAvatar(project.github_url || project.link_url);
+  const isTech = project.category === 'IT' || !project.category; // Par défaut IT
 
-        <div className="bg-white dark:bg-[#0b101a] rounded-[2.5rem] overflow-hidden shadow-2xl border border-gray-100 dark:border-white/5">
-          {/* Image de couverture (Placeholder dynamique ou dégradé) */}
-          <div className="h-64 bg-gradient-to-r from-ucak-blue to-ucak-green flex items-center justify-center relative overflow-hidden">
-             <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
-             <h1 className="text-4xl md:text-6xl font-black text-white opacity-20 uppercase tracking-tighter">Projet #{project.id.toString().slice(-4)}</h1>
+  return (
+    <div className="min-h-screen bg-white dark:bg-[#020408] font-sans selection:bg-ucak-blue selection:text-white pb-20">
+      
+      {/* --- HERO HEADER --- */}
+      <div className="relative pt-32 pb-20 px-6 bg-gray-50 dark:bg-[#0b101a] border-b border-gray-100 dark:border-white/5">
+        <div className="absolute inset-0 ucak-grid-pattern opacity-[0.05] pointer-events-none"></div>
+        <div className="container mx-auto max-w-5xl relative z-10">
+          <Link to="/showroom" className="inline-flex items-center gap-2 text-gray-400 hover:text-ucak-blue mb-8 transition-colors group text-[10px] font-black uppercase tracking-widest">
+            <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" /> Retour au Showroom
+          </Link>
+          
+          <div className="flex flex-col md:flex-row items-start justify-between gap-8">
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-6">
+                <span className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-[0.2em] border ${isTech ? 'bg-blue-50 text-blue-600 border-blue-100 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20' : 'bg-purple-50 text-purple-600 border-purple-100'}`}>
+                  {project.category || 'Tech & Dev'}
+                </span>
+                <span className="text-[10px] font-bold text-gray-400 flex items-center gap-1">
+                  <Calendar size={12} /> {new Date(project.created_at || Date.now()).toLocaleDateString()}
+                </span>
+              </div>
+              <h1 className="text-4xl md:text-6xl font-black text-gray-900 dark:text-white tracking-tighter leading-[1.1] mb-6">
+                {project.name}
+              </h1>
+              <p className="text-lg text-gray-500 dark:text-gray-400 max-w-2xl leading-relaxed">
+                Une solution innovante conçue par les talents de l'UFR MET.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-3 w-full md:w-auto">
+              {(project.github_url || (project.link_url && isTech)) && (
+                <a href={project.github_url || project.link_url} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-3 px-8 py-4 bg-gray-900 dark:bg-white text-white dark:text-black rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-transform shadow-xl">
+                  <Github size={18} /> Voir le Code
+                </a>
+              )}
+              {project.link_url && !isTech && (
+                <a href={project.link_url} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-3 px-8 py-4 bg-ucak-blue text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-ucak-green transition-all shadow-xl">
+                  <Globe size={18} /> Consulter le Projet
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* --- CONTENT GRID --- */}
+      <div className="container mx-auto max-w-5xl px-6 -mt-10 relative z-20">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          
+          {/* Main Content (Story) */}
+          <div className="lg:col-span-2">
+            <div className="bg-white dark:bg-[#0e121e] rounded-[2.5rem] p-8 md:p-12 shadow-xl border border-gray-100 dark:border-white/5">
+              <h3 className="text-sm font-black text-ucak-blue uppercase tracking-widest mb-8 flex items-center gap-2">
+                <Sparkles size={16} /> À propos du projet
+              </h3>
+              <div className="prose dark:prose-invert prose-lg max-w-none text-gray-600 dark:text-gray-300 leading-relaxed">
+                <p className="whitespace-pre-line">
+                  {project.description || "L'auteur n'a pas encore fourni de description détaillée pour ce projet. Cependant, l'excellence technique et la créativité sont au cœur de toutes les initiatives du Club MET."}
+                </p>
+              </div>
+            </div>
           </div>
 
-          <div className="p-8 md:p-12">
-            <div className="flex flex-col md:flex-row justify-between items-start gap-6 mb-8">
-              <div>
-                <h1 className="text-3xl md:text-4xl font-black mb-3 dark:text-white">{project.name}</h1>
-                <div className="flex gap-2">
-                  <span className="bg-ucak-blue/10 text-ucak-blue px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest">Innovation</span>
-                  <span className="bg-ucak-gold/10 text-ucak-gold px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest">Showroom</span>
+          {/* Sidebar (Metadata) */}
+          <div className="space-y-6">
+            
+            {/* Author Card */}
+            <div className="bg-white dark:bg-[#0e121e] rounded-[2rem] p-6 shadow-lg border border-gray-100 dark:border-white/5">
+              <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-6">Créateur</h4>
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl overflow-hidden bg-gray-100 dark:bg-white/5 flex items-center justify-center text-ucak-blue shadow-inner border border-gray-200 dark:border-white/10">
+                  {avatarUrl ? (
+                    <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                  ) : (
+                    <User size={24} />
+                  )}
                 </div>
-              </div>
-              <div className="flex gap-3">
-                {project.github_url && (
-                  <a href={project.github_url} target="_blank" rel="noreferrer" className="flex items-center gap-2 bg-gray-900 dark:bg-white dark:text-black text-white px-5 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:scale-105 transition-all shadow-lg">
-                    <Github size={16} /> Code
-                  </a>
-                )}
-                {/* Bouton Demo si disponible (à ajouter au modèle de données plus tard) */}
-                <button disabled className="flex items-center gap-2 bg-gray-100 dark:bg-white/10 text-gray-400 px-5 py-3 rounded-xl font-bold text-xs uppercase tracking-widest cursor-not-allowed">
-                  <Globe size={16} /> Demo
-                </button>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
-              <div className="col-span-2 space-y-6 text-gray-600 dark:text-gray-300 leading-relaxed text-lg">
-                <h3 className="text-sm font-black text-ucak-blue uppercase tracking-widest mb-2">Description du projet</h3>
-                <p className="whitespace-pre-line">{project.description || "Aucune description détaillée fournie pour ce projet."}</p>
-              </div>
-
-              <div className="bg-gray-50 dark:bg-white/5 p-8 rounded-[2rem] space-y-6 h-fit border border-gray-100 dark:border-white/5">
-                <h4 className="font-black text-gray-900 dark:text-white uppercase tracking-widest text-xs">Fiche Technique</h4>
-                
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-white dark:bg-white/10 flex items-center justify-center text-ucak-blue shadow-sm">
-                     <User size={18} /> 
-                  </div>
-                  <div>
-                    <p className="text-[9px] text-gray-400 font-black uppercase">Auteur</p>
-                    <p className="text-sm font-bold dark:text-white">{project.user?.full_name || "Anonyme"}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-white dark:bg-white/10 flex items-center justify-center text-ucak-gold shadow-sm">
-                     <Calendar size={18} /> 
-                  </div>
-                  <div>
-                    <p className="text-[9px] text-gray-400 font-black uppercase">Date de publication</p>
-                    <p className="text-sm font-bold dark:text-white">{new Date(project.created_at || Date.now()).toLocaleDateString()}</p>
-                  </div>
-                </div>
-
-                <hr className="border-gray-200 dark:border-white/10"/>
-                
                 <div>
-                  <h5 className="font-black text-[9px] uppercase text-gray-400 mb-3">Technologies (Estimées)</h5>
-                  <div className="flex flex-wrap gap-2">
-                    {/* Tags factices pour l'instant, à dynamiser si le backend le supporte */}
-                    {['React', 'Node.js', 'PostgreSQL'].map(tech => (
-                      <span key={tech} className="text-[9px] font-bold border border-gray-200 dark:border-white/20 px-2 py-1 rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-transparent">
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
+                  <p className="font-bold text-gray-900 dark:text-white text-lg leading-tight">{project.user?.full_name || "Membre MET"}</p>
+                  <p className="text-xs text-gray-500 font-medium">{project.user?.filiere || "Étudiant"}</p>
                 </div>
               </div>
             </div>
+
+            {/* Tech Stack Card */}
+            <div className="bg-white dark:bg-[#0e121e] rounded-[2rem] p-6 shadow-lg border border-gray-100 dark:border-white/5">
+              <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-6 flex items-center gap-2">
+                <Layers size={14} /> Stack Technique
+              </h4>
+              <div className="flex flex-wrap gap-2">
+                {/* Simulation de tags basés sur la catégorie, à rendre dynamique plus tard */}
+                {isTech ? (
+                  ['React', 'Node.js', 'GitHub'].map(tag => (
+                    <span key={tag} className="px-3 py-1.5 bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-lg text-[10px] font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wide">
+                      {tag}
+                    </span>
+                  ))
+                ) : (
+                  ['Business Plan', 'Finance', 'Strategy'].map(tag => (
+                    <span key={tag} className="px-3 py-1.5 bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-lg text-[10px] font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wide">
+                      {tag}
+                    </span>
+                  ))
+                )}
+              </div>
+            </div>
+
+            <button className="w-full py-4 rounded-2xl border border-dashed border-gray-300 dark:border-white/20 text-gray-400 font-bold text-xs uppercase tracking-widest hover:border-ucak-blue hover:text-ucak-blue transition-colors flex items-center justify-center gap-2">
+              <Share2 size={16} /> Partager la fiche
+            </button>
 
           </div>
         </div>
