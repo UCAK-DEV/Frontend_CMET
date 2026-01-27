@@ -22,6 +22,7 @@ const Showroom = lazy(() => import('./pages/Showroom'));
 const ProjectDetails = lazy(() => import('./pages/ProjectDetails'));
 const VerifyStudent = lazy(() => import('./pages/VerifyStudent'));
 const NotFound = lazy(() => import('./pages/NotFound'));
+const PendingApproval = lazy(() => import('./pages/PendingApproval'));
 
 const AcademyGuide = lazy(() => import('./pages/AcademyGuide'));
 const Profile = lazy(() => import('./pages/Profile'));
@@ -66,6 +67,7 @@ function AnimatedRoutes() {
               <Route path="/showroom" element={<PageWrapper><Showroom /></PageWrapper>} />
               <Route path="/project/:id" element={<PageWrapper><ProjectDetails /></PageWrapper>} />
               <Route path="/verify/student/:token" element={<PageWrapper><VerifyStudent /></PageWrapper>} />
+              <Route path="/pending" element={<PageWrapper><PendingApproval /></PageWrapper>} />
 
               {/* === ÉTUDIANT (Protégé) === */}
               <Route path="/dashboard" element={<ProtectedRoute><PageWrapper><Dashboard /></PageWrapper></ProtectedRoute>} />

@@ -1,15 +1,23 @@
 import { Navigate } from 'react-router-dom';
+import { useUser } from '../context/UserContext';
+import Loading from './Loading';
 
 export default function ProtectedRoute({ children }) {
-  // SIMULATION : On considère que l'utilisateur est connecté.
-  // Plus tard, vous remplacerez 'true' par votre logique d'auth réelle (ex: localStorage.getItem('token'))
-  const isAuthenticated = true; 
+  const { user, loading } = useUser();
 
-  if (!isAuthenticated) {
-    // Si pas connecté, redirection immédiate vers le Login
+  if (loading) return <Loading />;
+
+  // 1. Non connecté -> Login
+  if (!user) {
     return <Navigate to="/login" replace />;
   }
 
-  // Si connecté, on laisse passer
+  // 2. Connecté mais NON VÉRIFIÉ -> Salle d'attente
+  // On laisse passer les admins pour qu'ils ne se bloquent pas eux-mêmes
+  if (!user.is_ufr_verified && user.role !== 'ADMIN') {
+    return <Navigate to="/pending" replace />;
+  }
+
+  // 3. Connecté et Vérifié (ou Admin) -> Accès autorisé
   return children;
 }
