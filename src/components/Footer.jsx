@@ -135,8 +135,8 @@ export default function Footer() {
         <div className="border-t border-gray-100 dark:border-white/5 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-bold text-gray-400 uppercase tracking-wider">
           <p>© {new Date().getFullYear()} Club MET UCAK. Tous droits réservés.</p>
           <div className="flex items-center gap-6">
-            <Link to="/about" className="hover:text-ucak-blue transition-colors">À Propos</Link>
-            <Link to="#" className="hover:text-ucak-blue transition-colors">Confidentialité</Link>
+            <Link to="/" className="hover:text-ucak-blue transition-colors">À Propos</Link>
+            <Link to="/privacy" className="hover:text-ucak-blue transition-colors">Confidentialité</Link>
             <span className="flex items-center gap-1 normal-case text-gray-300">
               Made with <span className="text-red-500 text-sm">♥</span> by DevUcak
             </span>
