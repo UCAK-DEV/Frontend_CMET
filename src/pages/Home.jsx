@@ -161,8 +161,26 @@ export default function Home() {
               {loadingNews ? [1,2,3].map(i => <div key={i} className="h-80 bg-gray-100 dark:bg-white/5 rounded-[2.5rem] animate-pulse" />) :
                 latestNews.map((news) => (
                   <Link to="/news" key={news.id} className="group bg-white dark:bg-white/5 rounded-[2.5rem] overflow-hidden border border-gray-100 dark:border-white/5 hover:border-ucak-gold/30 transition-all duration-500">
-                    <div className="h-48 overflow-hidden bg-gray-100 dark:bg-white/10">
-                      <img src={news.image_url || news.imageUrl || 'https://via.placeholder.com/400x300'} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="" />
+                    <div className="h-48 overflow-hidden bg-gray-100 dark:bg-white/10 relative">
+                      {news.imageUrl || news.image_url ? (
+                        <img 
+                          src={news.imageUrl || news.image_url} 
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                          alt="" 
+                          onError={(e) => { e.target.onerror = null; e.target.src = "https://ucak.sn/wp-content/uploads/2023/10/logo-ucak.png"; }} // Fallback ultime
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-ucak-blue/5">
+                          <Newspaper size={40} className="text-ucak-blue/20" />
+                        </div>
+                      )}
+                      
+                      {/* Badge Source */}
+                      {news.isExternal && (
+                        <div className="absolute top-4 right-4 bg-white/90 backdrop-blur text-ucak-blue px-3 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest shadow-sm">
+                          UCAK.sn
+                        </div>
+                      )}
                     </div>
                     <div className="p-8">
                       <div className="flex items-center gap-3 text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">
