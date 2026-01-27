@@ -4,7 +4,7 @@ import {
   Home, GraduationCap, Newspaper, LayoutDashboard, 
   BookOpen, Briefcase, FileText, Trophy, MonitorPlay,
   Menu, X, ChevronDown, User, LogOut, Rocket,
-  Sun, Moon, ShieldCheck, Users, Vote, Settings, Sparkles
+  Sun, Moon, ShieldCheck, Users, Vote, Settings, Sparkles, Globe
 } from 'lucide-react';
 import { useUser } from '../context/UserContext';
 import logoUcak from '../assets/logo-ucak.png';
