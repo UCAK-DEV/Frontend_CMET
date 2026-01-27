@@ -1,148 +1,204 @@
-# 📘 Spécifications Techniques Backend (API)
-**Projet :** Club MET - UCAK (Plateforme Numérique)
-**Version Frontend :** 2.0 (React/Vite)
+📘 Documentation Technique & API (Spécifications Backend)
+Projet : Plateforme Numérique Club MET - UCAK
 
-Ce document décrit l'architecture, la base de données et les endpoints API nécessaires pour faire fonctionner le frontend.
+Version Frontend : 1.0 (React/Vite)
 
----
+Client : Club Métiers & Technologies (Université Cheikh Ahmadoul Khadim)
 
-## 1. Stack Technique Recommandée
+1. Architecture & Stack Suggérée
+Le Frontend est une SPA (Single Page Application). Le Backend doit servir une API RESTful qui retourne des données au format JSON.
 
-* **Langage :** Node.js (Express) ou Python (Django/FastAPI).
-* **Base de Données :** PostgreSQL (Relationnel) est fortement recommandé pour gérer les relations complexes (Étudiants <-> Cours <-> Votes).
-* **Authentification :** JWT (JSON Web Tokens). Le token doit être renvoyé au login et stocké par le frontend.
-* **Stockage Fichiers :** AWS S3, Cloudinary ou stockage local (pour les photos de profil, les PDF de cours).
+Base URL : /api/v1
 
----
+Auth : JWT (JSON Web Tokens) via Authorization: Bearer <token>
 
-## 2. Base de Données (Schéma Logique)
+Base de données suggérée : PostgreSQL (Relationnel) ou MongoDB (NoSQL). Préférence pour SQL vu la structure académique.
 
-Le backend doit gérer les entités suivantes.
+Stockage Fichiers : AWS S3, Cloudinary ou stockage local (pour les photos de profil, PDF cours).
 
-### 👤 Users (Étudiants & Alumni)
-* `id`: Primary Key
-* `matricule`: String (Unique, ex: "MET-2025-045")
-* `email`: String (Unique)
-* `password_hash`: String
-* `full_name`: String
-* `role`: Enum ('STUDENT', 'ADMIN', 'ALUMNI')
-* `filiere`: String (ex: "Génie Logiciel")
-* `promo`: String (ex: "Licence 3")
-* `status`: Enum ('ACTIVE', 'PENDING', 'ALUMNI') - *Détermine l'accès à l'E-Carte*
-* `xp_points`: Integer (Gamification, defaut: 0)
-* `badges`: JSON Array (ex: `["Major", "Contributeur"]`)
-* `is_verified`: Boolean (Indispensable pour le vote)
+2. Base de Données (Schéma Logique)
+Voici les entités (tables) nécessaires pour faire fonctionner le frontend actuel.
 
-### 🎓 Courses (Cours & Bibliothèques)
-* `id`: Primary Key
-* `title`: String
-* `instructor`: String
-* `filiere_tag`: String (Info/HEC)
-* `level`: String (L1, L2...)
-* `video_url`: String
-* `thumbnail_url`: String (Pour le Lazy Loading)
-* `duration`: String
+👤 Users (Étudiants)
+id (UUID/Int)
 
-### 📈 UserProgress (Suivi des Cours)
-* `user_id`: Foreign Key -> Users
-* `course_id`: Foreign Key -> Courses
-* `progress_percent`: Integer (0-100)
-* `is_completed`: Boolean
+matricule (String, Unique) - Clé de vérification UFR
 
-### 🗳️ Elections (Système de Vote)
-* `id`: Primary Key
-* `year`: Integer (2026)
-* `is_open`: Boolean (Si false, le menu est caché)
-* **Table Candidates :**
-    * `election_id`: FK
-    * `name`, `photo_url`, `manifesto` (Programme), `promo`
-    * `vote_count`: Integer
-* **Table Votes (Sécurité) :**
-    * `user_id`: FK (Unique par élection -> Un étudiant ne vote qu'une fois)
-    * `candidate_id`: FK
-    * `timestamp`: Date
+email (String, Unique)
 
-### 💼 Jobs (Career Center)
-* `id`: Primary Key
-* `title`, `company`, `logo_url`
-* `type`: Enum ('Stage', 'CDD', 'Bénévolat')
-* `location`: String
-* `description`: Text
+password_hash (String)
 
----
+full_name (String)
 
-## 3. Endpoints API (Routes)
+role (Enum: 'STUDENT', 'ADMIN', 'ALUMNI')
 
-Le frontend attend ces routes précises. Toutes les réponses doivent être en JSON.
+filiere (Enum: 'Informatique', 'HEC', etc.)
 
-### 🔐 Authentification (Auth)
+promo (String ex: "Licence 3")
 
-* `POST /api/auth/login`
-    * **Body:** `{ email, password }`
-    * **Réponse:** `{ token, user: { id, name, role, matricule, ... } }`
-    * *Note : Renvoyer toutes les infos pour remplir le Dashboard et l'E-Carte immédiatement.*
+xp_points (Int, default 0)
 
-* `POST /api/auth/register`
-    * **Body:** `{ email, password, matricule, fullName ... }`
-    * **Logique :** Vérifier si le matricule existe dans la base de l'école (si possible) ou mettre le compte en `status: PENDING`.
+badges (JSON/Array)
 
-### 👤 Espace Membre (Dashboard)
+is_ufr_verified (Boolean) - Crucial pour le vote
 
-* `GET /api/user/profile` (Protected)
-    * Renvoie les stats (XP, Badges) et l'état de la cotisation (pour afficher "Membre Actif").
+🎓 Courses (Cours Vidéo)
+id
 
-* `POST /api/user/update-cv` (Protected)
-    * Permet de sauvegarder les infos du Career Center (Compétences, Expériences) pour ne pas les perdre.
+title
 
-### 📚 Cours (Knowledge)
+description
 
-* `GET /api/courses`
-    * **Query Params :** `?filiere=Informatique&level=L3`
-    * Permet le filtrage dynamique.
+instructor_name
 
-* `POST /api/courses/:id/progress` (Protected)
-    * **Body:** `{ progress: 50 }`
-    * Met à jour la barre de progression. Si 100%, ajouter des XP à l'étudiant (+100 XP).
+level (L1, L2...)
 
-### 🗳️ Élections (Zone Critique)
+filiere_tag
 
-* `GET /api/elections/current`
-    * Renvoie la liste des candidats et le statut de l'élection.
-    * **Important :** Renvoyer un champ `user_has_voted: boolean` pour savoir si l'utilisateur connecté a déjà voté (pour bloquer le bouton).
+thumbnail_url
 
-* `POST /api/elections/vote` (Protected)
-    * **Body:** `{ candidate_id }`
-    * **Règles de sécurité :**
-        1. Vérifier le token JWT.
-        2. Vérifier si `user.is_verified` est TRUE.
-        3. Vérifier dans la table `Votes` si l'ID utilisateur a déjà voté pour cette élection.
-        4. Si tout est OK : Incrémenter le compteur candidat + Enregistrer le vote + Renvoyer succès.
+modules (JSON : structure des chapitres et liens vidéos)
 
-### 🌐 Réseau & News
+📂 Documents (Bibliothèque)
+id
 
-* `GET /api/alumni`
-    * Liste des anciens avec pagination (pour ne pas charger 1200 profils d'un coup).
-* `GET /api/news`
-    * Articles et événements triés par date.
+title
 
----
+type (PDF, EPUB)
 
-## 4. Règles de Sécurité & Performance
+file_url
 
-1.  **Images Optimisées :**
-    * Le backend doit renvoyer des URLs d'images légères (compressées) pour les miniatures (News, Showroom, Cours) afin que le *Lazy Loading* du frontend soit efficace.
+category (Filière)
 
-2.  **Protection des Routes :**
-    * Toutes les routes `/api/user/*`, `/api/elections/vote` et `/api/courses/progress` doivent exiger un **Header Authorization** valide (`Bearer <token>`).
+download_count (Int)
 
-3.  **Gestion des Erreurs :**
-    * Renvoyer les bons codes HTTP :
-        * `200 OK` : Succès.
-        * `401 Unauthorized` : Token invalide ou expiré (Le frontend redirigera vers Login).
-        * `403 Forbidden` : Accès refusé (Ex: un non-membre essaie de voter).
-        * `404 Not Found` : Ressource introuvable.
+🗳️ Elections (Votes)
+id
 
----
+year (2026)
 
-**Note pour le Dev :**
-Le frontend gère déjà les états de chargement (`<Loading />`) et les pages 404. Concentrez-vous sur la rapidité des réponses JSON et la sécurité des données.
+status ('OPEN', 'CLOSED')
+
+candidates (Relation OneToMany vers table Candidates)
+
+Table Votes (Pour éviter la fraude) :
+
+election_id
+
+user_id (UniqueConstraint : Un user ne vote qu'une fois par élection)
+
+candidate_id
+
+timestamp
+
+💼 Jobs (Offres)
+id
+
+title, company, location, type (Stage/CDD), description, link
+
+3. Endpoints API (Routes)
+Le frontend va appeler ces routes. Le backend doit respecter ces formats de réponse.
+
+🔐 Authentification & Profil
+POST /auth/login
+Body : { "email": "...", "password": "..." }
+
+Réponse (200) :
+
+JSON
+
+{
+  "token": "jwt_token_xyz",
+  "user": {
+    "id": 1,
+    "name": "Moussa Diop",
+    "avatar": "url...",
+    "role": "STUDENT"
+  }
+}
+GET /user/profile (Protected)
+Réponse : Données complètes pour le Dashboard (XP, Badges, Matricule, Status UFR).
+
+📚 Module Savoir (Knowledge)
+GET /courses
+Query Params : ?filiere=Info&level=L3
+
+Réponse : Liste des cours.
+
+JSON
+
+[
+  {
+    "id": 1,
+    "title": "React Avancé",
+    "instructor": "Club Tech",
+    "progress": 35, // Calculé selon l'user connecté
+    "image": "url..."
+  }
+]
+GET /courses/:id
+Réponse : Détail complet avec les modules et liens vidéos.
+
+POST /courses/:id/progress
+Permet au frontend de dire "J'ai fini la leçon 2".
+
+Body : { "lessonId": 12, "completed": true }
+
+GET /documents
+Retourne la liste des PDF/EPUB de la bibliothèque.
+
+🗳️ Module Élections (Sécurité Critique)
+GET /elections/current
+Renvoie les infos de l'élection en cours et la liste des candidats.
+
+Renvoie aussi un booléen user_has_voted: true/false pour l'utilisateur connecté.
+
+POST /elections/vote (Protected)
+Règle Backend : Vérifier si user.is_ufr_verified === true. Sinon rejeter (403).
+
+Règle Backend : Vérifier si l'user a déjà voté cette année. Sinon rejeter (400).
+
+Body : { "candidate_id": 3 }
+
+Action : Incrémenter le compteur du candidat et marquer l'user comme ayant voté.
+
+🤝 Module Réseau & Showroom
+GET /network/alumni
+Liste des anciens étudiants.
+
+Filtres : ?search=Orange
+
+GET /network/jobs
+Liste des offres de stage.
+
+GET /showroom/projects
+Liste des projets étudiants pour la vitrine.
+
+🏆 Module Challenges (Quizz)
+GET /challenges
+Liste des quizz disponibles.
+
+POST /challenges/:id/submit
+Envoi des réponses ou du score final.
+
+Action Backend : Mettre à jour les xp_points de l'étudiant s'il réussit.
+
+4. Règles Métier Spécifiques
+Vérification UFR :
+
+L'inscription (POST /auth/register) doit idéalement valider le matricule étudiant contre une liste blanche fournie par l'administration, OU mettre le compte en "En attente de validation" si automatique.
+
+Seuls les comptes vérifiés ont accès à la page /elections et au vote.
+
+Gamification (XP) :
+
+Finir un cours = +100 XP.
+
+Réussir un quizz = +50 XP.
+
+Le backend doit recalculer le rank (classement) des étudiants chaque nuit ou à chaque action.
+
+Upload de Fichiers :
+
+Pour le Career Center, l'étudiant peut vouloir uploader son propre CV PDF. Prévoir une route POST /user/upload-cv.
+

@@ -21,10 +21,11 @@ export default function Elections() {
 
   const fetchElections = async () => {
     try {
-      const res = await api.get('/api/v1/elections');
-      // On garde uniquement les élections non brouillons
-      const publicElections = res.data.filter(e => e.status !== 'draft');
-      setElections(publicElections);
+      // Endpoint conforme aux specs: /api/v1/elections/current
+      // Le backend peut renvoyer un objet unique ou une liste. On gère les deux cas.
+      const res = await api.get('/api/v1/elections/current');
+      const data = Array.isArray(res.data) ? res.data : [res.data];
+      setElections(data.filter(e => e && e.status !== 'draft'));
     } catch (e) {
       console.error(e);
     } finally {
@@ -45,7 +46,7 @@ export default function Elections() {
     if (!selectedCandidate || !elections[0]) return;
 
     try {
-      await api.post('/api/v1/votes', {
+      await api.post('/api/v1/elections/vote', {
         electionId: elections[0].id, // On suppose ici qu'il n'y a qu'une élection active à la fois
         candidateId: selectedCandidate.id
       });

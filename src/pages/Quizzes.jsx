@@ -12,7 +12,7 @@ export default function Quizzes() {
   const [result, setResult] = useState(null);
 
   useEffect(() => {
-    api.get('/api/v1/quizzes').then(res => setQuizzes(res.data));
+    api.get('/api/v1/challenges').then(res => setQuizzes(res.data));
   }, []);
 
   const handleAnswer = (index) => {
@@ -30,7 +30,7 @@ export default function Quizzes() {
   };
 
   const submitQuiz = async () => {
-    const res = await api.post(`/api/v1/quizzes/${activeQuiz.id}/submit`, {
+    const res = await api.post(`/api/v1/challenges/${activeQuiz.id}/submit`, {
       answers: selectedAnswers
     });
     setResult(res.data);
