@@ -195,104 +195,202 @@ export default function Navbar() {
         </div>
       </motion.nav>
 
-      {/* 📱 MOBILE : HEADER (LOGO + THEME) */}
-      <div className="lg:hidden fixed top-0 w-full z-40 px-6 py-4 bg-white/90 dark:bg-[#020408]/90 backdrop-blur-md border-b border-gray-100 dark:border-white/5 flex justify-between items-center">
-        <Link to="/" className="flex items-center gap-3">
-          <img src={logoUcak} alt="Logo" className="w-8 h-8" />
-          <span className="font-black text-lg dark:text-white uppercase tracking-tighter">Club MET</span>
-        </Link>
-        <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="p-2.5 rounded-xl bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-ucak-gold">
-          {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-        </button>
-      </div>
+            {/* 📱 MOBILE : HEADER (LOGO + THEME + MENU TRIGGER) */}
 
-      {/* 📱 MOBILE : DOCK BAS (ESSENTIEL) */}
-      <nav className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] z-50 bg-white/95 dark:bg-[#0b0f1a]/95 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-[2.5rem] shadow-2xl p-2 flex justify-around items-center">
-        <Link to="/" className={`p-4 rounded-2xl ${location.pathname === '/' ? 'bg-ucak-blue text-white shadow-lg shadow-ucak-blue/20' : 'text-gray-400'}`}><Home size={22}/></Link>
-        <Link to="/news" className={`p-4 rounded-2xl ${location.pathname === '/news' ? 'bg-ucak-blue text-white shadow-lg' : 'text-gray-400'}`}><Newspaper size={22}/></Link>
-        
-        {/* BOUTON CENTRAL : ESPACE PERSONNEL */}
-        <Link to={user ? "/dashboard" : "/login"} className="relative -top-8 w-16 h-16 rounded-full bg-gradient-to-tr from-ucak-blue to-ucak-green text-white flex items-center justify-center shadow-2xl border-4 border-[#fafafa] dark:border-[#020408]">
-          {user ? <LayoutDashboard size={28} /> : <User size={28} />}
-        </Link>
+            <div className="lg:hidden fixed top-0 w-full z-50 px-6 py-4 bg-white/90 dark:bg-[#020408]/90 backdrop-blur-md border-b border-gray-100 dark:border-white/5 flex justify-between items-center transition-all duration-300">
 
-        <Link to="/showroom" className={`p-4 rounded-2xl ${location.pathname === '/showroom' ? 'bg-ucak-blue text-white shadow-lg' : 'text-gray-400'}`}><MonitorPlay size={22}/></Link>
-        <button onClick={() => setMobileMenuOpen(true)} className={`p-4 rounded-2xl ${mobileMenuOpen ? 'bg-ucak-blue text-white shadow-lg' : 'text-gray-400'}`}><Menu size={22}/></button>
-      </nav>
+              <Link to="/" className="flex items-center gap-3" onClick={() => setMobileMenuOpen(false)}>
 
-      {/* 📱 MOBILE : MENU OVERLAY (OUTILS MEMBRES) */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <>
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setMobileMenuOpen(false)} className="fixed inset-0 bg-black/60 backdrop-blur-md z-[60] lg:hidden" />
-            <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} className="fixed bottom-0 left-0 w-full bg-white dark:bg-[#0b0f1a] rounded-t-[3rem] z-[70] lg:hidden p-8 pb-24 border-t border-white/10">
-              <div className="w-12 h-1.5 bg-gray-200 dark:bg-white/10 rounded-full mx-auto mb-10" />
-              
-              <div className="space-y-8">
-                {/* SECTION FORMATIONS (PUBLIC) */}
-                <div>
-                  <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 mb-4 ml-2">Formations UFR</h4>
-                  <div className="grid grid-cols-2 gap-3">
-                    <Link to="/formation/informatique" className="p-4 bg-gray-50 dark:bg-white/5 rounded-2xl flex flex-col gap-2">
-                       <GraduationCap size={20} className="text-ucak-blue" />
-                       <span className="text-xs font-bold dark:text-white">Informatique</span>
-                    </Link>
-                    <Link to="/formation/hec" className="p-4 bg-gray-50 dark:bg-white/5 rounded-2xl flex flex-col gap-2">
-                       <Briefcase size={20} className="text-ucak-blue" />
-                       <span className="text-xs font-bold dark:text-white">HEC</span>
-                    </Link>
-                  </div>
-                </div>
+                <img src={logoUcak} alt="Logo" className="w-8 h-8" />
 
-                {/* SECTION MEMBRES (PROTEGEE) */}
-                {user && (
-                  <div>
-                    <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 mb-4 ml-2">Mes Outils MET</h4>
-                    <div className="grid grid-cols-2 gap-3">
-                      <Link to="/knowledge" className="p-4 bg-gray-50 dark:bg-white/5 rounded-2xl flex items-center gap-3">
-                        <BookOpen size={18} className="text-ucak-blue" />
-                        <span className="text-xs font-bold dark:text-white">Cours</span>
-                      </Link>
-                      <Link to="/cv-generator" className="p-4 bg-gray-50 dark:bg-white/5 rounded-2xl flex items-center gap-3">
-                        <FileText size={18} className="text-ucak-blue" />
-                        <span className="text-xs font-bold dark:text-white">CV Pro</span>
-                      </Link>
-                      <Link to="/career" className="p-4 bg-gray-50 dark:bg-white/5 rounded-2xl flex items-center gap-3">
-                        <Rocket size={18} className="text-ucak-blue" />
-                        <span className="text-xs font-bold dark:text-white">Stages</span>
-                      </Link>
-                      <Link to="/elections" className="p-4 bg-gray-50 dark:bg-white/5 rounded-2xl flex items-center gap-3">
-                        <Vote size={18} className="text-ucak-blue" />
-                        <span className="text-xs font-bold dark:text-white">Voter</span>
-                      </Link>
-                    </div>
-                  </div>
-                )}
+                <span className="font-black text-lg dark:text-white uppercase tracking-tighter">Club MET</span>
 
-                {/* SECTION ADMIN (PROTEGEE) */}
-                {isAdmin && (
-                  <div>
-                    <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-red-500/50 mb-4 ml-2">Administration</h4>
-                    <Link to="/admin" className="p-5 bg-red-50 dark:bg-red-900/10 rounded-2xl flex items-center justify-between">
-                       <div className="flex items-center gap-4 text-red-600">
-                          <ShieldCheck size={20} />
-                          <span className="text-sm font-black uppercase tracking-widest">Panneau de contrôle</span>
-                       </div>
-                       <ChevronDown size={18} className="-rotate-90 text-red-500" />
-                    </Link>
-                  </div>
-                )}
+              </Link>
 
-                {user ? (
-                   <button onClick={logout} className="w-full py-5 bg-red-50 dark:bg-red-500/5 text-red-500 rounded-3xl font-black uppercase text-[10px] tracking-[0.3em]">Déconnexion</button>
-                ) : (
-                  <Link to="/login" className="w-full py-5 bg-ucak-blue text-white rounded-3xl font-black uppercase text-[10px] tracking-[0.3em] text-center block">Connexion</Link>
-                )}
+              <div className="flex items-center gap-4">
+
+                <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="p-2.5 rounded-xl bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-ucak-gold">
+
+                  {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+
+                </button>
+
+                <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="p-2.5 rounded-xl bg-ucak-blue text-white shadow-lg shadow-ucak-blue/30">
+
+                  {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+
+                </button>
+
               </div>
-            </motion.div>
+
+            </div>
+
+      
+
+            {/* 📱 MOBILE : FULL SCREEN MENU (MODERNE) */}
+
+            <AnimatePresence>
+
+              {mobileMenuOpen && (
+
+                <motion.div 
+
+                  initial={{ opacity: 0, y: -20 }} 
+
+                  animate={{ opacity: 1, y: 0 }} 
+
+                  exit={{ opacity: 0, y: -20 }} 
+
+                  className="fixed inset-0 z-40 bg-white dark:bg-[#020408] pt-24 pb-10 px-6 overflow-y-auto lg:hidden flex flex-col"
+
+                >
+
+                  {/* Liens Principaux */}
+
+                  <nav className="flex-1 space-y-2">
+
+                    <MobileLink to="/" icon={<Home size={20} />} label="Accueil" onClick={() => setMobileMenuOpen(false)} />
+
+                    <MobileLink to="/news" icon={<Newspaper size={20} />} label="Actualités" onClick={() => setMobileMenuOpen(false)} />
+
+                    <MobileLink to="/showroom" icon={<MonitorPlay size={20} />} label="Showroom" onClick={() => setMobileMenuOpen(false)} />
+
+                    
+
+                    {/* Séparateur */}
+
+                    <div className="my-6 border-t border-gray-100 dark:border-white/5"></div>
+
+      
+
+                    {/* Outils Membres */}
+
+                    {user && (
+
+                      <div className="space-y-4">
+
+                        <p className="text-xs font-black uppercase tracking-widest text-gray-400 pl-2">Espace Étudiant</p>
+
+                        <div className="grid grid-cols-2 gap-3">
+
+                          <MobileGridItem to="/knowledge" icon={<BookOpen size={18} />} label="Cours" color="bg-blue-50 text-blue-600" onClick={() => setMobileMenuOpen(false)} />
+
+                          <MobileGridItem to="/cv-generator" icon={<FileText size={18} />} label="CV Pro" color="bg-purple-50 text-purple-600" onClick={() => setMobileMenuOpen(false)} />
+
+                          <MobileGridItem to="/career" icon={<Rocket size={18} />} label="Carrières" color="bg-orange-50 text-orange-600" onClick={() => setMobileMenuOpen(false)} />
+
+                          <MobileGridItem to="/network" icon={<Users size={18} />} label="Réseau" color="bg-green-50 text-green-600" onClick={() => setMobileMenuOpen(false)} />
+
+                          <MobileGridItem to="/elections" icon={<Vote size={18} />} label="Votes" color="bg-gray-50 text-gray-600" onClick={() => setMobileMenuOpen(false)} />
+
+                        </div>
+
+                      </div>
+
+                    )}
+
+      
+
+                    {/* Outils Admin */}
+
+                    {isAdmin && (
+
+                      <div className="mt-8 space-y-4">
+
+                        <p className="text-xs font-black uppercase tracking-widest text-red-400 pl-2">Administration</p>
+
+                        <Link to="/admin" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-4 p-4 rounded-2xl bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/20">
+
+                          <div className="p-2 bg-red-500 text-white rounded-lg"><ShieldCheck size={18} /></div>
+
+                          <span className="font-bold text-red-600 dark:text-red-400">Accéder à la console</span>
+
+                        </Link>
+
+                      </div>
+
+                    )}
+
+                  </nav>
+
+      
+
+                  {/* Footer Menu */}
+
+                  <div className="mt-8 pt-8 border-t border-gray-100 dark:border-white/5">
+
+                    {user ? (
+
+                      <div className="flex flex-col gap-4">
+
+                        <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)} className="w-full py-4 bg-ucak-blue text-white rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-2 shadow-xl shadow-ucak-blue/20">
+
+                          <LayoutDashboard size={18} /> Mon Tableau de bord
+
+                        </Link>
+
+                        <button onClick={() => { logout(); setMobileMenuOpen(false); }} className="w-full py-4 text-red-500 font-bold text-xs uppercase tracking-widest hover:bg-red-50 dark:hover:bg-red-900/10 rounded-2xl transition-colors">
+
+                          Déconnexion
+
+                        </button>
+
+                      </div>
+
+                    ) : (
+
+                      <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="w-full py-4 bg-gray-900 dark:bg-white text-white dark:text-black rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-2 shadow-lg">
+
+                        <User size={18} /> Se Connecter
+
+                      </Link>
+
+                    )}
+
+                  </div>
+
+                </motion.div>
+
+              )}
+
+            </AnimatePresence>
+
           </>
-        )}
-      </AnimatePresence>
-    </>
-  );
-}
+
+        );
+
+      }
+
+      
+
+      // Composants Mobile Helper
+
+      const MobileLink = ({ to, icon, label, onClick }) => (
+
+        <Link to={to} onClick={onClick} className="flex items-center gap-4 p-4 rounded-2xl hover:bg-gray-50 dark:hover:bg-white/5 transition-all active:scale-95 group">
+
+          <div className="text-gray-400 group-hover:text-ucak-blue transition-colors">{icon}</div>
+
+          <span className="font-bold text-xl text-gray-800 dark:text-white group-hover:text-ucak-blue transition-colors">{label}</span>
+
+          <ChevronDown className="-rotate-90 ml-auto text-gray-300" size={16} />
+
+        </Link>
+
+      );
+
+      
+
+      const MobileGridItem = ({ to, icon, label, color, onClick }) => (
+
+        <Link to={to} onClick={onClick} className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-gray-50 dark:bg-white/5 border border-transparent hover:border-ucak-blue/20 transition-all active:scale-95">
+
+          <div className={`p-2 rounded-xl ${color} bg-opacity-10 dark:bg-opacity-20`}>{icon}</div>
+
+          <span className="text-[10px] font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wide">{label}</span>
+
+        </Link>
+
+      );
+
+      
