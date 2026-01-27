@@ -1,6 +1,8 @@
 // src/context/UserContext.jsx
 import { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
+import { signInWithPopup } from "firebase/auth";
+import { auth, googleProvider } from "../firebase";
 
 // Création du contexte
 const UserContext = createContext();
@@ -90,6 +92,42 @@ function UserProvider({ children }) {
   };
 
   /**
+   * Fonction de connexion via Google
+   */
+  const loginWithGoogle = async () => {
+    try {
+      // 1. Authentification Firebase (Client)
+      const result = await signInWithPopup(auth, googleProvider);
+      const firebaseToken = await result.user.getIdToken();
+      
+      // 2. Échange avec le Backend (Pour créer la session App)
+      // On envoie le token + infos utiles pour pré-remplir le profil si nouveau
+      const response = await api.post('/api/v1/auth/google', {
+        token: firebaseToken,
+        email: result.user.email,
+        full_name: result.user.displayName,
+        photo_url: result.user.photoURL
+      });
+
+      const { access_token, user: userData } = response.data;
+
+      // 3. Stockage Session
+      localStorage.setItem('token', access_token);
+      localStorage.setItem('club_met_user', JSON.stringify(userData));
+      api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+      setUser(userData);
+
+      return { success: true };
+    } catch (error) {
+      console.error("Erreur Google Auth:", error);
+      return { 
+        success: false, 
+        message: error.response?.data?.message || "Échec de l'authentification Google"
+      };
+    }
+  };
+
+  /**
    * Fonction de déconnexion
    */
   const logout = () => {
@@ -100,7 +138,7 @@ function UserProvider({ children }) {
   };
 
   return (
-    <UserContext.Provider value={{ user, login, register, logout, loading, isAdmin }}>
+    <UserContext.Provider value={{ user, login, register, loginWithGoogle, logout, loading, isAdmin }}>
       {children}
     </UserContext.Provider>
   );
