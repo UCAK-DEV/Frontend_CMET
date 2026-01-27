@@ -22,40 +22,40 @@ const ITExpansion = () => {
   };
 
   return (
-    <div className="pt-8 text-white">
-      <div className="mb-8 p-8 bg-gradient-to-r from-[#0f172a] to-[#1e3a8a] rounded-[2rem] border border-white/10 relative overflow-hidden">
+    <div className="pt-4 md:pt-8 text-white">
+      <div className="mb-6 md:mb-8 p-6 md:p-8 bg-gradient-to-r from-[#0f172a] to-[#1e3a8a] rounded-[1.5rem] md:rounded-[2rem] border border-white/10 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl"></div>
-        <h4 className="text-2xl font-black text-white mb-3 relative z-10 flex items-center gap-3"><Cpu className="text-ucak-gold" /> Licence Informatique & Télécoms</h4>
-        <p className="text-sm text-gray-300 italic relative z-10">"Former des experts capables de concevoir et sécuriser les infrastructures numériques."</p>
+        <h4 className="text-xl md:text-2xl font-black text-white mb-3 relative z-10 flex items-center gap-3"><Cpu className="text-ucak-gold w-5 h-5 md:w-6 md:h-6" /> <span className="leading-tight">Licence Informatique & Télécoms</span></h4>
+        <p className="text-xs md:text-sm text-gray-300 italic relative z-10 leading-relaxed">"Former des experts capables de concevoir et sécuriser les infrastructures numériques."</p>
       </div>
 
-      <div className="flex flex-wrap items-center gap-4 mb-8">
-        <div className="flex gap-2 p-1 bg-white/5 rounded-full">
+      <div className="flex flex-wrap items-center gap-3 md:gap-4 mb-6 md:mb-8">
+        <div className="flex gap-1.5 p-1 bg-white/5 rounded-full">
           {['L1', 'L2', 'L3'].map(year => (
-            <button key={year} onClick={(e) => {e.stopPropagation(); setActiveYear(year)}} className={`px-6 py-2 rounded-full text-xs font-black uppercase transition-all ${activeYear === year ? 'bg-ucak-gold text-black shadow-lg' : 'text-gray-400'}`}>{year}</button>
+            <button key={year} onClick={(e) => {e.stopPropagation(); setActiveYear(year)}} className={`px-4 md:px-6 py-1.5 md:py-2 rounded-full text-[10px] md:text-xs font-black uppercase transition-all ${activeYear === year ? 'bg-ucak-gold text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}>{year}</button>
           ))}
         </div>
         {activeYear === 'L3' && (
-          <div className="flex bg-blue-900/30 p-1 rounded-xl border border-blue-500/20">
+          <div className="flex flex-wrap bg-blue-900/30 p-1 rounded-xl border border-blue-500/20 gap-1">
             {['DAR', 'ASR', 'RT'].map(opt => (
-              <button key={opt} onClick={(e) => {e.stopPropagation(); setOptionL3(opt)}} className={`px-4 py-1.5 rounded-lg text-[10px] font-bold transition-all ${optionL3 === opt ? 'bg-blue-500 text-white' : 'text-blue-300'}`}>Option {opt}</button>
+              <button key={opt} onClick={(e) => {e.stopPropagation(); setOptionL3(opt)}} className={`px-3 py-1 rounded-lg text-[9px] md:text-[10px] font-bold transition-all ${optionL3 === opt ? 'bg-blue-500 text-white' : 'text-blue-300'}`}>{opt}</button>
             ))}
           </div>
         )}
       </div>
 
-      <motion.div key={activeYear + optionL3} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
+      <motion.div key={activeYear + optionL3} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 md:mb-10">
         {(activeYear === 'L3' ? curriculum['L3'].options[optionL3] : curriculum[activeYear].semesters).map(sem => (
-          <div key={sem.id} className="bg-white/5 p-6 rounded-2xl border border-white/5 hover:border-blue-500/30 transition-colors">
-            <div className="flex justify-between items-center mb-4"><span className="text-blue-400 font-black text-xs">{sem.id}</span><span className="text-[10px] bg-blue-500/10 px-2 py-1 rounded text-blue-300 font-bold">30 Crédits</span></div>
-            <h5 className="font-bold text-white mb-4">{sem.title}</h5>
-            <ul className="space-y-2">{sem.courses.map(c => (<li key={c} className="flex items-center gap-2 text-xs text-gray-400"><div className="w-1 h-1 rounded-full bg-ucak-gold"></div> {c}</li>))}</ul>
+          <div key={sem.id} className="bg-white/5 p-5 md:p-6 rounded-2xl border border-white/5 hover:border-blue-500/30 transition-colors">
+            <div className="flex justify-between items-center mb-4"><span className="text-blue-400 font-black text-[10px] md:text-xs uppercase">{sem.id}</span><span className="text-[9px] md:text-[10px] bg-blue-500/10 px-2 py-1 rounded text-blue-300 font-bold">30 Crédits</span></div>
+            <h5 className="font-bold text-sm md:text-base text-white mb-4">{sem.title}</h5>
+            <ul className="space-y-2">{sem.courses.map(c => (<li key={c} className="flex items-start gap-2 text-[11px] md:text-xs text-gray-400 leading-tight"><div className="w-1 h-1 rounded-full bg-ucak-gold shrink-0 mt-1.5"></div> {c}</li>))}</ul>
           </div>
         ))}
       </motion.div>
 
-      <button onClick={generateITBrochure} className="w-full py-4 bg-ucak-blue text-white rounded-2xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-ucak-green transition-colors shadow-lg">
-        <Download size={16} /> Télécharger la Brochure Complète (PDF)
+      <button onClick={generateITBrochure} className="w-full py-4 bg-ucak-blue text-white rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-ucak-green transition-colors shadow-lg active:scale-95">
+        <Download size={16} /> Télécharger la Brochure (PDF)
       </button>
     </div>
   );
@@ -76,40 +76,40 @@ const HECExpansion = () => {
   };
 
   return (
-    <div className="pt-8 text-white">
-      <div className="mb-8 p-8 bg-gradient-to-r from-[#2c1a4d] to-[#1e1b4b] rounded-[2rem] border border-white/10 relative overflow-hidden">
+    <div className="pt-4 md:pt-8 text-white">
+      <div className="mb-6 md:mb-8 p-6 md:p-8 bg-gradient-to-r from-[#2c1a4d] to-[#1e1b4b] rounded-[1.5rem] md:rounded-[2rem] border border-white/10 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl"></div>
-        <h4 className="text-2xl font-black text-white mb-3 relative z-10 flex items-center gap-3"><Building2 className="text-ucak-gold" /> Hautes Études Commerciales (HEC)</h4>
-        <p className="text-sm text-gray-300 italic relative z-10">"Former des managers responsables sur le modèle de l'excellence académique."</p>
+        <h4 className="text-xl md:text-2xl font-black text-white mb-3 relative z-10 flex items-center gap-3"><Building2 className="text-ucak-gold w-5 h-5 md:w-6 md:h-6" /> <span className="leading-tight">Hautes Études Commerciales (HEC)</span></h4>
+        <p className="text-xs md:text-sm text-gray-300 italic relative z-10 leading-relaxed">"Former des managers responsables sur le modèle de l'excellence académique."</p>
       </div>
 
-      <div className="flex flex-wrap items-center gap-4 mb-8">
-        <div className="flex gap-2 p-1 bg-white/5 rounded-full">
+      <div className="flex flex-wrap items-center gap-3 md:gap-4 mb-6 md:mb-8">
+        <div className="flex gap-1.5 p-1 bg-white/5 rounded-full">
           {['L1', 'L2', 'L3'].map(year => (
-            <button key={year} onClick={(e) => {e.stopPropagation(); setActiveYear(year)}} className={`px-6 py-2 rounded-full text-xs font-black uppercase transition-all ${activeYear === year ? 'bg-ucak-gold text-black shadow-lg' : 'text-gray-400'}`}>{year}</button>
+            <button key={year} onClick={(e) => {e.stopPropagation(); setActiveYear(year)}} className={`px-4 md:px-6 py-1.5 md:py-2 rounded-full text-[10px] md:text-xs font-black uppercase transition-all ${activeYear === year ? 'bg-ucak-gold text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}>{year}</button>
           ))}
         </div>
         {activeYear === 'L3' && (
-          <div className="flex bg-purple-900/30 p-1 rounded-xl border border-purple-500/20">
+          <div className="flex flex-wrap bg-purple-900/30 p-1 rounded-xl border border-purple-500/20 gap-1">
             {['CCG', 'ECE'].map(opt => (
-              <button key={opt} onClick={(e) => {e.stopPropagation(); setOptionL3(opt)}} className={`px-4 py-1.5 rounded-lg text-[10px] font-bold transition-all ${optionL3 === opt ? 'bg-purple-500 text-white' : 'text-purple-300'}`}>Option {opt}</button>
+              <button key={opt} onClick={(e) => {e.stopPropagation(); setOptionL3(opt)}} className={`px-3 py-1 rounded-lg text-[9px] md:text-[10px] font-bold transition-all ${optionL3 === opt ? 'bg-purple-500 text-white' : 'text-purple-300'}`}>{opt}</button>
             ))}
           </div>
         )}
       </div>
 
-      <motion.div key={activeYear + optionL3} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
+      <motion.div key={activeYear + optionL3} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 md:mb-10">
         {(activeYear === 'L3' ? curriculum['L3'].options[optionL3] : curriculum[activeYear].semesters).map(sem => (
-          <div key={sem.id} className="bg-white/5 p-6 rounded-2xl border border-white/5 hover:border-purple-500/30 transition-colors">
-            <div className="flex justify-between items-center mb-4"><span className="text-purple-400 font-black text-xs">{sem.id}</span><span className="text-[10px] bg-purple-500/10 px-2 py-1 rounded text-purple-300 font-bold">30 Crédits</span></div>
-            <h5 className="font-bold text-white mb-4">{sem.title}</h5>
-            <ul className="space-y-2">{sem.courses.map(c => (<li key={c} className="flex items-center gap-2 text-xs text-gray-400"><div className="w-1 h-1 rounded-full bg-ucak-gold"></div> {c}</li>))}</ul>
+          <div key={sem.id} className="bg-white/5 p-5 md:p-6 rounded-2xl border border-white/5 hover:border-purple-500/30 transition-colors">
+            <div className="flex justify-between items-center mb-4"><span className="text-purple-400 font-black text-[10px] md:text-xs uppercase">{sem.id}</span><span className="text-[9px] md:text-[10px] bg-purple-500/10 px-2 py-1 rounded text-purple-300 font-bold">30 Crédits</span></div>
+            <h5 className="font-bold text-sm md:text-base text-white mb-4">{sem.title}</h5>
+            <ul className="space-y-2">{sem.courses.map(c => (<li key={c} className="flex items-start gap-2 text-[11px] md:text-xs text-gray-400 leading-tight"><div className="w-1 h-1 rounded-full bg-ucak-gold shrink-0 mt-1.5"></div> {c}</li>))}</ul>
           </div>
         ))}
       </motion.div>
 
-      <button onClick={generateHECBrochure} className="w-full py-4 bg-purple-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-purple-500 transition-colors shadow-lg">
-        <FileText size={16} /> Télécharger la Brochure Complète (PDF)
+      <button onClick={generateHECBrochure} className="w-full py-4 bg-purple-600 text-white rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-purple-500 transition-colors shadow-lg active:scale-95">
+        <FileText size={16} /> Télécharger la Brochure (PDF)
       </button>
     </div>
   );
@@ -117,30 +117,37 @@ const HECExpansion = () => {
 
 const DepartmentDrawer = ({ dept, isOpen, onClick }) => {
   return (
-    <motion.div layout initial={false} className={`border-b border-gray-100 dark:border-gray-800 overflow-hidden transition-all duration-500 ${isOpen ? 'bg-white dark:bg-ucak-dark-card shadow-2xl rounded-[2.5rem] my-8 border-none ring-1 ring-ucak-blue/20' : 'bg-transparent hover:bg-gray-50 dark:hover:bg-white/5'}`}>
-      <button onClick={onClick} className="w-full flex items-center justify-between p-8 text-left focus:outline-none group">
-        <div className="flex items-center gap-6">
-          <div className={`relative p-5 rounded-2xl transition-all duration-500 ${isOpen ? 'bg-ucak-blue text-white scale-110 rotate-6 shadow-lg' : 'bg-gray-100 dark:bg-white/5 text-gray-400 group-hover:text-ucak-blue'}`}><dept.icon size={32} /></div>
-          <div><h3 className={`text-2xl font-black tracking-tight transition-colors ${isOpen ? 'text-ucak-blue dark:text-white' : 'text-gray-700 dark:text-gray-300'}`}>{dept.title}</h3><p className="text-sm text-gray-400 font-bold uppercase tracking-widest">{dept.shortDesc}</p></div>
+    <motion.div layout initial={false} className={`border-b border-gray-100 dark:border-gray-800 overflow-hidden transition-all duration-500 ${isOpen ? 'bg-white dark:bg-ucak-dark-card shadow-2xl rounded-[1.5rem] md:rounded-[2.5rem] my-4 md:my-8 border-none ring-1 ring-ucak-blue/20' : 'bg-transparent hover:bg-gray-50 dark:hover:bg-white/5'}`}>
+      <button onClick={onClick} className="w-full flex items-center justify-between p-5 md:p-8 text-left focus:outline-none group">
+        <div className="flex items-center gap-4 md:gap-6">
+          <div className={`relative p-3 md:p-5 rounded-xl md:rounded-2xl transition-all duration-500 shrink-0 ${isOpen ? 'bg-ucak-blue text-white scale-110 rotate-6 shadow-lg' : 'bg-gray-100 dark:bg-white/5 text-gray-400 group-hover:text-ucak-blue'}`}>
+            <dept.icon size={isOpen ? 24 : 20} className="md:w-8 md:h-8" />
+          </div>
+          <div className="min-w-0">
+            <h3 className={`text-base md:text-2xl font-black tracking-tight transition-colors truncate ${isOpen ? 'text-ucak-blue dark:text-white' : 'text-gray-700 dark:text-gray-300'}`}>{dept.title}</h3>
+            <p className="text-[9px] md:text-sm text-gray-400 font-bold uppercase tracking-widest truncate">{dept.shortDesc}</p>
+          </div>
         </div>
-        <div className="flex items-center gap-4">
-          {!isOpen && <span className={`hidden md:block text-[10px] px-3 py-1 rounded-full font-black tracking-widest border ${dept.status === 'Ouvert' ? 'border-green-200 text-green-600 bg-green-50' : 'border-gray-200 text-gray-400'}`}>{dept.status === 'Ouvert' ? 'ADMISSION' : 'BIENTÔT'}</span>}
-          <motion.div animate={{ rotate: isOpen ? 180 : 0 }} className={isOpen ? 'text-ucak-blue' : 'text-gray-300'}><ChevronDown size={24} /></motion.div>
+        <div className="flex items-center gap-2 md:gap-4 shrink-0 ml-2">
+          {!isOpen && <span className={`hidden sm:block text-[9px] px-2 py-1 rounded-full font-black tracking-widest border ${dept.status === 'Ouvert' ? 'border-green-200 text-green-600 bg-green-50' : 'border-gray-200 text-gray-400'}`}>{dept.status === 'Ouvert' ? 'ADMISSION' : 'BIENTÔT'}</span>}
+          <motion.div animate={{ rotate: isOpen ? 180 : 0 }} className={isOpen ? 'text-ucak-blue' : 'text-gray-300'}><ChevronDown size={20} className="md:w-6 md:h-6" /></motion.div>
         </div>
       </button>
       <AnimatePresence>
         {isOpen && (
           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.4 }}>
-            <div className="px-8 pb-10 md:pl-[8rem] md:pr-16">
+            <div className="px-5 pb-10 md:pl-[8rem] md:pr-16">
               
-              <div className="mb-10 prose dark:prose-invert max-w-none text-gray-600 dark:text-gray-300 text-sm md:text-base leading-relaxed text-justify border-l-4 border-ucak-gold pl-6 py-2">
+              {/* TEXTE DESCRIPTIF PRINCIPAL */}
+              <div className="mb-8 prose dark:prose-invert max-w-none text-gray-600 dark:text-gray-300 text-[13px] md:text-base leading-relaxed text-left md:text-justify border-l-4 border-ucak-gold pl-4 md:pl-6 py-1">
                 <p>{dept.fullText}</p>
               </div>
 
+              {/* CONTENU SPÉCIFIQUE (Programme) */}
               {dept.type === 'IT' ? <ITExpansion /> : dept.type === 'HEC' ? <HECExpansion /> : (
-                <div className="py-4">
-                  <div className="bg-gray-50 dark:bg-white/5 p-6 rounded-2xl border border-gray-100 dark:border-white/10 flex items-center gap-4 text-gray-500">
-                    <Lock size={20} /> <span className="text-sm font-bold">Programme académique en cours de finalisation.</span>
+                <div className="py-2">
+                  <div className="bg-gray-50 dark:bg-white/5 p-5 rounded-2xl border border-gray-100 dark:border-white/10 flex items-center gap-3 text-gray-500">
+                    <Lock size={18} className="shrink-0" /> <span className="text-xs md:text-sm font-bold">Programme académique en cours de finalisation.</span>
                   </div>
                 </div>
               )}
@@ -185,10 +192,13 @@ export default function DepartmentsSection() {
   ];
 
   return (
-    <section className="py-24 px-6 relative z-20">
+    <section className="py-16 md:py-24 px-6 relative z-20">
       <div className="container mx-auto max-w-5xl">
-         <div className="text-center mb-16"><span className="text-ucak-green font-black text-xs uppercase tracking-[0.5em] block mb-6">Nos Départements</span><h2 className="text-5xl md:text-6xl font-black text-ucak-blue dark:text-white leading-none tracking-tighter mb-4">Filières d'Excellence</h2></div>
-         <div className="space-y-4">
+         <div className="text-center mb-12 md:mb-16">
+           <span className="text-ucak-green font-black text-xs uppercase tracking-[0.5em] block mb-4 md:mb-6">Nos Départements</span>
+           <h2 className="text-3xl md:text-6xl font-black text-ucak-blue dark:text-white leading-none tracking-tighter mb-4">Filières d'Excellence</h2>
+         </div>
+         <div className="space-y-3 md:space-y-4">
             {departments.map((dept, idx) => (
               <DepartmentDrawer 
                 key={idx} 
