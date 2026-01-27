@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Github, ExternalLink, Plus, Code, Rocket, X, Edit2, Loader2, 
   Sparkles, Search, ArrowUpRight, Cpu, User, Terminal, Briefcase, 
-  PenTool, HardHat, FileText, Filter
+  PenTool, HardHat, FileText, Filter, Trash2
 } from 'lucide-react';
 
 // Configuration des catégories
@@ -81,6 +81,19 @@ export default function Showroom() {
       fetchProjects();
     } catch (error) {
       alert("Erreur lors de l'enregistrement.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Voulez-vous vraiment supprimer ce projet ?")) return;
+    setLoading(true);
+    try {
+      await api.delete(`/api/v1/projects/${id}`);
+      fetchProjects();
+    } catch (error) {
+      alert("Impossible de supprimer le projet.");
     } finally {
       setLoading(false);
     }
@@ -211,14 +224,24 @@ export default function Showroom() {
                         {catKey}
                       </span>
 
-                      {/* Edit Button */}
+                      {/* Edit & Delete Buttons */}
                       {user && user.id === project.userId && (
-                        <button 
-                          onClick={() => handleOpenEdit(project)}
-                          className="absolute top-8 right-20 p-2 text-gray-300 hover:text-ucak-blue transition-colors"
-                        >
-                          <Edit2 size={14} />
-                        </button>
+                        <div className="absolute top-8 right-8 flex gap-2">
+                          <button 
+                            onClick={() => handleOpenEdit(project)}
+                            className="p-2 text-gray-300 hover:text-ucak-blue transition-colors bg-white dark:bg-black/20 rounded-lg opacity-0 group-hover:opacity-100"
+                            title="Modifier"
+                          >
+                            <Edit2 size={14} />
+                          </button>
+                          <button 
+                            onClick={() => handleDelete(project.id)}
+                            className="p-2 text-gray-300 hover:text-red-500 transition-colors bg-white dark:bg-black/20 rounded-lg opacity-0 group-hover:opacity-100"
+                            title="Supprimer"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
                       )}
                     </div>
 
