@@ -46,7 +46,7 @@ export default function AdminQuizzes() {
   };
 
   return (
-    <div className="min-h-screen bg-[#fafafa] dark:bg-[#020408] pt-32 pb-20 px-6 relative">
+    <div className="min-h-screen bg-[#fafafa] dark:bg-[#020408] pt-24 md:pt-32 pb-20 px-6 relative">
       <div className="fixed inset-0 ucak-grid-pattern opacity-[0.03] dark:opacity-[0.05] pointer-events-none"></div>
 
       <div className="max-w-7xl mx-auto relative z-10">

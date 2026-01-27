@@ -46,7 +46,7 @@ export default function AdminStudents() {
   };
 
   return (
-    <div className="min-h-screen bg-[#fafafa] dark:bg-[#020408] pt-32 pb-20 px-6">
+    <div className="min-h-screen bg-[#fafafa] dark:bg-[#020408] pt-24 md:pt-32 pb-20 px-6">
       <div className="max-w-7xl mx-auto relative z-10">
         
         {/* --- HEADER ÉDITORIAL --- */}
@@ -82,8 +82,58 @@ export default function AdminStudents() {
           <QuickStat label="En attente" val={stats.pending} icon={<Activity />} color="text-gray-400" />
         </div>
 
-        {/* --- TABLEAU DE GESTION --- */}
-        <div className="bg-white dark:bg-[#0b101a] rounded-[3rem] border border-gray-100 dark:border-white/5 shadow-2xl overflow-hidden">
+        {/* --- VUE MOBILE : CARTES --- */}
+        <div className="md:hidden space-y-4">
+          <AnimatePresence>
+            {filtered.map((s, idx) => (
+              <motion.div
+                key={s.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.05 }}
+                className="bg-white dark:bg-[#0b101a] p-6 rounded-[2rem] border border-gray-100 dark:border-white/5 shadow-sm"
+              >
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-12 h-12 bg-ucak-blue/10 text-ucak-blue rounded-xl flex items-center justify-center font-black text-lg">
+                    {s.full_name.charAt(0)}
+                  </div>
+                  <div>
+                    <h3 className="font-black text-gray-900 dark:text-white">{s.full_name}</h3>
+                    <p className="text-xs text-gray-400 font-bold uppercase">{s.matricule}</p>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-2 mb-4 text-xs">
+                  <div className="bg-gray-50 dark:bg-white/5 p-3 rounded-xl">
+                    <p className="text-gray-400 font-bold uppercase text-[9px]">Filière</p>
+                    <p className="font-bold dark:text-white">{s.filiere}</p>
+                  </div>
+                  <div className="bg-gray-50 dark:bg-white/5 p-3 rounded-xl">
+                    <p className="text-gray-400 font-bold uppercase text-[9px]">XP</p>
+                    <p className="font-bold text-ucak-blue">{s.xp_points} pts</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between mt-4 border-t border-gray-100 dark:border-white/5 pt-4">
+                   {s.is_ufr_verified ? (
+                      <span className="text-ucak-gold text-[10px] font-black uppercase flex items-center gap-1"><ShieldCheck size={14}/> Vérifié</span>
+                   ) : (
+                      <span className="text-gray-400 text-[10px] font-black uppercase flex items-center gap-1"><XCircle size={14}/> En attente</span>
+                   )}
+                   <button 
+                      onClick={() => toggleVerify(s.id)}
+                      className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest ${s.is_ufr_verified ? 'bg-red-50 text-red-500' : 'bg-ucak-blue text-white'}`}
+                   >
+                      {s.is_ufr_verified ? 'Révoquer' : 'Valider'}
+                   </button>
+                </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
+
+        {/* --- VUE DESKTOP : TABLEAU --- */}
+        <div className="hidden md:block bg-white dark:bg-[#0b101a] rounded-[3rem] border border-gray-100 dark:border-white/5 shadow-2xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>

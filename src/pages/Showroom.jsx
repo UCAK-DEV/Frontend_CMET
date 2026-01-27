@@ -77,7 +77,7 @@ export default function Showroom() {
   );
 
   return (
-    <div className="min-h-screen bg-[#fafafa] dark:bg-[#020408] pt-32 pb-24 px-6 overflow-hidden relative">
+    <div className="min-h-screen bg-[#fafafa] dark:bg-[#020408] pt-24 md:pt-32 pb-24 px-6 overflow-hidden relative">
       
       {/* --- BACKGROUND TECH DECOR --- */}
       <div className="fixed inset-0 ucak-grid-pattern opacity-[0.03] dark:opacity-[0.07] pointer-events-none"></div>
@@ -201,7 +201,7 @@ export default function Showroom() {
             
             <motion.div 
               initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}
-              className="relative bg-white dark:bg-[#0b101a] w-full max-w-2xl rounded-[3rem] p-12 shadow-2xl border border-gray-100 dark:border-white/10"
+              className="relative bg-white dark:bg-[#0b101a] w-full max-w-2xl rounded-[2rem] md:rounded-[3rem] p-8 md:p-12 shadow-2xl border border-gray-100 dark:border-white/10 max-h-[90vh] overflow-y-auto"
             >
               <div className="flex items-center justify-between mb-10">
                 <h2 className="text-4xl font-black dark:text-white tracking-tighter flex items-center gap-4">

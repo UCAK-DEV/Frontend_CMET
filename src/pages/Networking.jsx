@@ -33,7 +33,7 @@ export default function Networking() {
   ];
 
   return (
-    <div className="min-h-screen pt-32 pb-20 bg-gray-50 dark:bg-ucak-dark">
+    <div className="min-h-screen pt-24 md:pt-32 pb-20 bg-gray-50 dark:bg-ucak-dark">
       <div className="container mx-auto px-6 max-w-6xl">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           

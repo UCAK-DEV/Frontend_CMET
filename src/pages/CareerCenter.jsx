@@ -43,7 +43,7 @@ export default function CareerCenter() {
   };
 
   return (
-    <div className="min-h-screen bg-[#fafafa] dark:bg-[#020408] pt-32 pb-20 px-6">
+    <div className="min-h-screen bg-[#fafafa] dark:bg-[#020408] pt-24 md:pt-32 pb-20 px-6">
       <div className="fixed inset-0 ucak-grid-pattern opacity-[0.03] dark:opacity-[0.05] pointer-events-none"></div>
 
       <div className="max-w-7xl mx-auto relative z-10">

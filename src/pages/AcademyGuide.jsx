@@ -25,7 +25,7 @@ export default function AcademyGuide() {
   ];
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#05070a] pt-32 pb-20 px-6">
+    <div className="min-h-screen bg-white dark:bg-[#05070a] pt-24 md:pt-32 pb-20 px-6">
       <div className="max-w-4xl mx-auto">
         
         {/* --- HEADER --- */}

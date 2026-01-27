@@ -71,10 +71,10 @@ export default function Elections() {
     return candidateResult ? Math.round((parseInt(candidateResult.count) / totalVotes) * 100) : 0;
   };
 
-  if (loading) return <div className="min-h-screen pt-32 text-center text-gray-500">Chargement des scrutins...</div>;
+  if (loading) return <div className="min-h-screen pt-24 md:pt-32 text-center text-gray-500">Chargement des scrutins...</div>;
 
   return (
-    <div className="min-h-screen pt-32 pb-20 bg-gray-50 dark:bg-ucak-dark px-6">
+    <div className="min-h-screen pt-24 md:pt-32 pb-20 bg-gray-50 dark:bg-ucak-dark px-6">
       <div className="container mx-auto max-w-5xl">
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-ucak-blue/10 text-ucak-blue rounded-full text-xs font-black uppercase tracking-widest mb-4 border border-ucak-blue/20">

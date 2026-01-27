@@ -53,7 +53,7 @@ export default function CVGenerator() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#05070a] pt-32 pb-20 px-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#05070a] pt-24 md:pt-32 pb-20 px-6">
       <div className="max-w-7xl mx-auto flex flex-col xl:flex-row gap-12">
         
         {/* --- ÉDITEUR (GAUCHE) --- */}
