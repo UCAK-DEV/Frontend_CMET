@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Facebook, Twitter, Instagram, Linkedin, Mail, MapPin, Phone, Send, Loader2, CheckCircle2 } from 'lucide-react';
-import logoUcak from '../assets/logo-ucak.png';
+import logoUcak from '../assets/images/logo-ucak.png';
 
 export default function Footer() {
   const [email, setEmail] = useState('');

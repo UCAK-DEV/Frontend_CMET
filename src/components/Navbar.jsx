@@ -7,7 +7,7 @@ import {
   Sun, Moon, ShieldCheck, Users, Vote, Settings, Sparkles, Globe
 } from 'lucide-react';
 import { useUser } from '../context/UserContext';
-import logoUcak from '../assets/logo-ucak.png';
+import logoUcak from '../assets/images/logo-ucak.png';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // --- UI COMPONENTS ---
@@ -86,10 +86,10 @@ export default function Navbar() {
   // Si connecté : On regroupe "Accueil/News/Showroom" dans un menu "Exploration" pour gagner de la place
   const visiblePublicLinks = user ? [
     { 
-      name: 'Exploration', type: 'dropdown', id: 'explore', icon: Globe,
+      name: 'UFR Direct', type: 'dropdown', id: 'explore', icon: Globe,
       items: [
         { title: 'Accueil', desc: 'Retour page principale', path: '/', icon: Home },
-        { title: 'Actualités', desc: 'Le journal du club', path: '/news', icon: Newspaper },
+        { title: 'Actualités', desc: 'Actualités & Événements', path: '/news', icon: Newspaper },
         { title: 'Showroom', desc: 'Vitrine projets', path: '/showroom', icon: MonitorPlay }
       ]
     }
@@ -99,7 +99,7 @@ export default function Navbar() {
   const studentLinks = user ? [
     { name: 'Cours', path: '/knowledge', icon: BookOpen },
     { 
-      name: 'Outils MET', type: 'dropdown', id: 'tools', icon: Sparkles,
+      name: 'Services Académiques', type: 'dropdown', id: 'tools', icon: Sparkles,
       items: [
         { title: 'Générateur CV', desc: 'Architecte Pro', path: '/cv-generator', icon: FileText },
         { title: 'Carrière', desc: 'Stages & Emplois', path: '/career', icon: Rocket },
@@ -135,10 +135,10 @@ export default function Navbar() {
       >
         <div className="w-full flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 shrink-0">
-            <img src={logoUcak} alt="Logo" className="w-10 h-10" />
+            <img src={logoUcak} alt="Logo" className="w-10 h-10 rounded-full" />
             <div className="flex flex-col">
-              <span className="text-xl font-black dark:text-white tracking-tighter uppercase">Club MET</span>
-              <span className="text-[8px] font-black text-ucak-blue dark:text-ucak-gold uppercase tracking-[0.3em]">Excellence UCAK</span>
+              <span className="text-xl font-black dark:text-white tracking-tighter uppercase">UFR MET</span>
+
             </div>
           </Link>
 
@@ -201,9 +201,9 @@ export default function Navbar() {
 
               <Link to="/" className="flex items-center gap-3" onClick={() => setMobileMenuOpen(false)}>
 
-                <img src={logoUcak} alt="Logo" className="w-8 h-8" />
+                <img src={logoUcak} alt="Logo" className="w-8 h-8 rounded-full" />
 
-                <span className="font-black text-lg dark:text-white uppercase tracking-tighter">Club MET</span>
+                <span className="font-black text-lg dark:text-white uppercase tracking-tighter">UFR MET</span>
 
               </Link>
 

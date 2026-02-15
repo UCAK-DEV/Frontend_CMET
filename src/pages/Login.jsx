@@ -3,7 +3,7 @@ import { useUser } from '../context/UserContext';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, Lock, Loader2, User, GraduationCap, Users } from 'lucide-react';
-import logoUcak from '../assets/logo-ucak.png';
+import logoUcak from '../assets/images/logo-ucak.png';
 
 const InputField = ({ icon: Icon, ...props }) => (
   <div className="group relative">
