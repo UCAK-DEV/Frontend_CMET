@@ -203,7 +203,7 @@ export default function Dashboard() {
                     {stats.students.pending} étudiants sont en attente de validation UFR pour accéder aux votes.
                   </p>
                   <Link to="/admin/students" className="text-[10px] font-black uppercase tracking-widest text-orange-600 underline">
-                    Voir la liste ->
+                    Voir la liste &rarr;
                   </Link>
                 </div>
               )}

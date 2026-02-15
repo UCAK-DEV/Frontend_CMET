@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ShieldCheck, XCircle, CheckCircle2, AlertTriangle, User, Calendar, Award } from 'lucide-react';
 import { api } from '../context/UserContext';
-import logoUcak from '../assets/logo-ucak.png';
+import logoUcak from '../assets/images/logo-ucak.png';
 
 export default function VerifyStudent() {
   const { token } = useParams();
